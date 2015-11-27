@@ -1,6 +1,6 @@
 var MqttNode = require('./index');
 
-var mqNode = new MqttNode('mnode_1', 1000, '1.1.1', '192.168.1.106', '00:0c:29:71:74:9f');
+var mqNode = new MqttNode('mnode_1', 2000, '1.1.1', '192.168.1.106', '00:0c:29:71:74:9f');
 var so = MqttNode.Generate('tempSensor');
 mqNode.hookSmartObject(so);
 //console.log(so);
