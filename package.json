@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An ip-based smart thing that plays as a client of mqtt-shepherd server",
   "main": "index.js",
   "scripts": {
