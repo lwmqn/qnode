@@ -25,6 +25,7 @@
     "q": "^1.4.1"
   },
   "devDependencies": {
+    "debug": "^2.2.0",
     "should": "^7.1.1"
   }
 }

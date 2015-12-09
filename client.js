@@ -2,52 +2,66 @@ var MqttNode = require('./index');
 var devAttrs = {
     lifetime: 2000,
     version: '1.1.1',
-    ip: '192.168.1.106',
+    ip: '192.168.1.110',
     mac: '00:0c:29:71:74:9f'
 };
 
-var mqNode = new MqttNode('mnode_1', devAttrs);
+var qnode = new MqttNode('mnode_1', devAttrs);
 var so = MqttNode.SmartObject.getTemplate('tempSensor');
+var newObject = new MqttNode.SmartObject.IObject('device', { manuf: 'sivann2' });
 
-mqNode.bindSo(so);
+qnode.bindSo(so);
+so.tempSensor[0].sensorValue = 241;
+so.device[0].manuf = 'sivannXXXXXX';
+// so.addIObjects(newObject);
 //console.log(so);
-console.log(mqNode.objectList());
+console.log(qnode.objectList());
 
-mqNode.on('request', function (msg) {
-    console.log(msg);
-});
-
-mqNode.on('reg_rsp', function (msg) {
-    console.log(msg);
-});
-
-mqNode.on('connect', function () {
+qnode.on('connect', function () {
     console.log('connect');
+    //console.log(so);
+    // qnode.pubRegister().then(function (res) {
+    //     console.log(res);
+    // });
+
+    setTimeout(function() {
+        setInterval(function () {
+            so.tempSensor[0].sensorValue = 67 + Math.floor(Math.random() * 100 + 1);
+        }, 2000);
+    }, 10000);
 });
 
-mqNode.on('reconnect', function () {
+qnode.on('request', function (msg) {
+    console.log(msg);
+});
+
+qnode.on('reg_rsp', function (msg) {
+    console.log(msg);
+});
+
+qnode.on('reconnect', function () {
     console.log('reconnect');
 });
 
-mqNode.on('close', function () {
+qnode.on('close', function () {
     console.log('close');
 });
 
-mqNode.on('offline', function () {
+qnode.on('offline', function () {
     console.log('offline');
 });
 
-mqNode.on('message', function (topic, message, packet) {
-    //console.log(topic);
-    //console.log(message);
+qnode.on('message', function (topic, message, packet) {
+    // console.log(topic);
+    // console.log(message.toString());
 });
 
-mqNode.on('error', function (err) {
+qnode.on('error', function (err) {
     console.log(err);
     console.log('error');
 });
 
-mqNode.connect('mqtt://localhost', {
+qnode.connect('mqtt://localhost', {
     username: 'freebird',
     password: 'skynyrd'
 });
