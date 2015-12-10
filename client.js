@@ -11,9 +11,9 @@ var so = MqttNode.SmartObject.getTemplate('tempSensor');
 var newObject = new MqttNode.SmartObject.IObject('device', { manuf: 'sivann2' });
 
 qnode.bindSo(so);
-so.tempSensor[0].sensorValue = 241;
-so.device[0].manuf = 'sivannXXXXXX';
-// so.addIObjects(newObject);
+so.tempSensor[0].sensorValue = 300;
+//so.device[0].manuf = 'sivannYYYYYY';
+so.addIObjects(newObject);
 //console.log(so);
 console.log(qnode.objectList());
 
@@ -27,7 +27,7 @@ qnode.on('connect', function () {
     setTimeout(function() {
         setInterval(function () {
             so.tempSensor[0].sensorValue = 67 + Math.floor(Math.random() * 100 + 1);
-        }, 2000);
+        }, 6000);
     }, 10000);
 });
 
