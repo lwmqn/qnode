@@ -7,6 +7,21 @@ var devAttrs = {
 };
 
 var qnode = new MqttNode('mnode_1', devAttrs);
+
+// what client wants
+//      qnode = new MqttNode('mnode_1', devAttrs, 'templateName');  // so is ready
+//      qnode.addIObject(oid, [iid,] ridSet);
+
+// qnode = new MqttNode('mnode_1', devAttrs);
+// qnode.bindSmartObject(name, iObjects);
+
+// qnode = new MqttNode('mnode_1', devAttrs);
+// qnode.bindSmartObject(name);
+// qnode.addIObject(oid, [iid,] ridSet);
+
+// so = new MqttNode.SmartObject(name, iObjects);
+// qnode.bind(so);
+
 var so = MqttNode.SmartObject.getTemplate('tempSensor');
 var newObject = new MqttNode.SmartObject.IObject('device', { manuf: 'sivann2' });
 
