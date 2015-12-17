@@ -53,7 +53,7 @@ qnode.on('connect', function () {
 
     setTimeout(function() {
         setInterval(function () {
-            var val = 67 + Math.floor(Math.random() * 100 + 1);
+            var val = 10 + Math.floor(Math.random() * 100 + 1);
             qnode.writeResrc('tempSensor', 0, 'sensorValue', val).done(function (val) {
                 console.log('WRITE SELF');
                 console.log(val);
@@ -71,12 +71,12 @@ qnode.on('connect', function () {
 });
 
 qnode.on('request', function (msg) {
-    console.log(msg);
+    // console.log(msg);
 });
 
 qnode.on('reg_rsp', function (msg) {
-    console.log('reg_rsp');
-    console.log(msg);
+    //console.log('reg_rsp');
+    //console.log(msg);
     setTimeout(function () {
         // qnode.addIObject('testoid', {
         //     tr1: 1,
@@ -100,18 +100,18 @@ qnode.on('reg_rsp', function (msg) {
 
 
 qnode.on('dereg_rsp', function (msg) {
-    console.log('dereg_rsp');
-    console.log(msg);
+    //console.log('dereg_rsp');
+    //console.log(msg);
 });
 
 
 qnode.on('ping_rsp', function (msg) {
-    console.log('ping_rsp');
-    console.log(msg);
+    //console.log('ping_rsp');
+    //console.log(msg);
 });
 
 qnode.on('notify_rsp', function (msg) {
-    console.log(' [[[[[[[[[ notify_rsp ]]]]]]]]]]]');
+    console.log(' >>>>>>> notify_rsp');
     console.log(msg);
 });
 
@@ -129,7 +129,7 @@ qnode.on('reconnect', function () {
 });
 
 qnode.on('update_rsp', function (rsp) {
-    console.log('update_rsp *****');
+    console.log('>>>>>>> update_rsp');
     console.log(rsp);
 });
 
