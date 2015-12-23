@@ -143,23 +143,23 @@ Create a new instance of the `MqttNode` class.
 
 **Examples:**
 
-    ```javascript
-        var MqttNode = require('mqtt-node');
-        var qnode = new MqttNode('my_foo_client_id', {
-            lifetime: 21600,
-            ip: '192.168.0.99',
-            mac: '00:0c:29:3e:1b:d2',
-            version: 'v0.0.6'
-        });
-            
-        console.log(qnode.clientId);    // 'my_foo_client_id'
-        console.log(qnode.lifetime);    // 108000
-        console.log(qnode.ip);          // '192.168.0.99'
-        console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-        console.log(qnode.version);     // 'v0.0.6'
-        // use .setDevAttrs() to change the device attributes or qnode won't 
-        // automatically publish the update message to the Server.
-    ```
+```javascript
+    var MqttNode = require('mqtt-node');
+    var qnode = new MqttNode('my_foo_client_id', {
+        lifetime: 21600,
+        ip: '192.168.0.99',
+        mac: '00:0c:29:3e:1b:d2',
+        version: 'v0.0.6'
+    });
+        
+    console.log(qnode.clientId);    // 'my_foo_client_id'
+    console.log(qnode.lifetime);    // 108000
+    console.log(qnode.ip);          // '192.168.0.99'
+    console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
+    console.log(qnode.version);     // 'v0.0.6'
+    // use .setDevAttrs() to change the device attributes or qnode won't 
+    // automatically publish the update message to the Server.
+```
 
 <br />
 ### .initResrc(oid, [iid,] resrcs)
@@ -181,114 +181,114 @@ Initialize the Resources on qnode.
 
 Resource is a simple value:  
   
-    ```javascript
-    /********************************************/
-    /*** Client Device Initialzation          ***/
-    /********************************************/
-    // use oid and rids in string
-    qnode.initResrc('humidSensor', 0, {
-        sensorValue: 20,
-        units: 'percent'
-    });
-    // use oid and rids in number
-    qnode.initResrc(3304, 0, {
-        5700: 20,
-        5701: 'percent'
-    });
+```javascript
+/********************************************/
+/*** Client Device Initialzation          ***/
+/********************************************/
+// use oid and rids in string
+qnode.initResrc('humidSensor', 0, {
+    sensorValue: 20,
+    units: 'percent'
+});
+// use oid and rids in number
+qnode.initResrc(3304, 0, {
+    5700: 20,
+    5701: 'percent'
+});
 
-    // using numbers in string will be ok
-    qnode.initResrc('3304', 0, {
-        '5700': 20,
-        '5701': 'percent'
-    });
-    ```
+// using numbers in string will be ok
+qnode.initResrc('3304', 0, {
+    '5700': 20,
+    '5701': 'percent'
+});
+```
   
 <br />
 Resource value is got from particular operations:  
   
-    ```javascript
-    // reading sensed value from an analog interface
-    qnode.initResrc('mySensor', 0, {
-        sensorValue: {
-            read: function (cb) {
-                // assume readSensor() is an asynchronous function or a callback-style function
-                readSensor('aio0', function (val) {
-                    cb(null, val);
-                });
-            }
-            // if write method is not given, this Resource will be considered as unwritable
+```javascript
+// reading sensed value from an analog interface
+qnode.initResrc('mySensor', 0, {
+    sensorValue: {
+        read: function (cb) {
+            // assume readSensor() is an asynchronous function or a callback-style function
+            readSensor('aio0', function (val) {
+                cb(null, val);
+            });
         }
-    });
-    
-    qnode.initResrc('mySensor', 0, {
-        sensorValue: {
-            read: function (cb) {
-                // if the callback of readSensor() is also in err-first style
-                readSensor('aio0', cb);
+        // if write method is not given, this Resource will be considered as unwritable
+    }
+});
+
+qnode.initResrc('mySensor', 0, {
+    sensorValue: {
+        read: function (cb) {
+            // if the callback of readSensor() is also in err-first style
+            readSensor('aio0', cb);
+        }
+    }
+});
+
+qnode.initResrc('mySensor', 0, {
+    sensorValue: {
+        read: function (cb) {
+            // assume readSensor() is a synchronous function
+            try {
+                var val = readSensor('aio0');
+                cb(null, val);
+            } catch (err) {
+                cb(err);
             }
         }
-    });
-    
-    qnode.initResrc('mySensor', 0, {
-        sensorValue: {
-            read: function (cb) {
-                // assume readSensor() is a synchronous function
-                try {
-                    var val = readSensor('aio0');
-                    cb(null, val);
-                } catch (err) {
-                    cb(err);
-                }
-            }
-        }
-    });
-    ```
+    }
+});
+```
   
 <br />
 Resource value needs to be written by particular operations:  
   
-    ```javascript
-    // writing a value to a digital interface
-    qnode.initResrc('mySwitch', 0, {
-        onOff: {
-            // if read method is not given, this Resource will be considered as unreadable
-            read: function (cb) {
-                // do the read procedure
-            },
-            write: function (val, cb) {
-                gpio.write('gpio06', val);
-    
-                var written = gpio.read('gpio06');
-                cb(null, written);
-            }
+```javascript
+// writing a value to a digital interface
+qnode.initResrc('mySwitch', 0, {
+    onOff: {
+        // if read method is not given, this Resource will be considered as unreadable
+        read: function (cb) {
+            // do the read procedure
+        },
+        write: function (val, cb) {
+            gpio.write('gpio06', val);
+
+            var written = gpio.read('gpio06');
+            cb(null, written);
         }
-    });
-    ```
+    }
+});
+```
   
 <br />
 Resource is executable (a procedure on the Client Device):  
   
-    ```javascript    
-    // The Resource is executable
-    qnode.initResrc('myLight', 0, {
-        blink: {
-            read: function (cb) {
-                blinkLed('led1', 10);       // bink led1 for 10 times
-                cb(null, { status: 200 });  // the 2nd argument of cb is a response object
-            }
+```javascript    
+// The Resource is executable
+qnode.initResrc('myLight', 0, {
+    blink: {
+        read: function (cb) {
+            blinkLed('led1', 10);       // bink led1 for 10 times
+            cb(null, { status: 200 });  // the 2nd argument of cb is a response object
         }
-    });
-    
-    qnode.initResrc('myCounter', 0, {
-        count: {
-            read: function (cb) {
-                countSomething(function (err, sum) {
-                    // responds back the status and some data
-                    cb(null, { status: 200, data: sum });
-                });
-            }
+    }
+});
+
+qnode.initResrc('myCounter', 0, {
+    count: {
+        read: function (cb) {
+            countSomething(function (err, sum) {
+                // responds back the status and some data
+                cb(null, { status: 200, data: sum });
+            });
         }
-    });
+    }
+});
     ```
   
 <br />
@@ -304,12 +304,12 @@ Set the device attribues on qnode.
 
 **Examples:**  
   
-    ```javascript
-    // this will publish the update of ip address to the Server
-    qnode.setDevAttrs({
-        ip: '192.168.0.211'
-    });
-    ```
+```javascript
+// this will publish the update of ip address to the Server
+qnode.setDevAttrs({
+    ip: '192.168.0.211'
+});
+```
   
 <br />
 ### .readResrc(oid, iid, rid[, callback])
@@ -329,28 +329,27 @@ Read the value from the allocated Resource.
 
 **Examples:**  
   
-    ```javascript
-    qnode.readResrc('humidSensor', 0, 'sensorValue', function (err, val) {
-        if (err)
-            console.log(err);
-        else
-            console.log(val);   // 20
-    });
+```javascript
+qnode.readResrc('humidSensor', 0, 'sensorValue', function (err, val) {
+    if (err)
+        console.log(err);
+    else
+        console.log(val);   // 20
+});
 
-    qnode.readResrc('humidSensor', 12, 'sensorValue', function (err, val) {
-        if (err)
-            console.log(err);   // if allocating Resource fails 
-    });
+qnode.readResrc('humidSensor', 12, 'sensorValue', function (err, val) {
+    if (err)
+        console.log(err);   // if allocating Resource fails 
+});
 
-    qnode.readResrc('mySensor', 0, 'sensorValue', function (err, val) {
-        console.log(val);       // '_unreadable_' if the Resource cannot be read
-    });
+qnode.readResrc('mySensor', 0, 'sensorValue', function (err, val) {
+    console.log(val);       // '_unreadable_' if the Resource cannot be read
+});
 
-    qnode.readResrc('myLight', 0, 'blink', function (err, val) {
-        console.log(val);       // '_exec_' if the Resource is executable
-    });
-
-    ```
+qnode.readResrc('myLight', 0, 'blink', function (err, val) {
+    console.log(val);       // '_exec_' if the Resource is executable
+});
+```
   
 <br />
 ### .writeResrc(oid, iid, rid, value[, callback])
@@ -370,21 +369,20 @@ Write the value to the allocated Resource.
 
 **Examples:**  
   
-    ```javascript
-    qnode.writeResrc('humidSensor', 0, 'sensorValue', 80, function (err, val) {
-        console.log(val);   // '_unwritable_'
-    });
+```javascript
+qnode.writeResrc('humidSensor', 0, 'sensorValue', 80, function (err, val) {
+    console.log(val);   // '_unwritable_'
+});
 
-    qnode.writeResrc('humidSensor', 12, 'sensorValue', 80, function (err, val) {
-        if (err)
-            console.log(err);   // if the Resource does not exist
-    });
+qnode.writeResrc('humidSensor', 12, 'sensorValue', 80, function (err, val) {
+    if (err)
+        console.log(err);   // if the Resource does not exist
+});
 
-    qnode.writeResrc('mySwitch', 0, 'onOff', 1, function (err, val) {
-        console.log(val);       // 1
-    });
-
-    ```
+qnode.writeResrc('mySwitch', 0, 'onOff', 1, function (err, val) {
+    console.log(val);       // 1
+});
+```
   
 <br />
 ### .connect(url[, opts])
@@ -407,28 +405,27 @@ Connects to the LWMQN Server with the given url and tries to register to the Ser
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('ready', function () {
-        // do your work here
-    });
+```javascript
+qnode.on('ready', function () {
+    // do your work here
+});
 
-    // use default account
-    qnode.connect('mqtt://192.168.0.100');
+// use default account
+qnode.connect('mqtt://192.168.0.100');
 
-    // use your own account
-    // you can encrypt the password if the Server knows how to decrypt it
-    qnode.connect('mqtt://192.168.0.100', {
-        username: 'someone',
-        password: 'somepassword'
-    });
+// use your own account
+// you can encrypt the password if the Server knows how to decrypt it
+qnode.connect('mqtt://192.168.0.100', {
+    username: 'someone',
+    password: 'somepassword'
+});
 
-    // use the MQTT connection options other than defaults
-    qnode.connect('mqtt://192.168.0.100', {
-        keepalive: 30,
-        reconnectPeriod: 5000
-    });
-    ```
-  
+// use the MQTT connection options other than defaults
+qnode.connect('mqtt://192.168.0.100', {
+    keepalive: 30,
+    reconnectPeriod: 5000
+});
+```
   
 <br />
 ### .close([force,] [callback])
@@ -443,13 +440,13 @@ Disconnects from the Server. qnode will fire a `close` event if it is disconnect
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('close', function () {
-        console.log('Disconnected from the Server.');
-    });
+```javascript
+qnode.on('close', function () {
+    console.log('Disconnected from the Server.');
+});
 
-    qnode.close();
-    ```
+qnode.close();
+```
   
 <br />
 ### .pubRegister([callback])
@@ -464,14 +461,14 @@ The qnode fires a `response` event when it received the response of registration
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('response', function (rsp) {
-        if (rsp.type === 'register')
-            console.log(rsp);
-    });
+```javascript
+qnode.on('response', function (rsp) {
+    if (rsp.type === 'register')
+        console.log(rsp);
+});
 
-    qnode.pubRegister();
-    ```
+qnode.pubRegister();
+```
   
 <br />
 ### .pubDeregister([callback])
@@ -487,14 +484,14 @@ The qnode fires a `response` event when it received the response of deregistrati
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('response', function (rsp) {
-        if (rsp.type === 'deregister')
-            console.log(rsp);
-    });
+```javascript
+qnode.on('response', function (rsp) {
+    if (rsp.type === 'deregister')
+        console.log(rsp);
+});
 
-    qnode.pubDeregister();
-    ```
+qnode.pubDeregister();
+```
   
 <br />
 ### .pubNotify(data[, callback])
@@ -512,30 +509,30 @@ The qnode fires a `response` event when it received the acknownledgement from th
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('response', function (rsp) {
-        if (rsp.type === 'notify')
-            console.log(rsp);
-    });
+```javascript
+qnode.on('response', function (rsp) {
+    if (rsp.type === 'notify')
+        console.log(rsp);
+});
 
-    // pub a Resource
-    qnode.pubNotify({
-        oid: humidSensor,
-        iid: 0,
-        rid: 'sensorValue',
-        data: 32
-    });
+// pub a Resource
+qnode.pubNotify({
+    oid: humidSensor,
+    iid: 0,
+    rid: 'sensorValue',
+    data: 32
+});
 
-    // pub an Object Instance
-    qnode.pubNotify({
-        oid: humidSensor,
-        iid: 0,
-        data: {
-            sensorValue: 32,
-            units: 'percent'
-        }
-    });
-    ```
+// pub an Object Instance
+qnode.pubNotify({
+    oid: humidSensor,
+    iid: 0,
+    data: {
+        sensorValue: 32,
+        units: 'percent'
+    }
+});
+```
   
 <br />
 ### .pingServer([callback])
@@ -552,15 +549,15 @@ The qnode fires a `response` event when it received the response from the Server
 
 **Examples:**  
   
-    ```javascript
-    qnode.on('response', function (rsp) {
-        if (rsp.type === 'ping')
-            console.log(rsp);
-    });
+```javascript
+qnode.on('response', function (rsp) {
+    if (rsp.type === 'ping')
+        console.log(rsp);
+});
 
-    // pub a Resource
-    qnode.pingServer();
-    ```
+// pub a Resource
+qnode.pingServer();
+```
   
 <br />
 ### .publish(topic, message[, options][, callback])
@@ -585,9 +582,9 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-    ```javascript
-    qnode.publish('foo/bar/greet', 'Hello World!');
-    ```
+```javascript
+qnode.publish('foo/bar/greet', 'Hello World!');
+```
   
 <br />
 ### .subscribe(topic[, options][, callback])
@@ -606,9 +603,9 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-    ```javascript
-    qnode.subscribe('foo/bar/score');
-    ```
+```javascript
+qnode.subscribe('foo/bar/score');
+```
   
 <br />
 ### .unsubscribe(topic[, callback])
@@ -624,7 +621,7 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-    ```javascript
-    qnode.unsubscribe('foo/bar/score');
-    ```
+```javascript
+qnode.unsubscribe('foo/bar/score');
+```
 
