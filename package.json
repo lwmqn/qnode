@@ -1,7 +1,7 @@
 {
   "name": "mqtt-node",
-  "version": "0.1.2",
-  "description": "An ip-based smart thing that plays as a client of mqtt-shepherd server",
+  "version": "0.1.3",
+  "description": "A client library for a light-weight MQTT machine network",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

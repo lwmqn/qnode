@@ -1,6 +1,5 @@
 mqtt-node
-=========
-A client library for a light-weight MQTT machine network.
+========================
 
 ## Table of Contents
 
@@ -11,7 +10,7 @@ A client library for a light-weight MQTT machine network.
 5. [APIs](#APIs)
 6. [Code Templates](#Templates) 
 
-###<a name="Overiew"></a>
+<a name="Overiew"></a>
 1. Overview
 --------
 
@@ -30,7 +29,7 @@ The `mqtt-node` uses IPSO definitions as its fundamental of the resource organiz
 
 Note: Object, Object Instance and Resource are used by the IPSO specification to describe the hierarchical structure of resources on a Client Device. The oid, iid, and rid are identifiers used to allocate the resource.  
 
-###<a name="Features"></a>
+<a name="Features"></a>
 2. Features
 --------
 * Communication based on the MQTT protocol and the client library [mqtt.js](https://www.npmjs.com/package/mqtt)
@@ -38,17 +37,17 @@ Note: Object, Object Instance and Resource are used by the IPSO specification to
 * Easy to create a Resource on the Client Device
 * LWM2M-like interfaces    
 
-###<a name="Installation"></a>
+<a name="Installation"></a>
 3. Installation
 --------
 > $ npm install mqtt-node --save
 
-###<a name="Basic"></a>
+<a name="Basic"></a>
 4. Basic Usage
 --------
 Client-side exmaple (here is how you are using the `mqtt-node`):
 
-```javascript
+```js
 var MqttNode = require('mqtt-node');
 
 /********************************************/
@@ -82,7 +81,7 @@ qnode.connect('mqtt://192.168.0.2', {
 
 Server-side example (please go to the `mqtt-shepherd` document for details):
 
-```javascript
+```js
 var qnode = shepherd.findNode('my_foo_client_id');
 
 qnode.readReq('humidSensor/0/sensorValue').then(function (rsp) {
@@ -96,7 +95,7 @@ qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
 });
 ```
 
-###<a name="APIs"></a>
+<a name="APIs"></a>
 5. APIs
 --------
 1. [new MqttNode()](#API_MqttNode)
@@ -115,10 +114,11 @@ qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
 14. [unsubscribe()](#API_unsubscribe)  
 
 *****
+
 ### MqttNode Class
 Exposed by `require('mqtt-node')`
-<br />
-###<a name="API_MqttNode"></a>
+  
+<a name="API_MqttNode"></a>
 ### new MqttNode(clientId, devAttrs)
 Create a new instance of the `MqttNode` class.
 
@@ -140,7 +140,7 @@ Create a new instance of the `MqttNode` class.
 
 **Examples:**
 
-```javascript
+```js
     var MqttNode = require('mqtt-node');
     var qnode = new MqttNode('my_foo_client_id', {
         lifetime: 21600,
@@ -157,8 +157,8 @@ Create a new instance of the `MqttNode` class.
     // use .setDevAttrs() to change the device attributes or qnode won't 
     // automatically publish the update message to the Server.
 ```
-<br />
-###<a name="API_initResrc"></a>
+  
+<a name="API_initResrc"></a>
 ### .initResrc(oid, [iid,] resrcs)
 Initialize the Resources on qnode.    
 
@@ -178,7 +178,7 @@ Initialize the Resources on qnode.
 
 Resource is a simple value:  
   
-```javascript
+```js
 /********************************************/
 /*** Client Device Initialzation          ***/
 /********************************************/
@@ -203,7 +203,7 @@ qnode.initResrc('3304', 0, {
 <br />
 Resource value is got from particular operations:  
   
-```javascript
+```js
 // reading sensed value from an analog interface
 qnode.initResrc('mySensor', 0, {
     sensorValue: {
@@ -244,7 +244,7 @@ qnode.initResrc('mySensor', 0, {
 <br />
 Resource value needs to be written by particular operations:  
   
-```javascript
+```js
 // writing a value to a digital interface
 qnode.initResrc('mySwitch', 0, {
     onOff: {
@@ -265,7 +265,7 @@ qnode.initResrc('mySwitch', 0, {
 <br />
 Resource is executable (a procedure on the Client Device):  
   
-```javascript    
+```js    
 // The Resource is executable
 qnode.initResrc('myLight', 0, {
     blink: {
@@ -288,8 +288,7 @@ qnode.initResrc('myCounter', 0, {
 });
 ```
   
-<br />
-###<a name="API_setDevAttrs"></a>
+<a name="API_setDevAttrs"></a>
 ### .setDevAttrs(devAttrs)
 Set the device attribues on qnode.  
 
@@ -302,15 +301,14 @@ Set the device attribues on qnode.
 
 **Examples:**  
   
-```javascript
+```js
 // this will publish the update of ip address to the Server
 qnode.setDevAttrs({
     ip: '192.168.0.211'
 });
 ```
   
-<br />
-###<a name="API_readResrc"></a>
+<a name="API_readResrc"></a>
 ### .readResrc(oid, iid, rid[, callback])
 Read the value from the allocated Resource.  
   
@@ -328,7 +326,7 @@ Read the value from the allocated Resource.
 
 **Examples:**  
   
-```javascript
+```js
 qnode.readResrc('humidSensor', 0, 'sensorValue', function (err, val) {
     if (err)
         console.log(err);
@@ -350,8 +348,7 @@ qnode.readResrc('myLight', 0, 'blink', function (err, val) {
 });
 ```
   
-<br />
-###<a name="API_writeResrc"></a>
+<a name="API_writeResrc"></a>
 ### .writeResrc(oid, iid, rid, value[, callback])
 Write the value to the allocated Resource.  
   
@@ -369,7 +366,7 @@ Write the value to the allocated Resource.
 
 **Examples:**  
   
-```javascript
+```js
 qnode.writeResrc('humidSensor', 0, 'sensorValue', 80, function (err, val) {
     console.log(val);   // '_unwritable_'
 });
@@ -384,8 +381,7 @@ qnode.writeResrc('mySwitch', 0, 'onOff', 1, function (err, val) {
 });
 ```
   
-<br />
-###<a name="API_connect"></a>
+<a name="API_connect"></a>
 ### .connect(url[, opts])
 Connects to the LWMQN Server with the given url and tries to register to the Server. If the procedure of connection and registration succeeds, qnode will fire a `ready` event.       
   
@@ -406,7 +402,7 @@ Connects to the LWMQN Server with the given url and tries to register to the Ser
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('ready', function () {
     // do your work here
 });
@@ -428,8 +424,7 @@ qnode.connect('mqtt://192.168.0.100', {
 });
 ```
   
-<br />
-###<a name="API_close"></a>
+<a name="API_close"></a>
 ### .close([force,] [callback])
 Disconnects from the Server. qnode will fire a `close` event if it is disconnected.       
   
@@ -442,7 +437,7 @@ Disconnects from the Server. qnode will fire a `close` event if it is disconnect
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('close', function () {
     console.log('Disconnected from the Server.');
 });
@@ -450,8 +445,7 @@ qnode.on('close', function () {
 qnode.close();
 ```
   
-<br />
-###<a name="API_pubRegister"></a>
+<a name="API_pubRegister"></a>
 ### .pubRegister([callback])
 Publishes the registering message to the Server. The message of registration will be automatically generated by the qnode. Everytime you invoke the .connect() method, qnode always does the regisetring procedure to the Server.  
 The qnode fires a `response` event when it received the response of registration from the Server.        
@@ -464,7 +458,7 @@ The qnode fires a `response` event when it received the response of registration
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('response', function (rsp) {
     if (rsp.type === 'register')
         console.log(rsp);
@@ -473,8 +467,7 @@ qnode.on('response', function (rsp) {
 qnode.pubRegister();
 ```
   
-<br />
-###<a name="API_pubDeregister"></a>
+<a name="API_pubDeregister"></a>
 ### .pubDeregister([callback])
 Publishes the deregistering message to the Server for leaving the network. The message will be automatically generated by the qnode.
 The qnode fires a `response` event when it received the response of deregistration from the Server.     
@@ -488,7 +481,7 @@ The qnode fires a `response` event when it received the response of deregistrati
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('response', function (rsp) {
     if (rsp.type === 'deregister')
         console.log(rsp);
@@ -497,8 +490,7 @@ qnode.on('response', function (rsp) {
 qnode.pubDeregister();
 ```
   
-<br />
-###<a name="API_pubNotify"></a>
+<a name="API_pubNotify"></a>
 ### .pubNotify(data[, callback])
 Publishes the notificatoin to the Server. The message should be a well-formatted data object.
 The qnode fires a `response` event when it received the acknownledgement from the Server.     
@@ -514,7 +506,7 @@ The qnode fires a `response` event when it received the acknownledgement from th
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('response', function (rsp) {
     if (rsp.type === 'notify')
         console.log(rsp);
@@ -539,8 +531,7 @@ qnode.pubNotify({
 });
 ```
   
-<br />
-###<a name="API_pingServer"></a>
+<a name="API_pingServer"></a>
 ### .pingServer([callback])
 Publishes the ping message to the Server.
 The qnode fires a `response` event when it received the response from the Server.     
@@ -555,7 +546,7 @@ The qnode fires a `response` event when it received the response from the Server
 
 **Examples:**  
   
-```javascript
+```js
 qnode.on('response', function (rsp) {
     if (rsp.type === 'ping')
         console.log(rsp);
@@ -565,8 +556,7 @@ qnode.on('response', function (rsp) {
 qnode.pingServer();
 ```
   
-<br />
-###<a name="API_publish"></a>
+<a name="API_publish"></a>
 ### .publish(topic, message[, options][, callback])
 This is a generic method to publish a message to a topic.  
 If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client to publish any message to any topic. In this case, the Server simply acts as an MQTT broker. The generic publishment is not authorized at the Server if the Client was not successfully registered. 
@@ -589,12 +579,11 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-```javascript
+```js
 qnode.publish('foo/bar/greet', 'Hello World!');
 ```
   
-<br />
-###<a name="API_subscribe"></a>
+<a name="API_subscribe"></a>
 ### .subscribe(topic[, options][, callback])
 This is a generic method to subscribe to a topic.  
 If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered. 
@@ -611,12 +600,11 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-```javascript
+```js
 qnode.subscribe('foo/bar/score');
 ```
   
-<br />
-###<a name="API_unsubscribe"></a>
+<a name="API_unsubscribe"></a>
 ### .unsubscribe(topic[, callback])
 This is a generic method to unsubscribe a topic from the broker.  
 If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client to unsubscribe any topic. In this case, the Server simply acts as an MQTT broker. The generic unsubscription is not authorized at the Server if the Client was not successfully registered. 
@@ -630,11 +618,11 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 **Examples:**  
   
-```javascript
+```js
 qnode.unsubscribe('foo/bar/score');
 ```
 
-###<a name="Templates"></a>
+<a name="Templates"></a>
 6. Code Templates
 --------
 This document provides you with many code templates of common devices defined by the IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/).  Each code snippet also lists out the oid and every Resource characteristic in the Object with the format:  
@@ -660,10 +648,10 @@ This document provides you with many code templates of common devices defined by
 18. [Barometer](#tmpl_barometer)     
 
 
-###<a name="tmpl_digitalInput"></a>
+<a name="tmpl_digitalInput"></a>
 ### 01. Digital Input
   
-```javascript
+```js
 // 01. Digital Input (oid = 3200 or 'digitalInput')
 qnode.initResrc('digitalInput', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
@@ -679,10 +667,10 @@ qnode.initResrc('digitalInput', 0, {
 });
 ```
 
-###<a name="tmpl_digitalOutput"></a>
+<a name="tmpl_digitalOutput"></a>
 ### 02. Digital Output
   
-```javascript
+```js
 // 02. Digital Output (oid = 3201 or 'digitalOutput')
 qnode.initResrc('digitalOutput', 0, {
     dOutState: {                    // < rid = 5550, RW, Boolean >
@@ -694,10 +682,10 @@ qnode.initResrc('digitalOutput', 0, {
 });
 ```
 
-###<a name="tmpl_analogInput"></a>
+<a name="tmpl_analogInput"></a>
 ### 03. Analog Input
   
-```javascript
+```js
 // 03. Analog Input (oid = 3202 or 'analogInput')
 qnode.initResrc('analogInput', 0, {
     aInCurrValue: {                 // < rid = 5600, R, Float >
@@ -713,10 +701,10 @@ qnode.initResrc('analogInput', 0, {
 });
 ```
 
-###<a name="tmpl_analogOutput"></a>
+<a name="tmpl_analogOutput"></a>
 ### 04. Analog Output
   
-```javascript
+```js
 // 04. Analog Output (oid = 3203 or 'analogOutput')
 qnode.initResrc('analogOutput', 0, {
     aOutCurrValue: {                // < rid = 5650, RW, Float >
@@ -729,10 +717,10 @@ qnode.initResrc('analogOutput', 0, {
 });
 ```
   
-###<a name="tmpl_genericSensor"></a>
+<a name="tmpl_genericSensor"></a>
 ### 05. Generic Sensor
   
-```javascript
+```js
 // 05. Generic Sensor (oid = 3300 or 'genericSensor')
 qnode.initResrc('genericSensor', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
@@ -749,10 +737,10 @@ qnode.initResrc('genericSensor', 0, {
 });
 ```
   
-###<a name="tmpl_illumSensor"></a>
+<a name="tmpl_illumSensor"></a>
 ### 06. Illuminance Sensor
   
-```javascript
+```js
 // 06. Illuminance Sensor (oid = 3301 or 'illumSensor')
 qnode.initResrc('illumSensor', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
@@ -767,10 +755,10 @@ qnode.initResrc('illumSensor', 0, {
 });
 ```
   
-###<a name="tmpl_presenceSensor"></a>
+<a name="tmpl_presenceSensor"></a>
 ### 07. Presence Sensor
   
-```javascript
+```js
 // 07. Presence Sensor (oid = 3302 or 'presenceSensor')
 qnode.initResrc('presenceSensor', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
@@ -784,10 +772,10 @@ qnode.initResrc('presenceSensor', 0, {
 });
 ```
   
-###<a name="tmpl_tempSensor"></a>
+<a name="tmpl_tempSensor"></a>
 ### 08. Temperature Sensor
   
-```javascript
+```js
 // 08. Temperature Sensor (oid = 3303 or 'tempSensor')
 qnode.initResrc('tempSensor', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
@@ -802,10 +790,10 @@ qnode.initResrc('tempSensor', 0, {
 });
 ```
   
-###<a name="tmpl_humidSensor"></a>
+<a name="tmpl_humidSensor"></a>
 ### 09. Humidity Sensor
   
-```javascript
+```js
 // 09. Humidity Sensor (oid = 3304 or 'humidSensor')
 qnode.initResrc('humidSensor', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
@@ -820,10 +808,10 @@ qnode.initResrc('humidSensor', 0, {
 });
 ```
   
-###<a name="tmpl_pwrMea"></a>
+<a name="tmpl_pwrMea"></a>
 ### 10. Power Measurement
   
-```javascript
+```js
 // 10. Power Measurement (oid = 3305 or 'pwrMea')
 qnode.initResrc('pwrMea', 0, {
     instActivePwr: {                // < rid = 5800, R, Float, Wh >
@@ -849,10 +837,10 @@ qnode.initResrc('pwrMea', 0, {
 });
 ```
   
-###<a name="tmpl_actuation"></a>
+<a name="tmpl_actuation"></a>
 ### 11. Actuation
   
-```javascript
+```js
 // 11. Actuation (oid = 3306 or 'actuation')
 qnode.initResrc('actuation', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
@@ -866,10 +854,10 @@ qnode.initResrc('actuation', 0, {
 });
 ```
   
-###<a name="tmpl_setPoint"></a>
+<a name="tmpl_setPoint"></a>
 ### 12. Set Point
   
-```javascript
+```js
 // 12. Set Point (oid = 3308 or 'setPoint')
 qnode.initResrc('setPoint', 0, {
     setPointValue: {                // < rid = 5900, RW, Float >
@@ -882,10 +870,10 @@ qnode.initResrc('setPoint', 0, {
 });
 ```
   
-###<a name="tmpl_loadCtrl"></a>
+<a name="tmpl_loadCtrl"></a>
 ### 13. Load Control
   
-```javascript
+```js
 // 13. Load Control (oid = 3310 or 'loadCtrl')
 qnode.initResrc('loadCtrl', 0, {
     eventId: {                      // < rid = 5823, RW, String >
@@ -906,10 +894,10 @@ qnode.initResrc('loadCtrl', 0, {
 });
 ```
   
-###<a name="tmpl_lightCtrl"></a>
+<a name="tmpl_lightCtrl"></a>
 ### 14. Light Control
   
-```javascript
+```js
 // 14. Light Control (oid = 3311 or 'lightCtrl')
 qnode.initResrc('lightCtrl', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
@@ -925,10 +913,10 @@ qnode.initResrc('lightCtrl', 0, {
 });
 ```
   
-###<a name="tmpl_pwrCtrl"></a>
+<a name="tmpl_pwrCtrl"></a>
 ### 15. Power Control
   
-```javascript
+```js
 // 15. Power Control (oid = 3312 or 'pwrCtrl')
 qnode.initResrc('pwrCtrl', 0, {
     onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
@@ -942,10 +930,10 @@ qnode.initResrc('pwrCtrl', 0, {
 });
 ```
   
-###<a name="tmpl_accelerometer"></a>
+<a name="tmpl_accelerometer"></a>
 ### 16. Accelerometer
-  
-```javascript
+
+```js
 // 16. Accelerometer (oid = 3313 or 'accelerometer')
 qnode.initResrc('accelerometer', 0, {
     xValue: {                       // < rid = 5702, R, Float >
@@ -957,13 +945,12 @@ qnode.initResrc('accelerometer', 0, {
     // minRangeValue: ,             // < rid = 5603, R, Float >
     // maxRangeValue:               // < rid = 5604, R, Float >
 });
-
 ```
   
-###<a name="tmpl_magnetometer"></a>
+<a name="tmpl_magnetometer"></a>
 ### 17. Magnetometer
   
-```javascript
+```js
 // 17. Magnetometer (oid = 3314 or 'magnetometer')
 qnode.initResrc('magnetometer', 0, {
     xValue: {                       // < rid = 5702, R, Float >
@@ -976,10 +963,10 @@ qnode.initResrc('magnetometer', 0, {
 });
 ```
   
-###<a name="tmpl_barometer"></a>
+<a name="tmpl_barometer"></a>
 ### 18. Barometer
   
-```javascript
+```js
 // 18. Barometer (oid = 3315 or 'barometer')
 qnode.initResrc('barometer', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
