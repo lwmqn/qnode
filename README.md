@@ -1,7 +1,7 @@
 mqtt-node
 ===============
 A client library for the light-wieght MQTT machine network.
-***
+
 
 ## Table of Contents
 1. Overview
@@ -9,24 +9,24 @@ A client library for the light-wieght MQTT machine network.
 3. Installation
 4. Basic Usage
 5. APIs
-- new MqttNode(clientId, devAttrs)
-- setDevAttrs(devAttrs)
-- initResrc(oid, [iid,] resrcs)
-- (X) getAttrs(oid[, iid[, rid]])
-- (X) setReportAttrs(oid[, iid[, rid]], attrs)
-- readResrc(oid, iid, rid[, callback])
-- writeResrc(oid, iid, rid, value[, callback])
-- (X) enableReport(oid, iid, rid[, attrs])
-- (X) disableReport(oid, iid, rid)
-- connect(url[, opts])
-- close(force[, callback])
-- pubRegister([callback])
-- pubDeregister([callback])
-- (X) pubUpdate(devAttrs[, callback])
-- pubNotify(data[, callback])
-- (X) pubResponse(rsp[, callback])
-- pingServer([callback])
-- publish(topic, message[[, options], callback])
+   [new MqttNode(clientId, devAttrs)](#1)
+   [setDevAttrs(devAttrs)](#1)
+   [initResrc(oid, [iid,] resrcs)](#1)
+   [(X) getAttrs(oid[, iid[, rid]])](#1)
+   [(X) setReportAttrs(oid[, iid[, rid]], attrs)](#1)
+   [readResrc(oid, iid, rid[, callback])](#1)
+   [writeResrc(oid, iid, rid, value[, callback])](#1)
+   [(X) enableReport(oid, iid, rid[, attrs])](#1)
+   [(X) disableReport(oid, iid, rid)](#1)
+   [connect(url[, opts])](#1)
+   [close(force[, callback])](#1)
+   [pubRegister([callback])](#1)
+   [pubDeregister([callback])](#1)
+   [(X) pubUpdate(devAttrs[, callback])](#1)
+   [pubNotify(data[, callback])](#1)
+   [(X) pubResponse(rsp[, callback])](#1)
+   [pingServer([callback])](#1)
+   [publish(topic, message[[, options], callback])](#1)
 
 1. Overview
 --------
@@ -34,6 +34,7 @@ A client library for the light-wieght MQTT machine network.
 The light-weight MQTT machine network (LWMQN) is an architecture that follows part of the LWM2M v1.0 specification to meet the minimum requirements of machine network management.
 
 `mqtt-shepherd` is an implementation of the LWMQN Server and `mqtt-node` is an implementation of the LWMQN Client on node.js. They are working together into an IoT application framework. This client-side module `mqtt-node` is suitable for devices working with the embedded Linux and node.js, such as Linkit Smart 7688, Raspberry Pi and Beaglebone Black, .etc. 
+
 The `mqtt-node` uses the IPSO definition as fundamental of the resource organizing on the device. It also provides templates of many common devices defined by the IPSO Smart Objects starter pack 1.0, i.e., presence sensor, temperature sensor, humidity sensor, light control and power control. The basic Objects like the Device Object and Server Object are ready. If you are going to build your own IoT application, consider trying `mqtt-node` on your device. It’s easy to use, you can build the device with no pain.
 
 To learn more about:
@@ -52,7 +53,7 @@ To learn more about:
 2. Features
 --------
 * Communication based on the MQTT protocol and the client library [mqtt.js](https://www.npmjs.com/package/dissolve)
-* Structuring the device resources in a hierarchical Smart-Object-style defined by the IPSO
+* Structuring the device resources in a hierarchical Smart-Object-style defined by IPSO
 * Easy to create a Resource on the Client Device
 * LWM2M-like interfaces
 
@@ -63,54 +64,56 @@ To learn more about:
 4. Basic Usage
 --------
 Client-side exmaple:
-```javascript
-var MqttNode = require('mqtt-node');
 
-/********************************************/
-/*** Client Device Initialzation          ***/
-/********************************************/
-var qnode = new MqttNode('my_foo_client_id');
-
-// Initialize the Resource that follows the IPSO definition
-// oid = 'humidSensor', iid = 0
-qnode.initResrc('humidSensor', 0, {
-    sensorValue: 20,
-    units: 'percent'
-});
-
-// Initialize a custom Resource
-qnode.initResrc('myObject', 0, {
-    myResrc1: 20,
-    myResrc2: 'hello world!'
-});
-
-qnode.on('ready', function () {
-    // If the registration procedure completes successfully, 'ready' will be fired
-    // do you work here
-});
-
-qnode.connect('mqtt://192.168.0.2', {
-    username: 'freebird',
-    password: 'skynyrd'
-});
-
-```
+    ```javascript
+    var MqttNode = require('mqtt-node');
+    
+    /********************************************/
+    /*** Client Device Initialzation          ***/
+    /********************************************/
+    var qnode = new MqttNode('my_foo_client_id');
+    
+    // Initialize the Resource that follows the IPSO definition
+    // oid = 'humidSensor', iid = 0
+    qnode.initResrc('humidSensor', 0, {
+        sensorValue: 20,
+        units: 'percent'
+    });
+    
+    // Initialize a custom Resource
+    qnode.initResrc('myObject', 0, {
+        myResrc1: 20,
+        myResrc2: 'hello world!'
+    });
+    
+    qnode.on('ready', function () {
+        // If the registration procedure completes successfully, 'ready' will be fired
+        // do you work here
+    });
+    
+    qnode.connect('mqtt://192.168.0.2', {
+        username: 'freebird',
+        password: 'skynyrd'
+    });
+    
+    ```
 
 Server-side example:
-```javascript
-var qnode = shepherd.findNode('my_foo_client_id');
 
-qnode.readReq('humidSensor/0/sensorValue').then(function (rsp) {
-    console.log(rsp.data);      // 20
-}).fail(function (err) {
-    console.log(err);
-}).done();
-
-qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
-    console.log(rsp.data);      // 'hello world!'
-});
-
-```
+    ```javascript
+    var qnode = shepherd.findNode('my_foo_client_id');
+    
+    qnode.readReq('humidSensor/0/sensorValue').then(function (rsp) {
+        console.log(rsp.data);      // 20
+    }).fail(function (err) {
+        console.log(err);
+    }).done();
+    
+    qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
+        console.log(rsp.data);      // 'hello world!'
+    });
+    
+    ```
 
 5. APIs
 --------
@@ -118,11 +121,14 @@ qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
 ### MqttNode Class
 Exposed by `require('mqtt-node')`
 
+###<a name="API_MqttNode"></a>
 ### new MqttNode(clientId, devAttrs)
 Create a new instance of the `MqttNode` class.
-**Arguments:**
-1.	`clientId` (String, required): The clientId should be a string and should be unique in the network. It is suggested to use the mac address (with a prefix or a suffix) as the clientId.
-2.	`devAttrs` (Object): This is an object of device attributes describing the basic information about the device, i.e., `lifetime`, `ip`, `mac` and `version`.
+
+* **Arguments:**
+
+    1. `clientId` (String, required): The clientId should be a string and should be unique in the network. It is suggested to use the mac address (with a prefix or a suffix) as the clientId.
+    2. `devAttrs` (Object): This is an object of device attributes describing the basic information about the device, i.e., `lifetime`, `ip`, `mac` and `version`.
 
 | Property | Type   | Mandatory | Description                     |
 |----------|--------|-----------|---------------------------------|
@@ -131,27 +137,28 @@ Create a new instance of the `MqttNode` class.
 | mac      | String | required  | mac address of the Client       |
 | version  | String | optional  | Minimum supported LWMQN version |
 
-**Returns:**
-	(Object): Returns the qnode
+* **Returns:**
+    + (Object): Returns the qnode
 
 **Example:**
-```javascript
-var MqttNode = require('mqtt-node');
-var qnode = new MqttNode('my_foo_client_id', {
-    lifetime: 21600,
-    ip: '192.168.0.99',
-    mac: '00:0c:29:3e:1b:d2',
-    version: 'v0.0.6'
-});
-    
-console.log(qnode.clientId);    // 'my_foo_client_id'
-console.log(qnode.lifetime);    // 108000
-console.log(qnode.ip);          // '192.168.0.99'
-console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-console.log(qnode.version);     // 'v0.0.6'
-// use .setDevAttrs() to change the device attributes or qnode won't 
-// automatically publish the update message to the Server.
-```
+
+    ```javascript
+    var MqttNode = require('mqtt-node');
+    var qnode = new MqttNode('my_foo_client_id', {
+        lifetime: 21600,
+        ip: '192.168.0.99',
+        mac: '00:0c:29:3e:1b:d2',
+        version: 'v0.0.6'
+    });
+        
+    console.log(qnode.clientId);    // 'my_foo_client_id'
+    console.log(qnode.lifetime);    // 108000
+    console.log(qnode.ip);          // '192.168.0.99'
+    console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
+    console.log(qnode.version);     // 'v0.0.6'
+    // use .setDevAttrs() to change the device attributes or qnode won't 
+    // automatically publish the update message to the Server.
+    ```
 
 ### .initResrc(oid, [iid,] resrcs)
 Initialize the Resources on qnode. 
@@ -164,7 +171,7 @@ The oid can be a IPSO-defined or lwm2m-defined object id, and it can be in numbe
 3. `resrcs`: An object in rid-value paris to describe the Resources. Each key represents the `rid` and each value is the value of the Resource. The value of Resource can be a primitive value, such as a number, a string, and a boolean. The value of a Resource can be an object with `read` or `write` methods if reading value from or writing value to the Resource is not a simple value assignment, i.e., reading value from a gpio, reading value from a database, reading value from a file. In addition, the value of a Resource can be an object with a `exec` method if the Resource is typed as an executable one.
 
 **Returns:**
-	(Object): Returns the qnode
+    (Object): Returns the qnode
 
 **Example:**
 ```javascript
@@ -271,7 +278,7 @@ Set the device attribues on qnode.
 1. `devAttrs` (Object): It is just like the `devAttrs` in the arguments of constructor MqttNode, but any change of the properties `clientId` and `mac` will be ignored. If you want to change either one of them, please deregister the qnode from the Server and then re-register it to the Server. If the devAttrs is an empty object or any of the given properties is equal to the current value, the qnode will not publish the update message.
 
 **Returns:**
-	(Object): Returns the qnode
+    (Object): Returns the qnode
 
 **Example:**
 ```javascript
@@ -288,7 +295,7 @@ Set the parameters of the report settings of the allocated target.
 1. `rpAttrs` (Object): It is just like the `devAttrs` in the arguments of constructor MqttNode, but any change of the properties `clientId` and `mac` will be ignored. If you want to change either one of them, please deregister the qnode from the Server and then re-register it to the Server. If the devAttrs is an empty object or any of the given properties is equal to the current value, the qnode will not publish the update message.
 
 **Returns:**
-	(Object): Returns the qnode
+    (Object): Returns the qnode
 
 **Example:**
 ```javascript
