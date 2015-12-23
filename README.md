@@ -638,7 +638,7 @@ qnode.unsubscribe('foo/bar/score');
 6. Code Templates
 --------
 This document provides you with many code templates of common devices defined by the IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/).  Each code snippet also lists out the oid and every Resource characteristic in the Object with the format:  
-> < rid number, access, data type { range or enum }, unit>
+> < rid number, access, data type { range or enum }, unit >
   
 1. [Digital Input](#tmpl_digitalInput)
 2. [Digital Output](#tmpl_digitalOutput)
