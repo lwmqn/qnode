@@ -144,21 +144,21 @@ Create a new instance of the `MqttNode` class.
 **Examples:**
 
     ```javascript
-    var MqttNode = require('mqtt-node');
-    var qnode = new MqttNode('my_foo_client_id', {
-        lifetime: 21600,
-        ip: '192.168.0.99',
-        mac: '00:0c:29:3e:1b:d2',
-        version: 'v0.0.6'
-    });
-        
-    console.log(qnode.clientId);    // 'my_foo_client_id'
-    console.log(qnode.lifetime);    // 108000
-    console.log(qnode.ip);          // '192.168.0.99'
-    console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-    console.log(qnode.version);     // 'v0.0.6'
-    // use .setDevAttrs() to change the device attributes or qnode won't 
-    // automatically publish the update message to the Server.
+        var MqttNode = require('mqtt-node');
+        var qnode = new MqttNode('my_foo_client_id', {
+            lifetime: 21600,
+            ip: '192.168.0.99',
+            mac: '00:0c:29:3e:1b:d2',
+            version: 'v0.0.6'
+        });
+            
+        console.log(qnode.clientId);    // 'my_foo_client_id'
+        console.log(qnode.lifetime);    // 108000
+        console.log(qnode.ip);          // '192.168.0.99'
+        console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
+        console.log(qnode.version);     // 'v0.0.6'
+        // use .setDevAttrs() to change the device attributes or qnode won't 
+        // automatically publish the update message to the Server.
     ```
 
 <br />
