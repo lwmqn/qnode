@@ -11,12 +11,11 @@ mqtt-node
 6. [Code Templates](#Templates) 
 
 <a name="Overiew"></a>
-1. Overview
---------
+## 1. Overview
 
-The light-weight MQTT machine network ([**LWMQN**](https://www.www.com)) is an architecture that follows part of the [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
+The light-weight MQTT machine network ([**LWMQN**](https://www.www.com)) is an architecture that follows part of the [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-[`mqtt-shepherd`](https://www.npmjs.com/package/mqtt-shepherd) is an implementation of the LWMQN Server and [`mqtt-node`](https://www.npmjs.com/package/mqtt-node) is an implementation of the LWMQN Client on node.js. They are working together into an IoT application framework. This client-side module `mqtt-node` is suitable for devices working with the embedded Linux and node.js, such as Linkit Smart 7688, Raspberry Pi and Beaglebone Black, .etc. 
+[`mqtt-shepherd`](https://www.npmjs.com/package/mqtt-shepherd) is an implementation of the LWMQN Server and [`mqtt-node`](https://www.npmjs.com/package/mqtt-node) is an implementation of the LWMQN Client on node.js. They are working together into an IoT application framework. This client-side module `mqtt-node` is suitable for devices working with the embedded Linux and node.js, such as Linkit Smart 7688, Raspberry Pi and Beaglebone Black, .etc.  
 
 The `mqtt-node` uses IPSO definitions as its fundamental of the resource organizing on the device. This document also provides templates of many common devices defined by the IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control. `mqtt-node` is trying to let you build the IoT peripheral machines with no pain.  
 
@@ -30,22 +29,22 @@ The `mqtt-node` uses IPSO definitions as its fundamental of the resource organiz
 Note: Object, Object Instance and Resource are used by the IPSO specification to describe the hierarchical structure of resources on a Client Device. The oid, iid, and rid are identifiers used to allocate the resource.  
 
 <a name="Features"></a>
-2. Features
---------
-* Communication based on the MQTT protocol and the client library [mqtt.js](https://www.npmjs.com/package/mqtt)
-* Structuring the device resources in a hierarchical Smart-Object-style defined by IPSO
-* Easy to create a Resource on the Client Device
-* LWM2M-like interfaces    
+## 2. Features
 
+* Communication based on the MQTT protocol and the client library [mqtt.js](https://www.npmjs.com/package/mqtt)  
+* Structuring the device resources in a hierarchical Smart-Object-style defined by IPSO  
+* Easy to create a Resource on the Client Device  
+* LWM2M-like interfaces  
+  
 <a name="Installation"></a>
-3. Installation
---------
-> $ npm install mqtt-node --save
+## 3. Installation
 
+> $ npm install mqtt-node --save
+  
 <a name="Basic"></a>
-4. Basic Usage
---------
-Client-side exmaple (here is how you are using the `mqtt-node`):
+## 4. Basic Usage
+
+Client-side exmaple (here is how you are using the `mqtt-node`):  
 
 ```js
 var MqttNode = require('mqtt-node');
@@ -79,7 +78,7 @@ qnode.connect('mqtt://192.168.0.2', {
 });
 ```
 
-Server-side example (please go to the `mqtt-shepherd` document for details):
+Server-side example (please go to the `mqtt-shepherd` document for details):  
 
 ```js
 var qnode = shepherd.findNode('my_foo_client_id');
@@ -94,49 +93,52 @@ qnode.readReq('myObject/0/myResrc2').done(function (rsp) {
     console.log(rsp.data);      // 'hello world!'
 });
 ```
-
+  
 <a name="APIs"></a>
-5. APIs
---------
-1. [new MqttNode()](#API_MqttNode)
-2. [setDevAttrs()](#API_setDevAttrs)
-3. [initResrc()](#API_initResrc)
-4. [readResrc()](#API_readResrc)
-5. [writeResrc()](#API_writeResrc)
-6. [connect()](#API_connect)
-7. [close()](#API_close)
-8. [pubRegister()](#API_pubRegister)
-9. [pubDeregister()](#API_pubDeregister)
-10. [pubNotify()](#API_pubNotify)
-11. [pingServer()](#API_pingServer)
-12. [publish()](#API_publish)  
-13. [subscribe()](#API_subscribe)  
-14. [unsubscribe()](#API_unsubscribe)  
+## 5. APIs
 
-*****
+* [new MqttNode()](#API_MqttNode)
+* [setDevAttrs()](#API_setDevAttrs)
+* [initResrc()](#API_initResrc)
+* [readResrc()](#API_readResrc)
+* [writeResrc()](#API_writeResrc)
+* [connect()](#API_connect)
+* [close()](#API_close)
+* [pubRegister()](#API_pubRegister)
+* [pubDeregister()](#API_pubDeregister)
+* [pubNotify()](#API_pubNotify)
+* [pingServer()](#API_pingServer)
+* [publish()](#API_publish)
+* [subscribe()](#API_subscribe)
+* [unsubscribe()](#API_unsubscribe)  
+
+*************************************************
 
 ### MqttNode Class
-Exposed by `require('mqtt-node')`
+Exposed by `require('mqtt-node')`  
   
 <a name="API_MqttNode"></a>
 ### new MqttNode(clientId, devAttrs)
-Create a new instance of the `MqttNode` class.
-
+Create a new instance of the `MqttNode` class.  
+  
 **Arguments:**  
 
 1. `clientId` (_String_, _required_): The clientId should be a string and should be unique in the network.  
     It is suggested to use the mac address (with a prefix or a suffix) as the clientId.
 2. `devAttrs` (_Object_): This is an object of device attributes describing the information about the device.  
-    The following table shows the details of each property within `devAttrs`. 
- 
+    The following table shows the details of each property within `devAttrs`.  
+    
+  
 | Property | Type   | Mandatory | Description                     |  
 |----------|--------|-----------|---------------------------------|  
 | lifetime | Number | optional  | seconds                         |  
 | ip       | String | required  | ip address of the Client        |  
 | mac      | String | required  | mac address of the Client       |  
 | version  | String | optional  | Minimum supported LWMQN version |  
-
-**Returns:** (_Object_) qnode
+  
+**Returns:**  
+  
+* (_Object_) qnode
 
 **Examples:**
 
@@ -160,7 +162,7 @@ Create a new instance of the `MqttNode` class.
   
 <a name="API_initResrc"></a>
 ### .initResrc(oid, [iid,] resrcs)
-Initialize the Resources on qnode.    
+Initialize the Resources on qnode.  
 
 **Arguments:**  
 
@@ -170,13 +172,14 @@ Initialize the Resources on qnode.
     If `iid` is not given, qnode will automatically create an Object Instance and assign a number for it. It is common to use numbers to enumerate the instances, but using a string for the `iid` is okay too, e.g., 'my_instance01'.  
 3. `resrcs` (_Object_): An object in rid-value paris to describe the Resources.  
     Each key represents the `rid` and each value is the value of the Resource. The value of Resource can be a   primitive value, such as a number, a string, and a boolean. The value of a Resource can be an object with `read` or `write` methods if reading value from or writing value to the Resource is not a simple value assignment, i.e., reading value from a gpio, reading value from a database, reading value from a file. In addition, the value of a Resource can be an object with a `exec` method if the Resource is typed as an executable one.  
-
-
-**Returns:** (_Object_): qnode
+  
+**Returns:**  
+  
+* (_Object_): qnode
 
 **Examples:**  
 
-Resource is a simple value:  
+* Resource is a simple value:  
   
 ```js
 /********************************************/
@@ -200,8 +203,7 @@ qnode.initResrc('3304', 0, {
 });
 ```
   
-<br />
-Resource value is got from particular operations:  
+* Resource value is got from particular operations:  
   
 ```js
 // reading sensed value from an analog interface
@@ -241,8 +243,7 @@ qnode.initResrc('mySensor', 0, {
 });
 ```
   
-<br />
-Resource value needs to be written by particular operations:  
+* Resource value needs to be written by particular operations:  
   
 ```js
 // writing a value to a digital interface
@@ -262,8 +263,7 @@ qnode.initResrc('mySwitch', 0, {
 });
 ```
   
-<br />
-Resource is executable (a procedure on the Client Device):  
+* Resource is executable (a procedure on the Client Device):  
   
 ```js    
 // The Resource is executable
@@ -296,8 +296,10 @@ Set the device attribues on qnode.
   
 1. `devAttrs` (_Object_): Device attributes.  
     It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` and unrecognized properties will be ignored. If you want to change either one of `clientId` and `mac`, please deregister the qnode from the Server and then re-register it to the Server. 
+  
+**Returns:**  
 
-**Returns:** (_Object_): qnode
+* (_Object_): qnode
 
 **Examples:**  
   
@@ -322,7 +324,9 @@ Read the value from the allocated Resource.
     If the Resource is an executable resource, the `val` passes to the callback will be a string `_exec_`.
     If the allocated Resource is not found, an error object will be passed to fisrt argument of the callback. **** Promise is supported! ****  
   
-**Returns:** (_Promise_): promise
+**Returns:**  
+
+* (_Promise_): promise
 
 **Examples:**  
   
@@ -362,7 +366,9 @@ Write the value to the allocated Resource.
     If the Resource is not a simple value and there has not a `write` method been initialized for it, in this case, the `val` passes to the callback will be a string `_unwritable_`. For example, you are trying to write a value to an executable Resource or a read-only Resource which is initialized without a write method.
     If the allocated Resource is not found, an error object will be passed to fisrt argument of the callback. **** Promise is supported! ****  
   
-**Returns:** (_Promise_): promise
+**Returns:**  
+
+* (_Promise_): promise
 
 **Examples:**  
   
@@ -389,7 +395,7 @@ Connects to the LWMQN Server with the given url and tries to register to the Ser
 
 1. `url` (_String_): Url of the LWMQN Server, e.g. `mqtt://localhost`, `mqtt://192.168.0.100:1883`.  
 2. `opts` (_Object_): The connect options with properties shown in the following table.  
-
+  
 | Property        | Type          | Default      | Description                                             |  
 |-----------------|---------------|--------------|---------------------------------------------------------|  
 | keepalive       | Number        | 10           | 10 seconds, set to 0 to disable                         |  
@@ -398,7 +404,9 @@ Connects to the LWMQN Server with the given url and tries to register to the Ser
 | username        | String        | `'freebird'` | The username required by your broker, if any            |  
 | password        | String|Buffer | `'skynyrd'`  | the password required by your broker, if any            |    
   
-**Returns:** (_Object_): qnode
+**Returns:**  
+
+* (_Object_): qnode
 
 **Examples:**  
   
@@ -432,8 +440,10 @@ Disconnects from the Server. qnode will fire a `close` event if it is disconnect
 
 1. `force` (_Boolean_): `true` will close the client right away, without waiting for the in-flight messages to be acked. This parameter is optional.  
 2. `callback` (_Function_): will be called when the client is closed    
- 
-**Returns:** (_Object_): qnode
+  
+**Returns:**  
+
+* (_Object_): qnode
 
 **Examples:**  
   
@@ -448,13 +458,15 @@ qnode.close();
 <a name="API_pubRegister"></a>
 ### .pubRegister([callback])
 Publishes the registering message to the Server. The message of registration will be automatically generated by the qnode. Everytime you invoke the .connect() method, qnode always does the regisetring procedure to the Server.  
-The qnode fires a `response` event when it received the response of registration from the Server.        
+The qnode fires a `response` event when it received the response of registration from the Server.  
   
 **Arguments:**  
 
-1. `callback` (_Function_): will be called when the registering message is published.   
- 
-**Returns:** (_Promise_): promise
+1. `callback` (_Function_): will be called when the registering message is published.  
+  
+**Returns:**  
+
+* (_Promise_): promise
 
 **Examples:**  
   
@@ -476,8 +488,10 @@ The qnode fires a `response` event when it received the response of deregistrati
 **Arguments:**  
 
 1. `callback` (_Function_): will be called when the deregistering message is published.  
- 
-**Returns:** (_Promise_): promise
+  
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -494,15 +508,15 @@ qnode.pubDeregister();
 ### .pubNotify(data[, callback])
 Publishes the notificatoin to the Server. The message should be a well-formatted data object.
 The qnode fires a `response` event when it received the acknownledgement from the Server.     
-     
   
 **Arguments:**  
 
 1. `data` (_Object_):  
 2. `callback` (_Function_): will be called when the notification is published.  
   
- 
-**Returns:** (_Promise_): promise
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -534,15 +548,15 @@ qnode.pubNotify({
 <a name="API_pingServer"></a>
 ### .pingServer([callback])
 Publishes the ping message to the Server.
-The qnode fires a `response` event when it received the response from the Server.     
-     
+The qnode fires a `response` event when it received the response from the Server.  
   
 **Arguments:**  
 
 1. `callback` (_Function_): will be called when the ping message is published.  
   
- 
-**Returns:** (_Promise_): promise
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -565,17 +579,17 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 
 1. `topic` (_String_): the topic to publish to.  
 2. `message` (_String|Buffer_): the message to publish.
-3. `options` (_Object_): the option to publish with, including the properties shown below    
-
+3. `options` (_Object_): the option to publish with, including the properties shown in the following table.
+4. `callback` (_Function_): will be called when the QoS handling completes, or at the next tick if QoS 0.
+  
 | Property | Type    | Default | Description |
 |----------|---------|---------|-------------|
 | `qos`    | Number  | 0       | QoS level   |
 | `retain` | Boolean | false   | Retain flag |
-
-4. `callback` (_Function_): will be called when the QoS handling completes, or at the next tick if QoS 0.
   
- 
-**Returns:** (_Promise_): promise
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -586,7 +600,7 @@ qnode.publish('foo/bar/greet', 'Hello World!');
 <a name="API_subscribe"></a>
 ### .subscribe(topic[, options][, callback])
 This is a generic method to subscribe to a topic.  
-If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered. 
+If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
@@ -595,8 +609,10 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 3. `callback` (_Function_): `function (err, granted)` callback will be called on suback, where
     `err` is a subscrtiption error
     `granted` is an arrary of objects formatted in `{ topic, qos }`    
- 
-**Returns:** (_Promise_): promise
+  
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -612,9 +628,11 @@ If you are using the `mqtt-shepherd` as the LWMQN Server, it accepts the Client 
 **Arguments:**  
 
 1. `topic` (_String_): the topic to unsubscribe.  
-3. `callback` (_Function_): callback fired on unsuback
- 
-**Returns:** (_Promise_): promise
+2. `callback` (_Function_): callback fired on unsuback  
+  
+**Returns:**  
+
+* (_Promise_) promise
 
 **Examples:**  
   
@@ -623,8 +641,8 @@ qnode.unsubscribe('foo/bar/score');
 ```
 
 <a name="Templates"></a>
-6. Code Templates
---------
+## 6. Code Templates
+
 This document provides you with many code templates of common devices defined by the IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/).  Each code snippet also lists out the oid and every Resource characteristic in the Object with the format:  
 > < rid number, access, data type { range or enum }, unit >
   
