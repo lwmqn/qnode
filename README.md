@@ -270,7 +270,7 @@ qnode.initResrc('mySwitch', 0, {
 // The Resource is executable
 qnode.initResrc('myLight', 0, {
     blink: {
-        read: function (cb) {
+        exec: function (cb) {
             blinkLed('led1', 10);       // bink led1 for 10 times
             cb(null, { status: 200 });  // the 2nd argument of cb is a response object
         }
@@ -279,7 +279,7 @@ qnode.initResrc('myLight', 0, {
 
 qnode.initResrc('myCounter', 0, {
     count: {
-        read: function (cb) {
+        exec: function (cb) {
             countSomething(function (err, sum) {
                 // responds back the status and some data
                 cb(null, { status: 200, data: sum });
