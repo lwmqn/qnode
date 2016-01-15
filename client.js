@@ -142,7 +142,7 @@ qnode.on('offline', function () {
 });
 
 qnode.on('message', function (topic, message, packet) {
-    // console.log(topic);
+    console.log(topic);
     // console.log(message.toString());
 });
 
