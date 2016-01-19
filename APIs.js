@@ -4,45 +4,37 @@
 // changeIp(ip)
 // initResrc(...) v
 // getAttrs(...) v
-// setAttrs(...)
-// readResrc(oid, iid, rid, callback)
-// writeResrc(oid, iid, rid, value, callback)
-// execResrc(oid, iid, rid, argus, callback)
+// setAttrs(...) v
+// readResrc(oid, iid, rid, callback) v
+// writeResrc(oid, iid, rid, value, callback) v
+// execResrc(oid, iid, rid, argus, callback) v
+
 // connect(url, opts)
 // close(callback)
-// pubRegister(callback)
-// pubDeregister(callback)
-// pingServer(callback)
-// pubUpdate(devAttrs, callback)
 
-// pubResponse(rsp, callback)
-// publish(topic, message, options, callback)
+// pubRegister(callback) v
+// pubDeregister(callback) v
+// pingServer(callback) v
+// pubUpdate(devAttrs, callback) v
+// pubResponse(rsp, callback) v
+
+// publish(topic, message, options, callback) v
 // subscribe(topic, qos, callback)
-// _pubReq(intf, data, callback)
-// _target(oid, iid, rid)
-// _id(intf) v
-// _dumpObj(...)
-// _rd(chk, oid, iid, rid, callback)
 
-// _rawHdlr(conn, topic, message)
-// _reqHdlr(msg)
-// _lfUp(enable)
-// _chkResrc(oid, iid, rid, currVal)
-// enableReport(oid, iid, rid, attrs)
-// disableReport(oid, iid, rid)
-// _tmout(key, delay)
+// _pubReq(intf, data, callback) v
+// _target(oid, iid, rid) v
+// _id(intf) -> _nextTransId v
+// _dumpObj(...)
+// _rd(chk, oid, iid, rid, callback) v
+
+// _rawHdlr(conn, topic, message) v
+// _reqHdlr(msg) v
+//      many request handlers
+// _lfUp(enable) v
+// _chkResrc(oid, iid, rid, currVal) v
+// enableReport(oid, iid, rid, attrs) v
+// disableReport(oid, iid, rid) v
+// _tmout(key, delay) -> _reqTimeout v
 // _path(path)
-// local function rm(tbl, pred)
-// local function chk()
-// tm.start()
-// tm.stop()
-// tm.set(tid)
-// tm.setTimeout(fn, delay, ...)
-// tm.setInterval(fn, delay, ...)
-// tm.clear(tobj)
-// _evtb(ev)
-// emit(ev, ...)
-// once(ev, listener)
-// removeAll(ev)
-// remove(ev, listener)
+
 
