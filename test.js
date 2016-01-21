@@ -1,17 +1,25 @@
-function u(a, b) {
-        console.log(a);
-        console.log(b);
-}
+var _ = require('lodash');
 
-function x() { 
-    process.nextTick(u, 'hi', 'simen');
-}
 
-setTimeout(function () {
-    console.log('fired');
-    x();
-    //var t = new Date();
-    console.log((new Date()).getTime());
-}, 3000);
-var b = new Buffer([1]);
-console.log(typeof b === 'object');
+// var x = {
+//     _pubics: {},
+//     _subics: {}
+// };
+
+// _.forEach([ 'register', 'deregister', 'notify', 'update', 'ping' ], function (intf) {
+//     x._pubics[intf] = intf + '/' + 'clientId';
+//     x._subics[intf] = intf + '/response/' + 'clientId';
+// });
+//     x._pubics.response = 'response/' + 'clientId';
+//     x._subics.request = 'request/' + 'clientId';
+//     x._subics.announce = 'announce';
+
+// console.log(x);
+
+// var subTopics = _.map(x._subics, function (t) {
+//             return t;
+//         });
+
+// console.log(subTopics);
+
+console.log(_.isEmpty({}));

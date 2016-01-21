@@ -1,1 +1,1 @@
-module.exports = require('./lib/mqtt-node');
+module.exports = require('./lib/mqnode');

@@ -1,43 +1,51 @@
-// new(n) v
-// encrypt(msg) v v
-// decrypt(msg) v v
-// changeIp(ip)
-// initResrc(...) v v
-// getAttrs(...) v v
-// setAttrs(...) v v
-// readResrc(oid, iid, rid, callback) v v
-// writeResrc(oid, iid, rid, value, callback) v v
-// execResrc(oid, iid, rid, argus, callback) v v
+// [o] function MqttNode(clientId, devAttrs)
 
-// connect(url, opts) v v
-// close(callback) v v
+// this._nextTransId = function (intf)
+// this.encrypt = function (msg)
+// this.decrypt = function (msg)
 
-// pubRegister(callback) v v
-// pubDeregister(callback) v v
-// pingServer(callback) v v
-// pubUpdate(devAttrs, callback) v v
-// pubResponse(rsp, callback) v v
+// MqttNode.prototype._init = function ()
+// MqttNode.prototype._has = function (oid, iid, rid)
+// MqttNode.prototype._target = function (oid, iid, rid)
+// MqttNode.prototype._dumpObj = function (oid, iid, callback)
+// MqttNode.prototype._getAttrs = function (oid, iid, rid)
+// MqttNode.prototype._setAttrs = function (oid, iid, rid, attrs)
 
-// publish(topic, message, options, callback) v v
-// subscribe(topic, qos, callback)
+// [o] MqttNode.prototype.connect = function (brokerUrl, opts)
+// [o] MqttNode.prototype.close = function (force, callback)
+// [o] MqttNode.prototype.setDevAttrs = function (attrs) {
+// [o] MqttNode.prototype.initResrc = function (oid, iid, resrcs)
+// [o] MqttNode.prototype.readResrc = function (oid, iid, rid, callback)
+// [o] MqttNode.prototype.writeResrc = function (oid, iid, rid, value, callback)
+// [A] MqttNode.prototype.execResrc = function (oid, iid, rid, argus, callback)
+// [o] MqttNode.prototype.publish = function (topic, message, options, callback)
+// [o] MqttNode.prototype.subscribe = function (topics, opts, callback)
+// [o] MqttNode.prototype.unsubscribe = function (topics, callback)
 
-// _pubReq(intf, data, callback) v v
-// _target(oid, iid, rid) v v
-// _has(oid, iid, rid) v v
-// _id(intf) -> _nextTransId v v
-// _dumpObj(...) v
-// _rd(chk, oid, iid, rid, callback) v v
+// [o] MqttNode.prototype.pubRegister = function (callback)
+// [o] MqttNode.prototype.pubDeregister = function (callback)
+// [o] MqttNode.prototype.pubNotify = function (data, callback)
+// [o] MqttNode.prototype.pingServer = function (callback)
+// MqttNode.prototype.pubUpdate = function (devAttrs, callback)
+// MqttNode.prototype.pubResponse = function (rsp, callback)
+// MqttNode.prototype.enableReport = function (oid, iid, rid)
+// MqttNode.prototype.disableReport = function (oid, iid, rid)
 
-// _rawHdlr(conn, topic, message) v
-// _reqHdlr(msg) v
-//      many request handlers
-// _lfUp(enable) v
-// _chkResrc(oid, iid, rid, currVal) v
-// enableReport(oid, iid, rid, attrs) v v
-// disableReport(oid, iid, rid) v v
-// _tmout(key, delay) -> _reqTimeout v v
-// _path(path)
+// function _addPrivateListener(emitter, evt, lsn)
+// function _removePrivateListeners(emitter, evt)
+// function _lwmqnSubAndReg(qn)
+// function _reqTimeout(qn, key, delay)
+// function _pubReq(qn, intf, data, callback)
+// function _lfUpdate(qn, enable)
+// function _checkAndReportResrc(qn, oid, iid, rid, currVal)
+// function _readResrc(qn, chk, oid, iid, rid, callback)
+// function _reqHdlr(qn, msg)
+// function _rawHdlr(qn, topic, message, packet)
 
-
-
-// _readResrc = function (chk, oid, iid, rid, callback) v v
+// function _readReqHandler(node, trg, msg, cb)
+// function _writeReqHandler(node, trg, msg, cb)
+// function _discoverReqHandler(node, trg, msg, cb)
+// function _writeAttrsReqHandler(node, trg, msg, cb)
+// function _executeReqHandler(node, trg, msg, cb)
+// function _observeReqHandler(node, trg, msg, cb)
+// function _unknownReqHandler(node, trg, msg, cb)
