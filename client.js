@@ -9,6 +9,7 @@ var devAttrs = {
     mac: '00:0c:29:71:74:ff'
 };
 
+var x = 0;
 var qnode = new MqttNode('mnode_1', devAttrs);
 qnode.initResrc('tempSensor', 0, {
     sensorValue: 1200,
@@ -16,27 +17,47 @@ qnode.initResrc('tempSensor', 0, {
     minMeaValue: 10,
     maxMeaValue: 2000,
     minRangeValue: 0,
-    maxRangeValue: 4000
+    maxRangeValue: 4000,
+    some1: {
+        exec: function (name, cb) { 
+            console.log('hello ' + name);
+            cb(null, 'exec world');
+        }
+    },
+    some2: {
+        write: function (val, cb) {
+            x = val;
+            console.log('write~~~~');
+            console.log(x);
+            cb(null, x);
+        }
+    },
+    some3: {
+        read: function (cb) { cb(null, 'hello'); }
+    }
 });
+
 qnode.on('registered', function (rsp) {
-    console.log('>>>>> registered');
-    console.log(rsp);
 
-    setTimeout(function () {
-        qnode.pubDeregister(function (err, rsp) {
-            console.log('>>>>> deregister');
-            console.log(err);
-            console.log(rsp);
-        });
-    }, 200);
+    // setInterval(function () {
+    //     console.log('>>>> tempSensor.0.sensorValue: ' + qnode.so.tempSensor[0].sensorValue);
+    //     var v = Math.floor((Math.random() * 100) + 1);
+    //     qnode.readResrc('tempSensor', 'sensorValue', v, function (err, val) {
+    //         console.log('>>>> read tempSensor.0.sensorValue');
+    //         console.log(val);
+    //         console.log(qnode.so.tempSensor[0].sensorValue);
+    //     });
+    // }, 1000);
 
-    setTimeout(function () {
-        qnode.pubDeregister(function (err, rsp) {
-            console.log('>>>>> deregister');
-            console.log(err);
-            console.log(rsp);
+    setInterval(function () {
+        console.log('>>>> tempSensor.0.sensorValue: ' + qnode.so.tempSensor[0].sensorValue);
+        var v = Math.floor((Math.random() * 100) + 1);
+        qnode.writeResrc('tempSensor', 0, 'sensorValue', v, function (err, val) {
+            console.log('>>>> write tempSensor.0.sensorValue');
+            console.log(val);
+            console.log(qnode.so.tempSensor[0].sensorValue);
         });
-    }, 600);
+    }, 5000);
 });
 
 qnode.on('connect', function () {
