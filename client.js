@@ -10,7 +10,7 @@ var devAttrs = {
 };
 
 var x = 0;
-var qnode = new MqttNode('mnode_1', devAttrs);
+var qnode = new MqttNode('mnode_1-5', devAttrs);
 qnode.initResrc('tempSensor', 0, {
     sensorValue: 1200,
     units: 'mCel',
@@ -97,5 +97,6 @@ qnode.on('error', function (err) {
 
 qnode.connect('mqtt://localhost', {
     username: 'freebird',
-    password: 'skynyrd'
+    password: 'skynyrd',
+    reconnectPeriod: 5000
 });

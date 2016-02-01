@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.1.9",
+  "version": "0.2.2",
   "description": "A client library for a light-weight MQTT machine network",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "dependencies": {
     "enum": "^2.2.0",
     "lodash": "^4.0.0",
-    "lwm2m-id": "0.0.6",
+    "lwm2m-id": "1.0.2",
     "mqtt": "^1.5.0",
     "network": "^0.1.3"
   },
