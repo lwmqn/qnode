@@ -1,5 +1,4 @@
 var util = require('util'),
-    mutils = require('./lib/mutils.js'),
     MqttNode = require('./index');
 
 var devAttrs = {
