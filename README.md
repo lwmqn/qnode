@@ -57,13 +57,13 @@ var qnode = new MqttNode('my_foo_client_id');
 
 // Initialize the Resource that follows the IPSO definition
 // We have two humidity sensor here
-// oid = 'humidSensor', iid = 0
-qnode.initResrc('humidSensor', 0, {
+// oid = 'humidity', iid = 0
+qnode.initResrc('humidity', 0, {
     sensorValue: 20,
     units: 'percent'
 });
-// / oid = 'humidSensor', iid = 1
-qnode.initResrc('humidSensor', 1, {
+// / oid = 'humidity', iid = 1
+qnode.initResrc('humidity', 1, {
     sensorValue: 16,
     units: 'percent'
 });
@@ -92,7 +92,7 @@ Server-side example (please go to [mqtt-shepherd](https://github.com/simenkid/mq
 ```js
 var qnode = shepherd.findNode('my_foo_client_id');
 
-qnode.readReq('humidSensor/0/sensorValue', function (err, rsp) {
+qnode.readReq('humidity/0/sensorValue', function (err, rsp) {
     console.log(rsp.data);      // 20
 });
 
@@ -109,9 +109,9 @@ The great benefit of using this module in your LWMQN Client design is that you a
 Use API `initResrc(oid, iid, resrcs)` to initialize your Resources, where `oid` and `iid` are the Object id and Object Instance id, respectively. `resrcs` is an object containing all Resources under this Object Instance. Each key in `resrcs` object should be an `rid` and its corresponding value is the Resource value. Resource value can be a simple primitive, such as a number, a string and a boolean. Here is an example: 
   
 ```js
-// oid = 'tempSensor' tells mqtt-node that you have a temperature sensor Object
+// oid = 'temperature' tells mqtt-node that you have a temperature sensor Object
 // iid = 0 tells mqtt-node to instantiate this sensor with an identifier of 0
-qnode.initResrc('tempSensor', 0, {
+qnode.initResrc('temperature', 0, {
     sensorValue: 20,
     units: 'cel'
 });
@@ -120,7 +120,7 @@ qnode.initResrc('tempSensor', 0, {
 You may think that the temperature is a time-varying value, just giving it a number is definitely not a good idea. You developers have responsibility for making this sensor play correctly. Let me show you an example:
   
 ```js
-qnode.initResrc('tempSensor', 0, {
+qnode.initResrc('temperature', 0, {
     sensorValue: 20,
     units: 'cel'
 });
@@ -129,7 +129,7 @@ qnode.initResrc('tempSensor', 0, {
 // Here, I poll the pin every 60 seconds and write the sensed value to the corresponding Resource
 setInterval(function () {
     var analogVal = analogPin0.read();
-    qnode.writeResrc('tempSensor', 0, 'sensorValue', analogVal);
+    qnode.writeResrc('temperature', 0, 'sensorValue', analogVal);
 }, 60*1000);
 ```
   
@@ -140,7 +140,7 @@ So far, polling seems just fine in this temperature sensing example. If the Serv
 It is very simple to use this scheme. The first thing you need to know is that the signature of `read` method is `function(cb)`, where `cb(err, value)` is an err-back function that you should call and pass the read value through its second argument when read operation accomplishes. If any error occurs, pass the error through the first argument. Let's go back to the previous example:
   
 ```js
-qnode.initResrc('tempSensor', 0, {
+qnode.initResrc('temperature', 0, {
     sensorValue: {
         read: function (cb) {
             var analogVal = analogPin0.read();
@@ -192,7 +192,7 @@ Ok, good! You've not only learned how to read/write a Resource but also learned 
 ```js
 var tempVal = 26;
 
-qnode.initResrc('tempSensor', 0, {
+qnode.initResrc('temperature', 0, {
     sensorValue: {
         read: function (cb) {
             cb(null, tempVal);
@@ -357,7 +357,7 @@ Initialize the Resources on qnode.
 /*** Client Device Initialzation          ***/
 /********************************************/
 // use oid and rids in string
-qnode.initResrc('humidSensor', 0, {
+qnode.initResrc('humidity', 0, {
     sensorValue: 20,
     units: 'percent'
 });
@@ -481,14 +481,14 @@ Read value from the allocated Resource.
 **Examples:**  
   
 ```js
-qnode.readResrc('humidSensor', 0, 'sensorValue', function (err, val) {
+qnode.readResrc('humidity', 0, 'sensorValue', function (err, val) {
     if (err)
         console.log(err);
     else
         console.log(val);   // 20
 });
 
-qnode.readResrc('humidSensor', 12, 'sensorValue', function (err, val) {
+qnode.readResrc('humidity', 12, 'sensorValue', function (err, val) {
     if (err)
         console.log(err);   // if allocating Resource fails 
 });
@@ -524,11 +524,11 @@ Write the value to the allocated Resource.
 **Examples:**  
   
 ```js
-qnode.writeResrc('humidSensor', 0, 'sensorValue', 80, function (err, val) {
+qnode.writeResrc('humidity', 0, 'sensorValue', 80, function (err, val) {
     console.log(val);       // '_unwritable_'
 });
 
-qnode.writeResrc('humidSensor', 12, 'sensorValue', 80, function (err, val) {
+qnode.writeResrc('humidity', 12, 'sensorValue', 80, function (err, val) {
     if (err)
         console.log(err);   // if the Resource does not exist
 });
@@ -670,7 +670,7 @@ It is noted that **mqtt-node** will automatically report notifications to the Se
 ```js
 // pub a Resource
 qnode.pubNotify({
-    oid: 'humidSensor',
+    oid: 'humidity',
     iid: 0,
     rid: 'sensorValue',
     data: 32
@@ -680,7 +680,7 @@ qnode.pubNotify({
 
 // pub an Object Instance
 qnode.pubNotify({
-    oid: 'humidSensor',
+    oid: 'humidity',
     iid: 0,
     data: {
         sensorValue: 32,
@@ -815,8 +815,8 @@ This document provides you with code templates of many IPSO-defined devices [(Sm
 5. [Generic Sensor](#tmpl_genericSensor)
 6. [Illuminance Sensor](#tmpl_illumSensor)
 7. [Presence Sensor](#tmpl_presenceSensor)
-8. [Temperature Sensor](#tmpl_tempSensor)
-9. [Humidity Sensor](#tmpl_humidSensor)
+8. [Temperature Sensor](#tmpl_temperature)
+9. [Humidity Sensor](#tmpl_humidity)
 10. [Power Measurement](#tmpl_pwrMea)
 11. [Actuation](#tmpl_actuation)
 12. [Set Point](#tmpl_setPoint)  
@@ -832,8 +832,8 @@ This document provides you with code templates of many IPSO-defined devices [(Sm
 ### 01. Digital Input
   
 ```js
-// 01. Digital Input (oid = 3200 or 'digitalInput')
-qnode.initResrc('digitalInput', 0, {
+// 01. Digital Input (oid = 3200 or 'dIn')
+qnode.initResrc('dIn', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
     },
@@ -852,8 +852,8 @@ qnode.initResrc('digitalInput', 0, {
 ### 02. Digital Output
   
 ```js
-// 02. Digital Output (oid = 3201 or 'digitalOutput')
-qnode.initResrc('digitalOutput', 0, {
+// 02. Digital Output (oid = 3201 or 'dOut')
+qnode.initResrc('dOut', 0, {
     dOutState: {                    // < rid = 5550, RW, Boolean >
         read: function (cb) {},
         write: function (cb) {}
@@ -868,8 +868,8 @@ qnode.initResrc('digitalOutput', 0, {
 ### 03. Analog Input
   
 ```js
-// 03. Analog Input (oid = 3202 or 'analogInput')
-qnode.initResrc('analogInput', 0, {
+// 03. Analog Input (oid = 3202 or 'aIn')
+qnode.initResrc('aIn', 0, {
     aInCurrValue: {                 // < rid = 5600, R, Float >
         read: function (cb) {}
     },
@@ -888,8 +888,8 @@ qnode.initResrc('analogInput', 0, {
 ### 04. Analog Output
   
 ```js
-// 04. Analog Output (oid = 3203 or 'analogOutput')
-qnode.initResrc('analogOutput', 0, {
+// 04. Analog Output (oid = 3203 or 'aOut')
+qnode.initResrc('aOut', 0, {
     aOutCurrValue: {                // < rid = 5650, RW, Float >
         read: function (cb) {},
         write: function (cb) {}
@@ -905,8 +905,8 @@ qnode.initResrc('analogOutput', 0, {
 ### 05. Generic Sensor
   
 ```js
-// 05. Generic Sensor (oid = 3300 or 'genericSensor')
-qnode.initResrc('genericSensor', 0, {
+// 05. Generic Sensor (oid = 3300 or 'generic')
+qnode.initResrc('generic', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -926,8 +926,8 @@ qnode.initResrc('genericSensor', 0, {
 ### 06. Illuminance Sensor
   
 ```js
-// 06. Illuminance Sensor (oid = 3301 or 'illumSensor')
-qnode.initResrc('illumSensor', 0, {
+// 06. Illuminance Sensor (oid = 3301 or 'illuminance')
+qnode.initResrc('illuminance', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -945,8 +945,8 @@ qnode.initResrc('illumSensor', 0, {
 ### 07. Presence Sensor
   
 ```js
-// 07. Presence Sensor (oid = 3302 or 'presenceSensor')
-qnode.initResrc('presenceSensor', 0, {
+// 07. Presence Sensor (oid = 3302 or 'presence')
+qnode.initResrc('presence', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
     },
@@ -959,12 +959,12 @@ qnode.initResrc('presenceSensor', 0, {
 ```
   
 ********************************************
-<a name="tmpl_tempSensor"></a>
+<a name="tmpl_temperature"></a>
 ### 08. Temperature Sensor
   
 ```js
-// 08. Temperature Sensor (oid = 3303 or 'tempSensor')
-qnode.initResrc('tempSensor', 0, {
+// 08. Temperature Sensor (oid = 3303 or 'temperature')
+qnode.initResrc('temperature', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
@@ -978,12 +978,12 @@ qnode.initResrc('tempSensor', 0, {
 ```
   
 ********************************************
-<a name="tmpl_humidSensor"></a>
+<a name="tmpl_humidity"></a>
 ### 09. Humidity Sensor
   
 ```js
-// 09. Humidity Sensor (oid = 3304 or 'humidSensor')
-qnode.initResrc('humidSensor', 0, {
+// 09. Humidity Sensor (oid = 3304 or 'humidity')
+qnode.initResrc('humidity', 0, {
     sensorValue: {                  // < rid = 5700, R, Float >
         read: function (cb) {}
     },
