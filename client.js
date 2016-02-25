@@ -1,4 +1,5 @@
 var util = require('util'),
+    crypto = require('crypto'),
     MqttNode = require('./index');
 
 var devAttrs = {
@@ -10,6 +11,34 @@ var devAttrs = {
 
 var x = 0;
 var qnode = new MqttNode('mnode_1-5', devAttrs);
+
+qnode.encrypt = function (msg, clientId) {         // Overide at will
+    console.log('ENCRYPTION: MY Client Id ' + clientId);
+    var msgBuf = new Buffer(msg),
+        cipher = crypto.createCipher('aes128', 'mypassword'),
+        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+
+    encrypted += cipher.final('base64');
+    return encrypted;
+};
+
+qnode.decrypt = function (msg, clientId) {         // Overide at will
+    console.log('DECRYPTION: MY Client Id ' + clientId);
+
+    msg = msg.toString();
+    var decipher = crypto.createDecipher('aes128', 'mypassword'),
+        decrypted = decipher.update(msg, 'base64', 'utf8');
+
+    try {
+        decrypted += decipher.final('utf8');
+    } catch (e) {
+        // log 'decrytion fails'
+        console.log('decrytion fails.');
+        return msg;
+    }
+    return decrypted;
+};
+
 qnode.initResrc('temperature', 0, {
     sensorValue: 1200,
     units: 'mCel',
