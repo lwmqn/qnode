@@ -131,6 +131,37 @@ qnode.on('registered', function (rsp) {
 
     runTask(readTemp, { interval: 1000, repeat: 1 });
     runTask(writeTemp, { interval: 5000, repeat: 1 });
+    // runTask(function () {
+    //     qnode.pingServer(function (err, r) {
+    //         console.log(err);
+    //         console.log(r);
+    //     });
+
+    // }, { interval: 2000, repeat: 1 } );
+
+    runTask(function () {
+        // console.log(qnode.so.temperature[0]);
+        // qnode._dumpObj('temperature', 0, function (err, o) {
+
+        //     qnode.pubNotify({
+        //         oid: 'temperature',
+        //         iid: 11,
+        //         data: o
+        //     }, function (err, rsp) {
+        //         console.log(rsp); 
+        //     });
+        // });
+
+
+        qnode.setDevAttrs({
+            clientId: 3
+        }, function (err, rsp) {
+            console.log('******* PUB UPDATE ********');
+            console.log(rsp);
+        });
+
+    }, { interval: 2000, repeat: 1 } );
+
 });
 
 qnode.on('request', function (msg) {

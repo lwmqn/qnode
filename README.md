@@ -314,8 +314,16 @@ Set the device attribues on qnode.
 **Arguments:**
   
 1. `devAttrs` (_Object_): Device attributes.  
-    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` and unrecognized properties will be ignored. If you want to change either one of `clientId` and `mac`, please deregister the qnode from the Server and then re-register to it again. 
+    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister the qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
   
+| rsp.status | Status Code         | Description                                                                        |
+|------------|---------------------|------------------------------------------------------------------------------------|
+| 204        | Changed             | The Server successfuly accepted this update message                                |
+| 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
+| 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
+| 408        | Timeout             | No response from the Server in 60 secs                                             |
+| 500        | InternalServerError | The Server has some trouble                                                        |
+
 **Returns:**  
 
 * (_Object_): qnode
@@ -326,6 +334,8 @@ Set the device attribues on qnode.
 // this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
 qnode.setDevAttrs({
     ip: '192.168.0.211'
+}, function (err, rsp) {
+    console.log(rsp);   // { status: 204 }
 });
 ```
   
@@ -571,7 +581,6 @@ qnode.on('ready', function () {
 qnode.connect('mqtt://192.168.0.100');
 
 // use your own account
-// you can use an encrypted password if the Server knows how to decrypt it
 qnode.connect('mqtt://192.168.0.100', {
     username: 'someone',
     password: 'somepassword'
@@ -615,8 +624,17 @@ Publishes the registering request to the Server. The registration message will b
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will pass you the result of registration. `rsp` is a response object with status code. `rsp.status` of 200(Ok) indicates that the Client was registered before and the record is successfully renewed on the Server. `rsp.status` of 201(Created) indicates that this registration is successful for this whole new Client. `rsp.status` will be 408(Timeout) if response does not come back in 60 seconds. Please refer to [LWMQN Register Channel](#LWMQN_PAGE) for more info.
+1. `callback` (_Function_): `function (err, rsp)` will pass you the result of registration. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with status code. The descriptions of `rsp.status` are given in the following table.  
   
+| rsp.status | Status Code         | Description                                                                           |
+|------------|---------------------|---------------------------------------------------------------------------------------|
+| 200        | OK                  | The Client was registered before and the record is successfully renewed on the Server |
+| 201        | Created             | Registration is successful for this new Client                                        |
+| 400        | BadRequest          | Invalid paramter(s) for registration                                                  |
+| 408        | Timeout             | No response from the Server in 60 secs                                                |
+| 409        | Conflict            | Client Id conflicts                                                                   |
+| 500        | InternalServerError | The Server has some trouble                                                           |
+
 **Returns:**  
 
 * (_Object_): qnode
@@ -636,8 +654,15 @@ Publishes the deregistering request to the Server for the Client to leave the ne
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called when the deregistering process is done. `rsp.status` of 200(Ok) indicates that the Client was successfully deregistered, and 408 indicates a response timeout. Please refer to [LWMQN Deregister Channel](#LWMQN_PAGE) for more info.
+1. `callback` (_Function_): `function (err, rsp)` will be called when the deregistering process is done. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with status code.  
   
+| rsp.status | Status Code         | Description                                |
+|------------|---------------------|--------------------------------------------|
+| 202        | Deleted             | The Client was successfully deregistered   |
+| 404        | NotFound            | The Client is not found on the Server      |
+| 408        | Timeout             | No response from the Server in 60 secs     |
+| 500        | InternalServerError | The Server has some trouble                |
+
 **Returns:**  
 
 * (_Object_) qnode
@@ -646,7 +671,7 @@ Publishes the deregistering request to the Server for the Client to leave the ne
   
 ```js
 qnode.pubDeregister(function (err, rsp) {
-    console.log(rsp);  // { status: 200 }
+    console.log(rsp);  // { status: 202 }
 });
 ```
   
@@ -659,8 +684,15 @@ It is noted that **mqtt-node** will automatically report notifications to the Se
 **Arguments:**  
 
 1. `note` (_Object_): a Resource or an Instance you like to report to the Server.  
-2. `callback` (_Function_): `function (err, rsp)` will be called when the acknowledgement is coming back from the Server. `rsp.status` of 204(Changed) indicates that the Server has got the notification.  
+2. `callback` (_Function_): `function (err, rsp)` will be called when the acknowledgement is coming back from the Server.  
   
+| rsp.status | Status Code         | Description                                                  |
+|------------|---------------------|--------------------------------------------------------------|
+| 204        | Changed             | The Server has got the notification                          |
+| 400        | BadRequest          | Invalid parameters, e.g., oid or iid is not given            |
+| 404        | NotFound            | The notified Object Instance or Resource cannot be allocated |
+| 500        | InternalServerError | The Server has some trouble                                  |
+
 **Returns:**  
 
 * (_Object_) qnode
@@ -713,8 +745,13 @@ Ping the Server.
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called upon the response coming back. `rsp.status` of 200 indicates pinging is successful, and 408 indicates a response timeout. `rsp.data` is a number of the round trip times in milliseconds.
+1. `callback` (_Function_): `function (err, rsp)` will be called upon the response coming back. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with status code. `rsp.data` is the approximate round trip time in milliseconds.
   
+| rsp.status | Status Code         | Description                                                     |
+|------------|---------------------|-----------------------------------------------------------------|
+| 200        | OK                  | Pinging is successful with `rsp.data` roundtrip time in ms      |
+| 408        | Timeout             | No response from the Server in 60 secs. `rsp.data` will be null |
+
 **Returns:**  
 
 * (_Object_) qnode
@@ -723,7 +760,7 @@ Ping the Server.
   
 ```js
 qnode.pingServer(function (err, rsp) {
-    console.log(rsp);   // { status: 200, data: 17 }
+    console.log(rsp);   // { status: 200, data: 16 }
 });
 ```
   
