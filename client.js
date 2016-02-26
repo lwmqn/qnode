@@ -1,19 +1,33 @@
 var util = require('util'),
     crypto = require('crypto'),
+    debug = require('debug'),
     MqttNode = require('./index');
 
+// set up debuggers
+var CON = debug('con'),
+    REG = debug('reg'),
+    RAW = debug('raw'),
+    MSG = debug('msg'),
+    PUB = debug('pub'),
+    TASK = debug('task'),
+    ERR = debug('err');
+
+/*************************************************************************************************/
+/*** Prepare the Client Node                                                                   ***/
+/*************************************************************************************************/
 var devAttrs = {
     lifetime: 2000,
-    version: '1.1.1',
+    version: '1.0.2',
     ip: '192.168.1.104',
     mac: '00:0c:29:71:74:ff'
 };
 
-var x = 0;
-var qnode = new MqttNode('mnode_1-5', devAttrs);
+var qnode = new MqttNode('test_node_01', devAttrs);
 
-qnode.encrypt = function (msg, clientId) {         // Overide at will
-    console.log('ENCRYPTION: MY Client Id ' + clientId);
+/*********************************************/
+/*** The custom encrption/decryption       ***/
+/*********************************************/
+qnode.encrypt = function (msg, clientId) {
     var msgBuf = new Buffer(msg),
         cipher = crypto.createCipher('aes128', 'mypassword'),
         encrypted = cipher.update(msgBuf, 'binary', 'base64');
@@ -22,9 +36,7 @@ qnode.encrypt = function (msg, clientId) {         // Overide at will
     return encrypted;
 };
 
-qnode.decrypt = function (msg, clientId) {         // Overide at will
-    console.log('DECRYPTION: MY Client Id ' + clientId);
-
+qnode.decrypt = function (msg, clientId) {
     msg = msg.toString();
     var decipher = crypto.createDecipher('aes128', 'mypassword'),
         decrypted = decipher.update(msg, 'base64', 'utf8');
@@ -39,6 +51,10 @@ qnode.decrypt = function (msg, clientId) {         // Overide at will
     return decrypted;
 };
 
+/*********************************************/
+/*** Prepare Resources on the Client Node  ***/
+/*********************************************/
+var x = 0;
 qnode.initResrc('temperature', 0, {
     sensorValue: 1200,
     units: 'mCel',
@@ -65,31 +81,56 @@ qnode.initResrc('temperature', 0, {
     }
 });
 
-qnode.on('registered', function (rsp) {
-
-    // setInterval(function () {
-    //     console.log('>>>> temperature.0.sensorValue: ' + qnode.so.temperature[0].sensorValue);
-    //     var v = Math.floor((Math.random() * 100) + 1);
-    //     qnode.readResrc('temperature', 'sensorValue', v, function (err, val) {
-    //         console.log('>>>> read temperature.0.sensorValue');
-    //         console.log(val);
-    //         console.log(qnode.so.temperature[0].sensorValue);
-    //     });
-    // }, 1000);
-
-    setInterval(function () {
-        console.log('>>>> temperature.0.sensorValue: ' + qnode.so.temperature[0].sensorValue);
-        var v = Math.floor((Math.random() * 100) + 1);
-        qnode.writeResrc('temperature', 0, 'sensorValue', v, function (err, val) {
-            console.log('>>>> write temperature.0.sensorValue');
-            console.log(val);
-            console.log(qnode.so.temperature[0].sensorValue);
-        });
-    }, 5000);
+/*************************************************************************************************/
+/*** Client Node Listeners                                                                     ***/
+/*************************************************************************************************/
+/*********************************************/
+/*** Fundamental Events                    ***/
+/*********************************************/
+qnode.on('connect', function () {
+    CON('connect');
 });
 
-qnode.on('connect', function () {
+qnode.on('reconnect', function () {
+    CON('reconnect');
+});
 
+qnode.on('offline', function () {
+    CON('offline');
+});
+
+qnode.on('close', function () {
+    CON('close');
+});
+
+qnode.on('error', function (err) {
+    ERR(err);
+});
+
+/*********************************************/
+/*** TRX Message Events                    ***/
+/*********************************************/
+qnode.on('raw', function (topic, message, packet) {
+    RAW('topic: ' + topic + ', msg: ' + message.toString());
+});
+
+qnode.on('message', function (topic, message, packet) {
+    MSG('topic: ' + topic + ', msg: ' + message.toString());
+});
+
+qnode.on('published', function (msg) {
+    PUB('topic: ' + msg.topic + ', msg: ' + msg.message.toString());
+});
+
+/*********************************************/
+/*** Registered Events                     ***/
+/*********************************************/
+qnode.on('registered', function (rsp) {
+    REG('registered: ');
+    REG(rsp);
+
+    runTask(readTemp, { interval: 1000, repeat: 1 });
+    runTask(writeTemp, { interval: 5000, repeat: 1 });
 });
 
 qnode.on('request', function (msg) {
@@ -101,30 +142,72 @@ qnode.on('announce', function (msg) {
     console.log(msg);
 });
 
-qnode.on('reconnect', function () {
-    console.log('reconnect');
-});
-
-qnode.on('close', function () {
-    console.log('close');
-});
-
-qnode.on('offline', function () {
-    console.log('offline');
-});
-
-qnode.on('message', function (topic, message, packet) {
-    console.log(topic);
-    console.log(message.toString());
-});
-
-qnode.on('error', function (err) {
-    console.log(err);
-    console.log('error');
-});
 
 qnode.connect('mqtt://localhost', {
     username: 'freebird',
     password: 'skynyrd',
     reconnectPeriod: 5000
 });
+
+
+
+/*************************************************************************************************/
+/*** Testing Tasks                                                                             ***/
+/*************************************************************************************************/
+function readTemp() {
+    qnode.readResrc('temperature', 0, 'sensorValue', function (err, val) {
+        TASK('READ >> read: ' + val + ', sensorValue: ' + qnode.so.temperature[0].sensorValue);
+    });
+}
+
+function writeTemp() {
+    var v = Math.floor((Math.random() * 100) + 1);
+    qnode.writeResrc('temperature', 0, 'sensorValue', v, function (err, val) {
+        TASK('WRITE >> write: ' + val + ', sensorValue: ' + qnode.so.temperature[0].sensorValue);
+    });
+}
+/*************************************************************************************************/
+/*** Test Task Runner                                                                          ***/
+/*************************************************************************************************/
+function runTask(task, opt) {
+    // opt = { interval: x, repeat: y }
+    var runType = 'NORMAL',
+        counter = 0,
+        tHandle;
+
+    if (opt.interval !== undefined) {
+        if (opt.repeat === 0)
+            runType = 'TIMEOUT';
+        else if (opt.repeat === 1)
+            runType = 'REPEAT';
+        else if (opt.repeat > 1)
+            runType = 'COUNTS';
+        else
+            runType = 'TIMEOUT';
+    }
+
+    switch (runType) {
+        case 'NORMAL':
+            task();
+            tHandle = {};
+            break;
+        case 'TIMEOUT':
+            tHandle = setTimeout(task, opt.interval);
+            break;
+        case 'REPEAT':
+            tHandle = setInterval(task, opt.interval);
+            break;
+        case 'COUNTS':
+            tHandle = setInterval(function () {
+                task();
+                counter += 1;
+                if (counter === opt.repeat)
+                    clearTimeout(tHandle);
+            }, opt.interval);
+            break;
+        default:
+            tHandle = {};
+    }
+
+    return tHandle;
+}
