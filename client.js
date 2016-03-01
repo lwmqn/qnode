@@ -139,28 +139,29 @@ qnode.on('registered', function (rsp) {
 
     // }, { interval: 2000, repeat: 1 } );
 
-    runTask(function () {
-        // console.log(qnode.so.temperature[0]);
-        // qnode._dumpObj('temperature', 0, function (err, o) {
+    // runTask(function () {
+    //     console.log(qnode.so.temperature[0]);
+    //     qnode._dumpObj('temperature', 0, function (err, o) {
 
-        //     qnode.pubNotify({
-        //         oid: 'temperature',
-        //         iid: 11,
-        //         data: o
-        //     }, function (err, rsp) {
-        //         console.log(rsp); 
-        //     });
-        // });
+    //         qnode.pubNotify({
+    //             oid: 'temperature',
+    //             iid: 0,
+    //             rid: 'sensorValue',
+    //             data: o.sensorValue
+    //         }, function (err, rsp) {
+    //             console.log(rsp); 
+    //         });
+    //     });
 
 
-        qnode.setDevAttrs({
-            clientId: 3
-        }, function (err, rsp) {
-            console.log('******* PUB UPDATE ********');
-            console.log(rsp);
-        });
+    //     // qnode.setDevAttrs({
+    //     //     clientId: 3
+    //     // }, function (err, rsp) {
+    //     //     console.log('******* PUB UPDATE ********');
+    //     //     console.log(rsp);
+    //     // });
 
-    }, { interval: 2000, repeat: 1 } );
+    // }, { interval: 2000, repeat: 1 } );
 
 });
 
