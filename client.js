@@ -193,9 +193,15 @@ function readTemp() {
 }
 
 function writeTemp() {
-    var v = Math.floor((Math.random() * 100) + 1);
+    var v = Math.floor((Math.random() * 100) + 1),
+        x = Math.floor((Math.random() * 100) + 1);
     qnode.writeResrc('temperature', 0, 'sensorValue', v, function (err, val) {
         TASK('WRITE >> write: ' + val + ', sensorValue: ' + qnode.so.temperature[0].sensorValue);
+    });
+
+
+    qnode.writeResrc('temperature', 0, 'minRangeValue', x, function (err, val) {
+        TASK('WRITE >> write: ' + val + ', minRangeValue: ' + qnode.so.temperature[0].sensorValue);
     });
 }
 /*************************************************************************************************/
