@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "A client library for a light-weight MQTT machine network",
   "main": "index.js",
   "scripts": {
