@@ -16,9 +16,12 @@ mqtt-node
 
 Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-[**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server, and this module, [**mqtt-node**](https://github.com/simenkid/mqtt-node), is an implementation of LWMQN Client with node.js. **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network. This client module is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
-
-**mqtt-node** uses IPSO definitions as its fundamental of resource organizing on devices. This document also provides templates of many common devices defined by IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control. **mqtt-node** is trying to let you build IoT peripheral machines with no pain.  
+* Tis module, **mqtt-node**, is an implementation of LWMQN Client.  
+* [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server.  
+* **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network.  
+* **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
+* **mqtt-node** uses IPSO definitions as its fundamental of resource organizing on devices. This document also provides [templates](https://github.com/lwmqn/mqtt-node/blob/master/docs/templates.md) of many common devices defined by IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control.  
+* **mqtt-node** is trying to let you build IoT peripheral machines with no pain.  
 
 #### Acronym
 * **MqttNode**: class exposed by `require('mqtt-node')`  
@@ -27,12 +30,12 @@ Lightweight MQTT machine network (**LWMQN**) is an architecture that follows par
 * **iid**: identifier of an Object Instance  
 * **rid**: indetifier of a Resource  
 * **Server**: LWMQN server
-* **Client** or **Client Device**: LWMQN client which is usually a machine node in IoT network
+* **Client** or **Client Device**: LWMQN client which is usually a machine node in an IoT network
 
 
 **Note**:  
 * IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where oid, iid, and rid are identifiers of them respectively to allocate resources on a Client Device.  
-* An IPSO **_Object_** is like a Class, and an IPSO **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
+* An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
 
 <a name="Features"></a>
 ## 2. Features
@@ -114,9 +117,11 @@ if (qnode) {
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using this module in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will tackle many of the REQ/RSP things for you.  
+The great benefit of using **mqtt-node** in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will tackle many of the REQ/RSP things for you.  
 
 What Resources do you have on the Client Device? Which Resource is readable? Which Resource is writable? And which Resource is remotely executable? Once your Resources are initialized, **mqtt-node** itself will know how to respond to the requests from a LWMQN Server.  
+
+Here is the [tutorial of how to plan your Resources](https://github.com/lwmqn/mqtt-node/blob/master/docs/rsc_plan.md) with **mqtt-node** initResrc() method. The description of [initResrc()](#API_initResrc) also shows some quick examples.  
 
 </br>
 
@@ -144,16 +149,19 @@ What Resources do you have on the Client Device? Which Resource is readable? Whi
 
 Exposed by `require('mqtt-node')`  
   
+<br />
+
+*************************************************
 <a name="API_MqttNode"></a>
 ### new MqttNode(clientId, devAttrs)
-Create a new instance of `MqttNode` class.  
+Create an instance of `MqttNode` class.  
   
 **Arguments:**  
 
-1. `clientId` (_String_): clientId should be a string and should be unique in the network. Using the mac address (along with a prefix or suffix) as the clientId would be a good idea.  
-2. `devAttrs` (_Object_): This is an object to describe information about the device. The following table shows the details of each property within `devAttrs`.  
+1. `clientId` (_String_): clientId should be a string and should be unique in the network. Using mac address (with a prefix or suffix) as the clientId would be a good idea.  
+2. `devAttrs` (_Object_): An object to describe information about the device. The following table shows details of each property within `devAttrs` object.  
 
-[FIXME] ip and mac may not require
+[FIXME] ip and mac may not be required
 
 | Property | Type   | Mandatory | Description                     |  
 |----------|--------|-----------|---------------------------------|  
@@ -169,54 +177,21 @@ Create a new instance of `MqttNode` class.
 **Examples:**
 
 ```js
-    var MqttNode = require('mqtt-node');
-    var qnode = new MqttNode('my_foo_client_id', {
-        lifetime: 21600,
-        ip: '192.168.0.99',
-        mac: '00:0c:29:3e:1b:d2',
-        version: 'v0.0.6'
-    });
-        
-    console.log(qnode.clientId);    // 'my_foo_client_id'
-    console.log(qnode.lifetime);    // 21600
-    console.log(qnode.ip);          // '192.168.0.99'
-    console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-    console.log(qnode.version);     // 'v0.0.6'
-    // use qnode.setDevAttrs() to change the device attributes will
-    // automatically publish the update message to the Server.
-```
-  
-********************************************
-<a name="API_setDevAttrs"></a>
-### .setDevAttrs(devAttrs)
-Set device attribues on the qnode.  
-
-**Arguments:**
-  
-1. `devAttrs` (_Object_): Device attributes.  
-    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister the qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
-
-| rsp.status | Status Code         | Description                                                                        |
-|------------|---------------------|------------------------------------------------------------------------------------|
-| 204        | Changed             | The Server successfuly accepted this update message                                |
-| 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
-| 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
-| 408        | Timeout             | No response from the Server in 60 secs                                             |
-| 500        | InternalServerError | The Server has some trouble                                                        |
-
-**Returns:**  
-
-* (_Object_): qnode
-
-**Examples:**  
-  
-```js
-// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
-qnode.setDevAttrs({
-    ip: '192.168.0.211'
-}, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
+var MqttNode = require('mqtt-node');
+var qnode = new MqttNode('my_foo_client_id', {
+    lifetime: 21600,
+    ip: '192.168.0.99',
+    mac: '00:0c:29:3e:1b:d2',
+    version: 'v0.0.6'
 });
+    
+console.log(qnode.clientId);    // 'my_foo_client_id'
+console.log(qnode.lifetime);    // 21600
+console.log(qnode.ip);          // '192.168.0.99'
+console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
+console.log(qnode.version);     // 'v0.0.6'
+// use qnode.setDevAttrs() to change the device attributes will
+// automatically publish the update message to the Server.
 ```
   
 ********************************************
@@ -561,6 +536,39 @@ qnode.pubDeregister(function (err, rsp) {
 ```
   
 ********************************************
+<a name="API_setDevAttrs"></a>
+### .setDevAttrs(devAttrs[, callback])
+Set device attribues on the qnode.  
+
+**Arguments:**
+  
+1. `devAttrs` (_Object_): Device attributes.  
+    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister the qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
+
+| rsp.status | Status Code         | Description                                                                        |
+|------------|---------------------|------------------------------------------------------------------------------------|
+| 204        | Changed             | The Server successfuly accepted this update message                                |
+| 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
+| 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
+| 408        | Timeout             | No response from the Server in 60 secs                                             |
+| 500        | InternalServerError | The Server has some trouble                                                        |
+
+**Returns:**  
+
+* (_Object_): qnode
+
+**Examples:**  
+  
+```js
+// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
+qnode.setDevAttrs({
+    ip: '192.168.0.211'
+}, function (err, rsp) {
+    console.log(rsp);   // { status: 204 }
+});
+```
+  
+********************************************
 <a name="API_pubNotify"></a>
 ### .pubNotify(note[, callback])
 Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
@@ -728,23 +736,19 @@ If you are using `mqtt-shepherd` as the LWMQN Server, the generic unsubscription
 ```js
 qnode.unsubscribe('foo/bar/score');
 ```
-..
+  
 ********************************************
 <br />
 <a name="Templates"></a>
 ## 7. Code Templates
 
-This document provides you with code templates of many IPSO-defined devices [(Smart Objects starter pack 1.0)](http://www.ipso-alliance.org/smart-object-guidelines/). Each code snippet also lists out the oid and every Resource characteristic in the Object with the format:  
-> < rid number, access, data type { range or enum }, unit >
-  
-1. [Digital Input](#tmpl_digitalInput)
-  
-********************************************
-<a name="tmpl_digitalInput"></a>
-### 01. Digital Input
+[Here is the document](https://github.com/lwmqn/mqtt-node/blob/master/docs/templates.md) that provides you with code templates of many IPSO-defined devices. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
+
+The following example shows how to create an **digital input** Object Instance. In the code snippet, commented lines are optional Resources. A phrase `< rid = 5500, R, Boolean >` tells the access permission and data type of a Resource.  
   
 ```js
-// 01. Digital Input (oid = 3200 or 'dIn')
+// Create an Object Instance: Digital Input (oid = 3200 or 'dIn')
+
 qnode.initResrc('dIn', 0, {
     dInState: {                     // < rid = 5500, R, Boolean >
         read: function (cb) {}
@@ -758,4 +762,4 @@ qnode.initResrc('dIn', 0, {
     // sensorType:                  // < rid = 5751,  R, String >
 });
 ```
-  
+
