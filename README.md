@@ -14,9 +14,9 @@ mqtt-node
 <a name="Overiew"></a>
 ## 1. Overview
 
-The lightweight MQTT machine network ([**LWMQN**](https://simenkid.github.io/lwmqn)) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-[**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server and this module, [**mqtt-node**](https://github.com/simenkid/mqtt-node), is an implementation of LWMQN Client with node.js. **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network. This client module is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
+[**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server, and this module, [**mqtt-node**](https://github.com/simenkid/mqtt-node), is an implementation of LWMQN Client with node.js. **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network. This client module is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
 
 **mqtt-node** uses IPSO definitions as its fundamental of resource organizing on devices. This document also provides templates of many common devices defined by IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control. **mqtt-node** is trying to let you build IoT peripheral machines with no pain.  
 
@@ -26,15 +26,20 @@ The lightweight MQTT machine network ([**LWMQN**](https://simenkid.github.io/lwm
 * **oid**: identifier of an Object  
 * **iid**: identifier of an Object Instance  
 * **rid**: indetifier of a Resource  
+* **Server**: LWMQN server
+* **Client** or **Client Device**: LWMQN client which is usually a machine node in IoT network
 
-Note: IPSO uses _Object_, _Object Instance_ and _Resource_ to describe the hierarchical structure of resources on a Client Device, and oid, iid, and rid are identifiers of them respectively to allocate the resource on a device.  
+
+**Note**:  
+* IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where oid, iid, and rid are identifiers of them respectively to allocate resources on a Client Device.  
+* An IPSO **_Object_** is like a Class, and an IPSO **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
 
 <a name="Features"></a>
 ## 2. Features
 
 * Communication based on MQTT protocol and library [**mqtt.js**](https://www.npmjs.com/package/mqtt)  
-* Structuring the device resources in a hierarchical Smart-Object-style (IPSO)  
-* Easy to create a Resource on a Client Device  
+* Structuring resources in a hierarchical Smart-Object-style (IPSO)  
+* Easy to create Resources on a Client Device  
 * LWM2M-like interfaces for Client/Server interaction 
   
 <a name="Installation"></a>
@@ -45,7 +50,7 @@ Note: IPSO uses _Object_, _Object Instance_ and _Resource_ to describe the hiera
 <a name="Basic"></a>
 ## 4. Basic Usage
 
-Client-side exmaple (here is how to use `mqtt-node` on the machine device):  
+* Client-side exmaple (here is how you use `mqtt-node` on a machine node):  
 
 ```js
 var MqttNode = require('mqtt-node');
@@ -56,7 +61,7 @@ var MqttNode = require('mqtt-node');
 var qnode = new MqttNode('my_foo_client_id');
 
 // Initialize the Resource that follows the IPSO definition
-// We have two humidity sensor here
+// We have two humidity sensors here
 
 // oid = 'humidity', iid = 0
 qnode.initResrc('humidity', 0, {
@@ -78,10 +83,11 @@ qnode.initResrc('myObject', 0, {
 
 qnode.on('ready', function () {
     // If the registration procedure completes successfully, 'ready' will be fired
-    // do you work here
+
+    // start to run your application
 });
 
-// Connect to the server with default account of mqtt-shepherd
+// Connect to the Server with default account of mqtt-shepherd
 // Registration procedure 
 qnode.connect('mqtt://192.168.0.2', {
     username: 'freebird',
@@ -89,167 +95,30 @@ qnode.connect('mqtt://192.168.0.2', {
 });
 ```
 
-Server-side example (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
+* Server-side example (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
 
 ```js
 var qnode = qserver.findNode('my_foo_client_id');
 
-qnode.readReq('humidity/0/sensorValue', function (err, rsp) {
-    console.log(rsp.data);      // 20
-});
+if (qnode) {
+    qnode.readReq('humidity/0/sensorValue', function (err, rsp) {
+        console.log(rsp.data);      // 20
+    });
 
-qnode.readReq('myObject/0/myResrc2', function (err, rsp) {
-    console.log(rsp.data);      // 'hello world!'
-});
+    qnode.readReq('myObject/0/myResrc2', function (err, rsp) {
+        console.log(rsp.data);      // 'hello world!'
+    });
+}
 ```
   
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using this module in your LWMQN Client design is that you almost need not to tackle the requests/responses by yourself, since **mqtt-node** has tackled many of them for you. All you have to do is to plan your Resources well. What Resources do you have on the Client Device? Which Resource is readable? Which Resource is writable? And which Resource is remotely executable? Once your Resources are initialized, **mqtt-node** itself will know how to respond to the requests from a LWMQN Server.  
+The great benefit of using this module in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will tackle many of the REQ/RSP things for you.  
+
+What Resources do you have on the Client Device? Which Resource is readable? Which Resource is writable? And which Resource is remotely executable? Once your Resources are initialized, **mqtt-node** itself will know how to respond to the requests from a LWMQN Server.  
 
 </br>
-
-Use API `initResrc(oid, iid, resrcs)` to initialize your Resources, where `oid` and `iid` are the Object id and Object Instance id, respectively. `resrcs` is an object containing all Resources under this Object Instance. Each key in `resrcs` object should be an `rid` and each value is the corresponding Resource value. Resource value can be a simple primitive, such as a number, a string and a boolean. Here is an example: 
-  
-```js
-// oid = 'temperature' tells mqtt-node that you have a temperature sensor Object
-// iid = 0 tells mqtt-node to instantiate this sensor with an identifier of 0
-qnode.initResrc('temperature', 0, {
-    sensorValue: 20,
-    units: 'cel'
-});
-```
-  
-You may think that the temperature is a time-varying value, and just giving it a number is definitely not a good idea. You developers have responsibility for making this sensor play correctly. Let me show you an example:
-  
-```js
-qnode.initResrc('temperature', 0, {
-    sensorValue: 20,
-    units: 'cel'
-});
-
-// Assume that temperature value is just read from a particular analog pin  
-// Here, I use setInterval() to poll the pin every 60 seconds and write the sensed value to the corresponding Resource
-setInterval(function () {
-    var analogVal = analogPin0.read();
-    qnode.writeResrc('temperature', 0, 'sensorValue', analogVal);
-}, 60*1000);
-```
-  
-So far, polling seems just fine in this temperature sensing example. If the Server requests for the sensorValue of this Resource, **mqtt-node** will find out the latest value you updated and respond it back to the Server. The problem of polling is that the Server may not always get the newest value each time it requests for the sensorValue.  
-
-A solution to this problem is to poll the sensor more frequently, e.g., every 100ms, this is what you may face if you are using a simple MQTT client on your device. I think you never want to do so to keep your device busy. This is where **mqtt-node** can help.  
-
-**mqtt-node** allows a Resource value to be an object with `read` and `write` methods. You can tell **mqtt-node** how to read/write your Resource through this kind of object. Each time the Server requests for the Resource, **mqtt-node** will perform the read() method on that Resource to get its current value and respond the result to the Server immediately.  
-
-It is very simple to use this scheme. The first thing you need to know is that the signature of `read` method is `function(cb)`, where `cb(err, value)` is an err-back function that you should call and pass the read value through its second argument when read operation accomplishes. If any error occurs, pass the error through the first argument. Let's go back to the previous example:
-  
-```js
-qnode.initResrc('temperature', 0, {
-    sensorValue: {
-        read: function (cb) {
-            var analogVal = analogPin0.read();
-            cb(null, analogVal);
-        }
-    },
-    units: 'cel'
-});
-```
-  
-See, it's simple. If you define this object with a read method, this Resource will be inherently readable.  
-  
-The pattern for a writable Resource is similar. The signature of `write` method is `function(value, cb)`, where `value` is the value to wirte to this Resource and `cb(err, value)` is an err-back function that you should call and pass the written value through its second argument. Example again:  
-  
-```js
-qnode.initResrc('actuation', 6, {
-    onOff: {
-        write: function (value, cb) {
-            digitalPin2.write(value);
-
-            var digitalVal = digitalPin2.read();
-            cb(null, digitalVal);
-        }
-    }
-});
-```
-  
-Now, the written value will be automatically responded back to the Server along with a status code of 204(Changed). In this example, we only define the write method for the Resource, thus it is writable but not readable. If the Server is trying to request for this Resource, he will get a special value of string `'\_unreadable\_'` along with a status code of 405(MethodNotAllow).  
-  
-If this Resource is both readable and writable, you should give both of read and write methods to it:
-  
-```js
-qnode.initResrc('actuation', 6, {
-    onOff: {
-        read: function () {
-            var digitalVal = digitalPin2.read();
-            cb(null, digitalVal);
-        },
-        write: function (value, cb) {
-            digitalPin2.write(value);
-            cb(null, digitalPin2.read());
-        }
-    }
-});
-```
-  
-Ok, good! You've not only learned how to read/write a Resource but also learned how to do the 'Access Control' on a Resource. If the Resource value is a primitive, **mqtt-node** will flow the access rules from IPSO specification. Section [Code Templates] lists out these rules for each Object. If your Resource value is a primitive and you don't want to follow the default access rules, you can wrap it up with the special object we've just introduced. See this example:
-  
-```js
-var tempVal = 26;
-
-qnode.initResrc('temperature', 0, {
-    sensorValue: {
-        read: function (cb) {
-            cb(null, tempVal);
-        }
-    },
-    units: 'cel'
-});
-```
-  
-Next, let's take a look at something really cool - an executable Resource. This kind of Resource allows you to remotely issue a procedure on the Device, for example, ask your Device to blink a LED for 10 times. You can define some useful and interesting remote procedure calls(RPCs) with executable Resources. To do so, give your Resource an object with the `exec` method. In this case, the Resource will be inherently an executable one, the Server will get a bad response of status 405(MethodNotAllow) with a special value of string `'\_exec\_'` when a Server is trying to remotely access (read/write) it. This means that read and write methods are meaningless to an executable Resource even if you do give an object with these two methods to the Resource.  
-
-If the Resource is not an executable one, **mqtt-node** will respond a status 405(MethodNotAllow) with a special value of `'\_unexecutable\_'` when a Server is trying to remotely invoke it.  
-  
-It's time to show you an example. Assume that we have an executable Resource 'function(led, t)' on the Device to start blinking the `led` with `t` times.  
-  
-```js
-function blinkLed(led, t) {
-    // logic of blinking an led
-}
-
-qnode.initResrc('myObject', 0, {
-    blink: {
-        exec: function (led, t, cb) {
-            blinkLed(led, t);       // invoke the procedure
-            cb(null, 'blinking');   // cb(status, data), default status is 204(Changed)
-                                    // data is something you want to respond to the Server
-        }
-    }
-});
-```
-  
-The signature of `exec` method is `function(...[, cb])`, the number of arguments depends on your own definition. The callback `cb(status, data)` is optional and should be called if you want to respond something back to the Server. If `cb` is not given or got called, **mqtt-node** will regard this execuation as a successful one and respond the default status 204(Changed) with an undefined data to the Server. Since **mqtt-node** doesn't know what your procudure is doing, developers must be responsible for creating the resulted response on their own.  
-
-As mentioned in LWM2M specification, the Client should response a status code of 400(BadRequest) if it doesn't understand the argument in the payload. Let me show you an example:  
-  
-```js
-qnode.initResrc('myObject', 0, {
-    blink: {
-        exec: function (led, t, cb) {
-            if (typeof t !== 'number') {
-                cb(400, null);
-            } else {
-                blinkLed(led, t);
-                cb(204, 'blinking');
-            }
-        }
-    }
-});
-```
-  
-An Executable Resource is a necessary if you like to do something complicated. Think of that how do you blink a certain led with arbitray times if you are just using general readable/writable Resources? That can be a pain in the ass. In addtion, the difference bewteen LWMQN and LWM2M on Executable Resources is that LWMQN allows an executable Resource to response data back to the Server and LWM2M just response status to the Server by definition. RPCs in LWMQN is more interactive. An Executable Resource is very powerful and it let your machines do more things and be more automatic. IoT is not just about reading something from or writing something to machines.  
 
 <a name="APIs"></a>
 ## 6. APIs
@@ -869,23 +738,6 @@ This document provides you with code templates of many IPSO-defined devices [(Sm
 > < rid number, access, data type { range or enum }, unit >
   
 1. [Digital Input](#tmpl_digitalInput)
-2. [Digital Output](#tmpl_digitalOutput)
-3. [Analog Input](#tmpl_analogInput)
-4. [Analog Output](#tmpl_analogOutput)
-5. [Generic Sensor](#tmpl_genericSensor)
-6. [Illuminance Sensor](#tmpl_illumSensor)
-7. [Presence Sensor](#tmpl_presenceSensor)
-8. [Temperature Sensor](#tmpl_temperature)
-9. [Humidity Sensor](#tmpl_humidity)
-10. [Power Measurement](#tmpl_pwrMea)
-11. [Actuation](#tmpl_actuation)
-12. [Set Point](#tmpl_setPoint)  
-13. [Load Control](#tmpl_loadCtrl)  
-14. [Light Control](#tmpl_lightCtrl) 
-15. [Power Control](#tmpl_pwrCtrl)
-16. [Accelerometer](#tmpl_accelerometer)
-17. [Magnetometer](#tmpl_magnetometer) 
-18. [Barometer](#tmpl_barometer)     
   
 ********************************************
 <a name="tmpl_digitalInput"></a>
@@ -904,337 +756,6 @@ qnode.initResrc('dIn', 0, {
     // counterReset: ,              // < rid = 5505,  E, Opaque >
     // appType: ,                   // < rid = 5750, RW, String >
     // sensorType:                  // < rid = 5751,  R, String >
-});
-```
-  
-********************************************
-<a name="tmpl_digitalOutput"></a>
-### 02. Digital Output
-  
-```js
-// 02. Digital Output (oid = 3201 or 'dOut')
-qnode.initResrc('dOut', 0, {
-    dOutState: {                    // < rid = 5550, RW, Boolean >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // dOutpolarity: ,              // < rid = 5551, RW, Boolean { 0: normal, 1: reversed } >
-    // appType:                     // < rid = 5750, RW, String >
-});
-```
-  
-********************************************
-<a name="tmpl_analogInput"></a>
-### 03. Analog Input
-  
-```js
-// 03. Analog Input (oid = 3202 or 'aIn')
-qnode.initResrc('aIn', 0, {
-    aInCurrValue: {                 // < rid = 5600, R, Float >
-        read: function (cb) {}
-    },
-    // minMeaValue: ,               // < rid = 5601,  R, Float >
-    // maxMeaValue: ,               // < rid = 5602,  R, Float >
-    // minRangeValue: ,             // < rid = 5603,  R, Float >
-    // maxRangeValue: ,             // < rid = 5604,  R, Float >
-    // resetMinMaxMeaValues: ,      // < rid = 5605,  E, Opaque >
-    // appType: ,                   // < rid = 5750, RW, String >
-    // sensorType:                  // < rid = 5751,  R, String >
-});
-```
-  
-********************************************
-<a name="tmpl_analogOutput"></a>
-### 04. Analog Output
-  
-```js
-// 04. Analog Output (oid = 3203 or 'aOut')
-qnode.initResrc('aOut', 0, {
-    aOutCurrValue: {                // < rid = 5650, RW, Float >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // minRangeValue: ,             // < rid = 5603,  R, Float >
-    // maxRangeValue: ,             // < rid = 5604,  R, Float >
-    // appType:                     // < rid = 5750, RW, String >
-});
-```
-  
-********************************************
-<a name="tmpl_genericSensor"></a>
-### 05. Generic Sensor
-  
-```js
-// 05. Generic Sensor (oid = 3300 or 'generic')
-qnode.initResrc('generic', 0, {
-    sensorValue: {                  // < rid = 5700, R, Float >
-        read: function (cb) {}
-    },
-    // units: ,                     // < rid = 5701,  R, String >
-    // minMeaValue: ,               // < rid = 5601,  R, Float >
-    // maxMeaValue: ,               // < rid = 5602,  R, Float >
-    // minRangeValue: ,             // < rid = 5603,  R, Float >
-    // maxRangeValue: ,             // < rid = 5604,  R, Float >
-    // resetMinMaxMeaValues: ,      // < rid = 5605,  E, Opaque >
-    // appType: ,                   // < rid = 5750, RW, String >
-    // sensorType:                  // < rid = 5751,  R, String >
-});
-```
-  
-********************************************
-<a name="tmpl_illumSensor"></a>
-### 06. Illuminance Sensor
-  
-```js
-// 06. Illuminance Sensor (oid = 3301 or 'illuminance')
-qnode.initResrc('illuminance', 0, {
-    sensorValue: {                  // < rid = 5700, R, Float >
-        read: function (cb) {}
-    },
-    // units: ,                     // < rid = 5701, R, String >
-    // minMeaValue: ,               // < rid = 5601, R, Float >
-    // maxMeaValue: ,               // < rid = 5602, R, Float >
-    // minRangeValue: ,             // < rid = 5603, R, Float >
-    // maxRangeValue: ,             // < rid = 5604, R, Float >
-    // resetMinMaxMeaValues:        // < rid = 5605, E, Opaque >
-});
-```
-  
-********************************************
-<a name="tmpl_presenceSensor"></a>
-### 07. Presence Sensor
-  
-```js
-// 07. Presence Sensor (oid = 3302 or 'presence')
-qnode.initResrc('presence', 0, {
-    dInState: {                     // < rid = 5500, R, Boolean >
-        read: function (cb) {}
-    },
-    // counter: ,                   // < rid = 5501,  R, Integer >
-    // counterReset: ,              // < rid = 5505,  E, Opaque >
-    // sensorType: ,                // < rid = 5751,  R, String >
-    // busyToClearDelay: ,          // < rid = 5903, RW, Integer, ms >
-    // clearToBusyDelay:            // < rid = 5904  RW, Integer, ms >
-});
-```
-  
-********************************************
-<a name="tmpl_temperature"></a>
-### 08. Temperature Sensor
-  
-```js
-// 08. Temperature Sensor (oid = 3303 or 'temperature')
-qnode.initResrc('temperature', 0, {
-    sensorValue: {                  // < rid = 5700, R, Float >
-        read: function (cb) {}
-    },
-    // units: ,                     // < rid = 5701, R, String >
-    // minMeaValue: ,               // < rid = 5601, R, Float >
-    // maxMeaValue: ,               // < rid = 5602, R, Float >
-    // minRangeValue: ,             // < rid = 5603, R, Float >
-    // maxRangeValue: ,             // < rid = 5604, R, Float >
-    // resetMinMaxMeaValues:        // < rid = 5605, E, Opaque >
-});
-```
-  
-********************************************
-<a name="tmpl_humidity"></a>
-### 09. Humidity Sensor
-  
-```js
-// 09. Humidity Sensor (oid = 3304 or 'humidity')
-qnode.initResrc('humidity', 0, {
-    sensorValue: {                  // < rid = 5700, R, Float >
-        read: function (cb) {}
-    },
-    // units: ,                     // < rid = 5701, R, String >
-    // minMeaValue: ,               // < rid = 5601, R, Float >
-    // maxMeaValue: ,               // < rid = 5602, R, Float >
-    // minRangeValue: ,             // < rid = 5603, R, Float >
-    // maxRangeValue: ,             // < rid = 5604, R, Float >
-    // resetMinMaxMeaValues:        // < rid = 5605, E, Opaque >
-});
-```
-  
-********************************************
-<a name="tmpl_pwrMea"></a>
-### 10. Power Measurement
-  
-```js
-// 10. Power Measurement (oid = 3305 or 'pwrMea')
-qnode.initResrc('pwrMea', 0, {
-    instActivePwr: {                // < rid = 5800, R, Float, Wh >
-        read: function (cb) {}
-    },
-    // minMeaActivePwr: ,           // < rid = 5801,  R, Float, W >
-    // maxMeaActivePwr: ,           // < rid = 5802,  R, Float, W >
-    // minRangeActivePwr: ,         // < rid = 5803,  R, Float, W >
-    // maxRangeActivePwr: ,         // < rid = 5804,  R, Float, W >
-    // cumulActivePwr: ,            // < rid = 5805,  R, Float, Wh >
-    // activePwrCal: ,              // < rid = 5806,  W, Float, W >
-    // instReactivePwr: ,           // < rid = 5810,  R, Float, VAR >
-    // minMeaReactivePwr: ,         // < rid = 5811,  R, Float, VAR >
-    // maxMeaReactivePwr: ,         // < rid = 5812,  R, Float, VAR >
-    // minRangeReactivePwr: ,       // < rid = 5813,  R, Float, VAR >
-    // maxRangeReactivePwr: ,       // < rid = 5814,  R, Float, VAR >
-    // resetMinMaxMeaValues: ,      // < rid = 5605,  E, Opaque >
-    // cumulReactivePwr: ,          // < rid = 5815,  R, Float, VARh >
-    // reactivePwrCal: ,            // < rid = 5816,  W, Float, VAR >
-    // pwrFactor: ,                 // < rid = 5820,  R, Float >
-    // currCal: ,                   // < rid = 5821, RW, Float >
-    // resetCumulEnergy: ,          // < rid = 5822,  E, Opaque >
-});
-```
-  
-********************************************
-<a name="tmpl_actuation"></a>
-### 11. Actuation
-  
-```js
-// 11. Actuation (oid = 3306 or 'actuation')
-qnode.initResrc('actuation', 0, {
-    onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // dimmer: ,                    // < rid = 5851, RW, Integer { 0 ~ 100 }, % >
-    // onTime: ,                    // < rid = 5852, RW, Integer, s >
-    // mstateOut: ,                 // < rid = 5853, RW, String >
-    // appType:                     // < rid = 5750, RW, String >
-});
-```
-  
-********************************************
-<a name="tmpl_setPoint"></a>
-### 12. Set Point
-  
-```js
-// 12. Set Point (oid = 3308 or 'setPoint')
-qnode.initResrc('setPoint', 0, {
-    setPointValue: {                // < rid = 5900, RW, Float >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // colour: ,                    // < rid = 5706, RW, String >
-    // units: ,                     // < rid = 5701,  R, String >
-    // appType:                     // < rid = 5750, RW, String >
-});
-```
-  
-********************************************
-<a name="tmpl_loadCtrl"></a>
-### 13. Load Control
-  
-```js
-// 13. Load Control (oid = 3310 or 'loadCtrl')
-qnode.initResrc('loadCtrl', 0, {
-    eventId: {                      // < rid = 5823, RW, String >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    startTime: {                    // < rid = 5824, RW, Time >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    durationInMin: {                // < rid = 5825, RW, Integer, min >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // criticalLevel: ,             // < rid = 5826, RW, Integer { 0: normal, 1: warning, 2: danger, 3: fatal } >
-    // avgLoadAdjPct: ,             // < rid = 5827, RW, Integer { 0 ~ 100 }, % >
-    // dutyCycle:                   // < rid = 5828, RW, Interger { 0 ~ 100 }, % >
-});
-```
-  
-********************************************
-<a name="tmpl_lightCtrl"></a>
-### 14. Light Control
-  
-```js
-// 14. Light Control (oid = 3311 or 'lightCtrl')
-qnode.initResrc('lightCtrl', 0, {
-    onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // dimmer: ,                    // < rid = 5851, RW, Integer { 0 ~ 100 }, %  >
-    // colour: ,                    // < rid = 5706, RW, String >
-    // units: ,                     // < rid = 5701,  R, String >
-    // onTime: ,                    // < rid = 5852, RW, Integer, s >
-    // cumulActivePwr: ,            // < rid = 5805,  R, Float, Wh >
-    // pwrFactor:                   // < rid = 5820,  R, Float >
-});
-```
-  
-********************************************
-<a name="tmpl_pwrCtrl"></a>
-### 15. Power Control
-  
-```js
-// 15. Power Control (oid = 3312 or 'pwrCtrl')
-qnode.initResrc('pwrCtrl', 0, {
-    onOff: {                        // < rid = 5850, RW, Boolean { 0: off, 1: on } >
-        read: function (cb) {},
-        write: function (cb) {}
-    },
-    // dimmer: ,                    // < rid = 5851, RW, Integer { 0 ~ 100 }, % >
-    // onTime: ,                    // < rid = 5852, RW, Integer, s >
-    // cumulActivePwr: ,            // < rid = 5805,  R, Float, Wh >
-    // pwrFactor:                   // < rid = 5820,  R, Float >
-});
-```
-  
-********************************************
-<a name="tmpl_accelerometer"></a>
-### 16. Accelerometer
-
-```js
-// 16. Accelerometer (oid = 3313 or 'accelerometer')
-qnode.initResrc('accelerometer', 0, {
-    xValue: {                       // < rid = 5702, R, Float >
-        read: function (cb) {}
-    },
-    // yValue: ,                    // < rid = 5703, R, Float >
-    // zValue: ,                    // < rid = 5704, R, Float >
-    // units: ,                     // < rid = 5701, R, String >
-    // minRangeValue: ,             // < rid = 5603, R, Float >
-    // maxRangeValue:               // < rid = 5604, R, Float >
-});
-```
-  
-********************************************
-<a name="tmpl_magnetometer"></a>
-### 17. Magnetometer
-  
-```js
-// 17. Magnetometer (oid = 3314 or 'magnetometer')
-qnode.initResrc('magnetometer', 0, {
-    xValue: {                       // < rid = 5702, R, Float >
-        read: function (cb) {}
-    },
-    // yValue: ,                    // < rid = 5703, R, Float >
-    // zValue: ,                    // < rid = 5704, R, Float >
-    // units:,                      // < rid = 5701, R, String >
-    // compassDir:                  // < rid = 5705, R, Float { 0 ~ 360 }, deg >
-});
-```
-  
-********************************************
-<a name="tmpl_barometer"></a>
-### 18. Barometer
-  
-```js
-// 18. Barometer (oid = 3315 or 'barometer')
-qnode.initResrc('barometer', 0, {
-    sensorValue: {                  // < rid = 5700, R, Float >
-        read: function (cb) {}
-    },
-    // units: ,                     // < rid = 5701, R, String >
-    // minMeaValue: ,               // < rid = 5601, R, Float >
-    // maxMeaValue: ,               // < rid = 5602, R, Float >
-    // minRangeValue: ,             // < rid = 5603, R, Float >
-    // maxRangeValue: ,             // < rid = 5604, R, Float >
-    // resetMinMaxMeaValues:        // < rid = 5605, E, Opaque >
 });
 ```
   
