@@ -16,7 +16,7 @@ mqtt-node
 
 Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-* Tis module, **mqtt-node**, is an implementation of LWMQN Client.  
+* This module, **mqtt-node**, is an implementation of LWMQN Client.  
 * [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server.  
 * **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network.  
 * **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
@@ -117,11 +117,11 @@ if (qnode) {
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using **mqtt-node** in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will tackle many of the REQ/RSP things for you.  
+The great benefit of using **mqtt-node** in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will automatically tackle many of the REQ/RSP things for you.  
 
 What Resources do you have on the Client Device? Which Resource is readable? Which Resource is writable? And which Resource is remotely executable? Once your Resources are initialized, **mqtt-node** itself will know how to respond to the requests from a LWMQN Server.  
 
-Here is the [tutorial of how to plan your Resources](https://github.com/lwmqn/mqtt-node/blob/master/docs/rsc_plan.md) with **mqtt-node** initResrc() method. The description of [initResrc()](#API_initResrc) also shows some quick examples.  
+Here is a [tutorial of how to plan your Resources](https://github.com/lwmqn/mqtt-node/blob/master/docs/rsc_plan.md) with **mqtt-node**. The description of [initResrc()](#API_initResrc) also shows some quick examples.  
 
 </br>
 
@@ -201,15 +201,16 @@ Initialize the Resources on qnode.
 
 **Arguments:**  
 
-1. `oid` (_String|Number_): Id of the Object that owns the Resources.  
-    `oid` can be an IPSO-defined or LWM2M-defined identifiers in string or in number. Please refer to the [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined ids. If `oid` is not a pre-defined identifer, LWMQN will regard it as a private one.  
+1. `oid` (_String | Number_): Id of the Object that owns the Resources.  
+    `oid` can be an IPSO-defined or LWM2M-defined identifiers in string or in number. Please refer to the [lwm2m-id](https://github.com/simenkid/lwm2m-id#5-table-of-identifiers) for all pre-defined ids. If `oid` is not a pre-defined identifer, LWMQN will take it as a private one.  
 
-2. `iid` (_String|Number_): Id of the Object Instance that owns the Resource.  
-    It is common to use numbers to enumerate Object Instances, but using a string for the `iid` is also accepted, e.g., 12, '12' and 'my_instance01' are all valid.  
+2. `iid` (_String | Number_): Id of the Object Instance that owns the Resource.  
+    It is common to use numbers to enumerate Object Instances, but using a string for the `iid` is also accepted, e.g., `12`, `'12'` and `'my_instance01'` are all valid.  
 
-3. `resrcs` (_Object_): An object with rid-value pairs to describe the Resources.  
-    Each key represents a `rid` and each value is the corresponding Resource value. Resource value can be a primitive, an data object, or an object with specific methods, i.e. `read()`, `write()`, `exec()`. Please refer to section [Resources Planning](#Resources) for more details of Resource initializztion.  
-    </br>
+3. `resrcs` (_Object_): An object with **rid-value** pairs to describe the Resources.  
+    Each key is a `rid` and each value is the corresponding value of the Resource. Resource value can be a primitive, an data object, or an object with specific methods, i.e. `read()`, `write()`, `exec()`. Please refer to section [Resources Planning](#Resources) for more details of Resource initializztion.  
+
+</br>
   
 **Returns:**  
   
@@ -334,12 +335,12 @@ Read the value from an allocated Resource.
   
 **Arguments:**  
 
-1. `oid` (_String|Number_): Object id  
-2. `iid` (_String|Number_): Object Instance id  
-3. `rid` (_String|Number_): Resource id  
+1. `oid` (_String | Number_): Object id  
+2. `iid` (_String | Number_): Object Instance id  
+3. `rid` (_String | Number_): Resource id  
 4. `callback` (_Function_): An err-fisrt callback `function(err, val)` to get the read value.  
 
-    * If the Resource is not a simple value and there has no `read` method been initialized for it, the `val` passes to the callback will be a string `_unreadable_`. For example, you are trying to read a write-only Resource which is initialized without a read method.  
+    * If the Resource is not a simple value and there has not a `read` method been initialized for it, the `val` passes to the callback will be a string `_unreadable_`, e.g., you are trying to read a write-only Resource which is initialized without a read method.  
     * If the Resource is an executable Resource, the `val` passes to the callback will be a string `_exec_`.  
     * If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
 
@@ -378,13 +379,13 @@ Write the value to an allocated Resource.
   
 **Arguments:**  
 
-1. `oid` (_String|Number_): Object id  
-2. `iid` (_String|Number_): Object Instance id  
-3. `rid` (_String|Number_): Resource id  
+1. `oid` (_String | Number_): Object id  
+2. `iid` (_String | Number_): Object Instance id  
+3. `rid` (_String | Number_): Resource id  
 3. `value` (_Depends_): The value to write to the allocated Resource.  
-4. `callback` (_Function_): An err-fisrt callback `function(err, val)` to get the current value after the Resource been written.  
+4. `callback` (_Function_): An err-fisrt callback `function(err, val)`, where `val` is the value been successfully written.  
 
-    * If the Resource is not a simple value and there has no `write` method been initialized for it, the `val` passes to the callback will be a string `_unwritable_`.  
+    * If the Resource is not a simple value and there has not a `write` method been initialized for it, the `val` passes to the callback will be a string `_unwritable_`.  
     * If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
   
 **Returns:**  
@@ -480,11 +481,11 @@ qnode.close();
 ********************************************
 <a name="API_pubRegister"></a>
 ### .pubRegister([callback])
-Publish a registering request to the Server. Everytime you invoke .connect() method, qnode will do the regiseteringn procedure to the Server under the hood as well.  
+Publish a registering request to the Server. Everytime you invoke .connect(), qnode will do regiseter to the Server as well.  
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)`. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of registration. The descriptions of `rsp.status` are given in the following table.  
+1. `callback` (_Function_): `function (err, rsp)`. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of registration. The descriptions of possible `rsp.status` are given in the following table.  
   
 | rsp.status | Status              | Description                                                                           |
 |------------|---------------------|---------------------------------------------------------------------------------------|
@@ -514,7 +515,7 @@ Publish a deregistering request to the Server for the Client to leave the networ
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called when the deregistering procedure is done. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of deregistration.  
+1. `callback` (_Function_): `function (err, rsp)` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
   
 | rsp.status | Status              | Description                                |
 |------------|---------------------|--------------------------------------------|
@@ -543,8 +544,9 @@ Set device attribues on the qnode.
 **Arguments:**
   
 1. `devAttrs` (_Object_): Device attributes.  
-    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister the qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
+    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
 
+2. `callback` (_Function_): `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
 | rsp.status | Status Code         | Description                                                                        |
 |------------|---------------------|------------------------------------------------------------------------------------|
 | 204        | Changed             | The Server successfuly accepted this update message                                |
@@ -573,14 +575,13 @@ qnode.setDevAttrs({
 ### .pubNotify(note[, callback])
 Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
 
+* Notice that **mqtt-node** will automatically report notifications to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
 * If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid`, and `data`, where `data` is the Resource value.  
 * If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid`, and `data` fields, where `data` is the Object Instance containing all its Resources. Please refer to [LWMQN Notify Channel](#LWMQN_PAGE) for more info.  
-* It is noted that **mqtt-node** will automatically report notifications to the Server if the Client is 'observed' by the Server. Therefore, this API is seldom been used unless you do have to notify something to the Server aggressively in your application.  
- 
 
 **Arguments:**  
 
-1. `note` (_Object_): a Resource or an Instance you like to report to the Server.  
+1. `note` (_Object_): A Resource or an Object Instance you like to report to the Server.  
 2. `callback` (_Function_): `function (err, rsp)` will be called when the acknowledgement is coming back from the Server.  
   
 | rsp.status | Status              | Description                                                  |
@@ -642,7 +643,7 @@ Ping the Server.
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called upon the response coming back. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round trip time in milliseconds.  
+1. `callback` (_Function_): `function (err, rsp)` will be called upon receiving the response. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round trip time in milliseconds.  
   
 | rsp.status | Status              | Description                                                     |
 |------------|---------------------|-----------------------------------------------------------------|
@@ -670,10 +671,10 @@ If you are using `mqtt-shepherd` as the LWMQN Server, it accepts a registered Cl
   
 **Arguments:**  
 
-1. `topic` (_String_): the topic to publish to.  
-2. `message` (_String|Buffer_): the message to publish.  
-3. `options` (_Object_): the option to publish with, including the properties shown in the following table.  
-4. `callback` (_Function_): will be called when the QoS handling completes, or at the next tick if QoS 0.  
+1. `topic` (_String_): Topic to publish to.  
+2. `message` (_String | Buffer_): Message to publish.  
+3. `options` (_Object_): Option to publish with, including the properties shown in the following table.  
+4. `callback` (_Function_): Will be called when the QoS handling completes, or at the next tick if QoS 0.  
   
 | Property | Type    | Default | Description |
 |----------|---------|---------|-------------|
@@ -693,14 +694,14 @@ qnode.publish('foo/bar/greet', 'Hello World!');
 ********************************************
 <a name="API_subscribe"></a>
 ### .subscribe(topics[, options][, callback])
-This is a generic method to subscribe to a topic or topics in an array.  
+This is a generic method to subscribe to a topic or topics listed in an array.  
   
 If you are using `mqtt-shepherd` as the LWMQN Server, it accepts the registered Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
 1. `topics` (_String_ | _String[]_): the topic(s) to subscribe to.  
-2. `options` (_Object_): the option to subscribe with, including the property `qos` which is a Qos level of the subscription. `qos` is 0 by default.    
+2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a Qos level of the subscription. `qos` is 0 by default.  
 3. `callback` (_Function_): `function (err, granted)` callback will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`  
   
 **Returns:**  
@@ -724,8 +725,8 @@ If you are using `mqtt-shepherd` as the LWMQN Server, the generic unsubscription
   
 **Arguments:**  
 
-1. `topic` (_String_|_String[]_): the topic(s) to unsubscribe from.  
-2. `callback` (_Function_): callback fired on unsuback  
+1. `topic` (_String_|_String[]_): Topic(s) to unsubscribe from.  
+2. `callback` (_Function_): Callback will be fired on unsuback  
   
 **Returns:**  
 
@@ -742,7 +743,7 @@ qnode.unsubscribe('foo/bar/score');
 <a name="Templates"></a>
 ## 7. Code Templates
 
-[Here is the document](https://github.com/lwmqn/mqtt-node/blob/master/docs/templates.md) that provides you with code templates of many IPSO-defined devices. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
+[Here is the document](https://github.com/lwmqn/mqtt-node/blob/master/docs/templates.md) that provides you with many code templates of IPSO-defined devices. Each template gives the code snippet of how to initialize an Object Instance with its oid and iid, and lists every Resource the Object Instance may have.  
 
 The following example shows how to create an **digital input** Object Instance. In the code snippet, commented lines are optional Resources. A phrase `< rid = 5500, R, Boolean >` tells the access permission and data type of a Resource.  
   
@@ -762,4 +763,3 @@ qnode.initResrc('dIn', 0, {
     // sensorType:                  // < rid = 5751,  R, String >
 });
 ```
-
