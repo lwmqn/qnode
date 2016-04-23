@@ -545,8 +545,8 @@ Set device attribues on the qnode.
   
 1. `devAttrs` (_Object_): Device attributes.  
     It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
-
 2. `callback` (_Function_): `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
+
 | rsp.status | Status Code         | Description                                                                        |
 |------------|---------------------|------------------------------------------------------------------------------------|
 | 204        | Changed             | The Server successfuly accepted this update message                                |
