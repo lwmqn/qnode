@@ -14,36 +14,37 @@ mqtt-node
 <a name="Overiew"></a>
 ## 1. Overview
 
-Lightweight MQTT machine network (**LWMQN**) is an architecture that follows part of [**LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
 * This module, **mqtt-node**, is an implementation of LWMQN Client.  
 * [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server.  
 * **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network.  
-* **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html) and many more.  
+* **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
 * **mqtt-node** uses IPSO definitions as its fundamental of resource organizing on devices. This document also provides [templates](https://github.com/lwmqn/mqtt-node/blob/master/docs/templates.md) of many common devices defined by IPSO [**Smart Objects starter pack 1.0**](http://www.ipso-alliance.org/smart-object-guidelines/), i.e., temperature sensor, humidity sensor, light control.  
-* **mqtt-node** is trying to let you build IoT peripheral machines with no pain.  
-
-#### Acronym
-* **MqttNode**: class exposed by `require('mqtt-node')`  
-* **qnode**: instance of MqttNode class  
-* **oid**: identifier of an Object  
-* **iid**: identifier of an Object Instance  
-* **rid**: indetifier of a Resource  
-* **Server**: LWMQN server
-* **Client** or **Client Device**: LWMQN client which is usually a machine node in an IoT network
-
+* **mqtt-node** is trying to let you build IoT peripheral machines with less pain.  
 
 **Note**:  
 * IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where oid, iid, and rid are identifiers of them respectively to allocate resources on a Client Device.  
 * An IPSO **_Object_** is like a Class, and an **_Object Instance_** is an entity of such Class. For example, when you have many 'temperature' sensors, you have to use an iid on each Object Instance to distinguish one entity from the other.  
 
+<br />
+
+#### Acronyms and Abbreviations
+* **Server**: LWMQN server
+* **Client** or **Client Device**: LWMQN client which is a machine node in an IoT network
+* **MqttNode**: class exposed by `require('mqtt-node')`  
+* **qnode**: instance of MqttNode class  
+* **oid**: identifier of an Object  
+* **iid**: identifier of an Object Instance  
+* **rid**: indetifier of a Resource  
+
 <a name="Features"></a>
 ## 2. Features
 
 * Communication based on MQTT protocol and library [**mqtt.js**](https://www.npmjs.com/package/mqtt)  
-* Structuring resources in a hierarchical Smart-Object-style (IPSO)  
+* Resources structured in a hierarchical Smart-Object-style (IPSO)  
 * Easy to create Resources on a Client Device  
-* LWM2M-like interfaces for Client/Server interaction 
+* LWM2M-like interfaces for Client/Server interaction  
   
 <a name="Installation"></a>
 ## 3. Installation
@@ -63,16 +64,16 @@ var MqttNode = require('mqtt-node');
 /********************************************/
 var qnode = new MqttNode('my_foo_client_id');
 
-// Initialize the Resource that follows the IPSO definition
-// We have two humidity sensors here
+// Initialize Resources that follow IPSO definition
 
+// We have two humidity sensors here
 // oid = 'humidity', iid = 0
 qnode.initResrc('humidity', 0, {
     sensorValue: 20,
     units: 'percent'
 });
 
-// / oid = 'humidity', iid = 1
+// oid = 'humidity', iid = 1
 qnode.initResrc('humidity', 1, {
     sensorValue: 16,
     units: 'percent'
@@ -87,11 +88,10 @@ qnode.initResrc('myObject', 0, {
 qnode.on('ready', function () {
     // If the registration procedure completes successfully, 'ready' will be fired
 
-    // start to run your application
+    // start to run your application after registration
 });
 
-// Connect to the Server with default account of mqtt-shepherd
-// Registration procedure 
+// Connect and register to a Server with the default account of mqtt-shepherd
 qnode.connect('mqtt://192.168.0.2', {
     username: 'freebird',
     password: 'skynyrd'
@@ -117,11 +117,16 @@ if (qnode) {
 <a name="Resources"></a>
 ## 5. Resources Planning
 
-The great benefit of using **mqtt-node** in your LWMQN Client design is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan your Resources well, and **mqtt-node** will automatically tackle many of the REQ/RSP things for you.  
+The great benefit of using **mqtt-node** in your LWMQN Client is that you almost need not to tackle requests/responses by yourself. All you have to do is to plan and define your Resources well, and **mqtt-node** will automatically tackle many of the REQ/RSP things for you.  
 
-What Resources do you have on the Client Device? Which Resource is readable? Which Resource is writable? And which Resource is remotely executable? Once your Resources are initialized, **mqtt-node** itself will know how to respond to the requests from a LWMQN Server.  
+* What Resources do you have on the Client Device?  
+* Which Resource is readable?  
+* Which Resource is writable?  
+* And which Resource is remotely executable?  
 
-Here is a [tutorial of how to plan your Resources](https://github.com/lwmqn/mqtt-node/blob/master/docs/rsc_plan.md) with **mqtt-node**. The description of [initResrc()](#API_initResrc) also shows some quick examples.  
+Here is a [tutorial of how to plan your Resources](https://github.com/lwmqn/mqtt-node/blob/master/docs/rsc_plan.md) with **mqtt-node**. Some quick examples are also given in the description of [initResrc()](#API_initResrc) method.  
+
+Once your Resources are initialized, **mqtt-node** itself will know how to respond to requests from a LWMQN Server.  
 
 </br>
 
@@ -161,14 +166,12 @@ Create an instance of `MqttNode` class.
 1. `clientId` (_String_): clientId should be a string and should be unique in the network. Using mac address (with a prefix or suffix) as the clientId would be a good idea.  
 2. `devAttrs` (_Object_): An object to describe information about the device. The following table shows details of each property within `devAttrs` object.  
 
-[FIXME] ip and mac may not be required
-
-| Property | Type   | Mandatory | Description                     |  
-|----------|--------|-----------|---------------------------------|  
-| lifetime | Number | optional  | default is 86400. Unit: seconds |  
-| ip       | String | required  | device ip address               |  
-| mac      | String | required  | device mac address              |  
-| version  | String | optional  | minimum supported LWMQN version |  
+| Property | Type   | Mandatory | Description                                                                            |  
+|----------|--------|-----------|----------------------------------------------------------------------------------------|  
+| lifetime | Number | optional  | Default is 86400. Unit: seconds                                                        |  
+| version  | String | optional  | Minimum supported LWMQN version (this is not really effective at this moment)          |  
+| ip       | String | optional  | Device ip address. By default, mqtt-node itself will query this parameter from system  |  
+| mac      | String | optional  | Device mac address. By default, mqtt-node itself will query this parameter from system |  
   
 **Returns:**  
   
@@ -190,8 +193,12 @@ console.log(qnode.lifetime);    // 21600
 console.log(qnode.ip);          // '192.168.0.99'
 console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
 console.log(qnode.version);     // 'v0.0.6'
-// use qnode.setDevAttrs() to change the device attributes will
-// automatically publish the update message to the Server.
+
+// Do not change the device attributes with direct assigments, 
+// i.e., qnode.lifetime = 2000.
+
+// Use qnode.setDevAttrs() to change attributes, and qnode will 
+// automatically check if it needs to publish an update message to the Server.
 ```
   
 ********************************************
@@ -208,9 +215,8 @@ Initialize the Resources on qnode.
     It is common to use numbers to enumerate Object Instances, but using a string for the `iid` is also accepted, e.g., `12`, `'12'` and `'my_instance01'` are all valid.  
 
 3. `resrcs` (_Object_): An object with **rid-value** pairs to describe the Resources.  
-    Each key is a `rid` and each value is the corresponding value of the Resource. Resource value can be a primitive, an data object, or an object with specific methods, i.e. `read()`, `write()`, `exec()`. Please refer to section [Resources Planning](#Resources) for more details of Resource initializztion.  
+    Each key is a `rid` and each value is the corresponding value of the Resource. Resource value can be a primitive, an data object, or an object with specific methods, i.e. `read()`, `write()`, `exec()`. Please refer to section [Resources Planning](#Resources) for more details of Resource initialization.  
 
-</br>
   
 **Returns:**  
   
@@ -221,9 +227,6 @@ Initialize the Resources on qnode.
 * Resource is a simple value:  
   
 ```js
-/********************************************/
-/*** Client Device Initialzation          ***/
-/********************************************/
 // use oid and rids in string
 qnode.initResrc('humidity', 0, {
     sensorValue: 20,
@@ -306,7 +309,6 @@ qnode.initResrc('mySwitch', 0, {
 * Resource is executable (a procedure on the Client Device that can be remotely called):  
   
 ```js    
-// The Resource is executable
 qnode.initResrc('myLight', 0, {
     blink: {
         exec: function (t, cb) {
@@ -331,7 +333,7 @@ qnode.initResrc('myCounter', 0, {
 ********************************************
 <a name="API_readResrc"></a>
 ### .readResrc(oid, iid, rid[, callback])
-Read the value from an allocated Resource.  
+Read a value from the allocated Resource.  
   
 **Arguments:**  
 
@@ -340,9 +342,9 @@ Read the value from an allocated Resource.
 3. `rid` (_String | Number_): Resource id  
 4. `callback` (_Function_): An err-fisrt callback `function(err, val)` to get the read value.  
 
-    * If the Resource is not a simple value and there has not a `read` method been initialized for it, the `val` passes to the callback will be a string `_unreadable_`, e.g., you are trying to read a write-only Resource which is initialized without a read method.  
-    * If the Resource is an executable Resource, the `val` passes to the callback will be a string `_exec_`.  
-    * If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
+    * If the Resource is not a simple value and there has not a `read` method been initialized for it, the `val` passes to callback will be a string `_unreadable_`, e.g., you are trying to read a write-only Resource which is initialized without a read method.  
+    * If the Resource is an executable Resource, the `val` passes to callback will be a string `_exec_`.  
+    * If the allocating Resource is not found, an error will be passed to fisrt argument of the callback.  
 
 **Returns:**  
 
@@ -352,30 +354,28 @@ Read the value from an allocated Resource.
   
 ```js
 qnode.readResrc('humidity', 0, 'sensorValue', function (err, val) {
-    if (err)
-        console.log(err);
-    else
+    if (!err)
         console.log(val);   // 20
 });
 
 qnode.readResrc('humidity', 12, 'sensorValue', function (err, val) {
     if (err)
-        console.log(err);   // if allocating Resource fails 
+        console.log(err);   // if Resource allocation fails 
 });
 
 qnode.readResrc('mySensor', 0, 'sensorValue', function (err, val) {
-    console.log(val);       // '_unreadable_' if the Resource cannot be read
+    console.log(val);       // '_unreadable_', if the Resource cannot be read
 });
 
 qnode.readResrc('myLight', 0, 'blink', function (err, val) {
-    console.log(val);       // '_exec_' if the Resource is executable which cannot be read from
+    console.log(val);       // '_exec_', if the Resource is executable which cannot be read from
 });
 ```
   
 ********************************************
 <a name="API_writeResrc"></a>
 ### .writeResrc(oid, iid, rid, value[, callback])
-Write the value to an allocated Resource.  
+Write a value to the allocated Resource.  
   
 **Arguments:**  
 
@@ -385,8 +385,8 @@ Write the value to an allocated Resource.
 3. `value` (_Depends_): The value to write to the allocated Resource.  
 4. `callback` (_Function_): An err-fisrt callback `function(err, val)`, where `val` is the value been successfully written.  
 
-    * If the Resource is not a simple value and there has not a `write` method been initialized for it, the `val` passes to the callback will be a string `_unwritable_`.  
-    * If the allocated Resource is not found, an error will be passed to fisrt argument of the callback.  
+    * If the Resource is not a simple value and there has not a `write` method been initialized for it, the `val` passes to callback will be a string `_unwritable_`.  
+    * If the allocating Resource is not found, an error will be passed to fisrt argument of the callback.  
   
 **Returns:**  
 
@@ -417,15 +417,16 @@ Connect and register to a LWMQN Server with the given url. If succeeds, qnode wi
 **Arguments:**  
 
 1. `url` (_String_): Url of the LWMQN Server, e.g. `mqtt://localhost`, `mqtt://192.168.0.100`, `mqtt://192.168.0.20:3000`.  
-2. `opts` (_Object_): The connect options with properties shown in the following table.  
+2. `opts` (_Object_): The connect options with properties given in the following table.  
   
 | Property        | Type             | Default      | Description                                             |  
 |-----------------|------------------|--------------|---------------------------------------------------------|  
-| keepalive       | Number           | 10           | 10 seconds, set to 0 to disable                         |  
-| reconnectPeriod | Number           | 1000         | milliseconds, interval between two reconnections        |  
-| connectTimeout  | Number           | 30000        | milliseconds, time to wait before a CONNACK is received |  
 | username        | String           | `'freebird'` | The username required by your broker, if any            |  
 | password        | String \| Buffer | `'skynyrd'`  | the password required by your broker, if any            |  
+| keepalive       | Number           | 10           | 10 seconds, set to 0 to disable                         |  
+| reconnectPeriod | Number           | 3000         | milliseconds, interval between two reconnections        |  
+| connectTimeout  | Number           | 30000        | milliseconds, time to wait before a CONNACK is received |  
+
   
 **Returns:**  
 
@@ -462,7 +463,7 @@ Disconnect from the Server. qnode will fire a `close` event if it is disconnecte
 **Arguments:**  
 
 1. `force` (_Boolean_): `true` will close the client right away, without waiting for the in-flight messages to be acked. This parameter is optional.  
-2. `callback` (_Function_): will be called when the Client is closed.  
+2. `callback` (_Function_): Will be called when the Client is closed.  
   
 **Returns:**  
 
@@ -481,7 +482,7 @@ qnode.close();
 ********************************************
 <a name="API_pubRegister"></a>
 ### .pubRegister([callback])
-Publish a registering request to the Server. Everytime you invoke .connect(), qnode will do regiseter to the Server as well.  
+Publish a registering request to the Server. Everytime you invoke connect(), qnode will do regiseter to the Server as well.  
   
 **Arguments:**  
 
@@ -544,7 +545,7 @@ Set device attribues on the qnode.
 **Arguments:**
   
 1. `devAttrs` (_Object_): Device attributes.  
-    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId`, `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
+    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
 2. `callback` (_Function_): `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
 
 | rsp.status | Status Code         | Description                                                                        |
@@ -576,8 +577,8 @@ qnode.setDevAttrs({
 Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
 
 * Notice that **mqtt-node** will automatically report notifications to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
-* If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid`, and `data`, where `data` is the Resource value.  
-* If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid`, and `data` fields, where `data` is the Object Instance containing all its Resources. Please refer to [LWMQN Notify Channel](#LWMQN_PAGE) for more info.  
+* If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid` and `data`, where `data` is the Resource value.  
+* If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid` and `data` fields, where `data` is the Object Instance containing all its Resources. Please refer to [LWMQN Notify Channel](#LWMQN_PAGE) for more info.  
 
 **Arguments:**  
 
@@ -667,7 +668,7 @@ qnode.pingServer(function (err, rsp) {
 ### .publish(topic, message[, options][, callback])
 This is a generic method to publish a message to a topic.  
   
-If you are using `mqtt-shepherd` as the LWMQN Server, it accepts a registered Client to publish any message to any topic. In this case, the Server simply acts as an MQTT broker. The publishment is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered Client to publish any message to any topic. In this case, the Server simply acts as an MQTT broker. The publishment is not authorized at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
@@ -696,11 +697,11 @@ qnode.publish('foo/bar/greet', 'Hello World!');
 ### .subscribe(topics[, options][, callback])
 This is a generic method to subscribe to a topic or topics listed in an array.  
   
-If you are using `mqtt-shepherd` as the LWMQN Server, it accepts the registered Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registered Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
-1. `topics` (_String_ | _String[]_): the topic(s) to subscribe to.  
+1. `topics` (_String_ | _String[]_): The topic(s) to subscribe to.  
 2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a Qos level of the subscription. `qos` is 0 by default.  
 3. `callback` (_Function_): `function (err, granted)` callback will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`  
   
@@ -721,7 +722,7 @@ qnode.subscribe('foo/bar/score', function (err, granted) {
 ### .unsubscribe(topics[, callback])
 This is a generic method to unsubscribe from a topic or topics.  
 
-If you are using `mqtt-shepherd` as the LWMQN Server, the generic unsubscription is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscription is not authorized at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
@@ -739,7 +740,9 @@ qnode.unsubscribe('foo/bar/score');
 ```
   
 ********************************************
+
 <br />
+
 <a name="Templates"></a>
 ## 7. Code Templates
 
