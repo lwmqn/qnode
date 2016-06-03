@@ -27,33 +27,33 @@ var qnode = new MqttNode('test_node_01', devAttrs);
 /*********************************************/
 /*** The custom encrption/decryption       ***/
 /*********************************************/
-qnode.encrypt = function (msg, clientId, callback) {
-    var msgBuf = new Buffer(msg),
-        cipher = crypto.createCipher('aes128', 'mypassword'),
-        encrypted = cipher.update(msgBuf, 'binary', 'base64');
-    try {
-        encrypted += cipher.final('base64');
-        callback(null, encrypted);
-    } catch (e) {
-        callback(e);
-    }
+// qnode.encrypt = function (msg, clientId, callback) {
+//     var msgBuf = new Buffer(msg),
+//         cipher = crypto.createCipher('aes128', 'mypassword'),
+//         encrypted = cipher.update(msgBuf, 'binary', 'base64');
+//     try {
+//         encrypted += cipher.final('base64');
+//         callback(null, encrypted);
+//     } catch (e) {
+//         callback(e);
+//     }
 
-};
+// };
 
-qnode.decrypt = function (msg, clientId, callback) {
-    msg = msg.toString();
-    var decipher = crypto.createDecipher('aes128', 'mypassword'),
-        decrypted = decipher.update(msg, 'base64', 'utf8');
+// qnode.decrypt = function (msg, clientId, callback) {
+//     msg = msg.toString();
+//     var decipher = crypto.createDecipher('aes128', 'mypassword'),
+//         decrypted = decipher.update(msg, 'base64', 'utf8');
 
-    try {
-        decrypted += decipher.final('utf8');
-        callback(null, decrypted);
-    } catch (e) {
-        // log 'decrytion fails'
-        console.log('decrytion fails.');
-        callback(e);
-    }
-};
+//     try {
+//         decrypted += decipher.final('utf8');
+//         callback(null, decrypted);
+//     } catch (e) {
+//         // log 'decrytion fails'
+//         console.log('decrytion fails.');
+//         callback(e);
+//     }
+// };
 
 /*********************************************/
 /*** Prepare Resources on the Client Node  ***/
