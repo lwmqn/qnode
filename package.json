@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/simenkid/mqtt-node.git"
+    "url": "https://github.com/lwmqn/mqtt-node.git"
   },
   "author": "Simen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/simenkid/mqtt-node/issues"
+    "url": "https://github.com/lwmqn/mqtt-node/issues"
   },
-  "homepage": "https://github.com/simenkid/mqtt-node",
+  "homepage": "https://github.com/lwmqn/mqtt-node",
   "dependencies": {
     "lodash": "^4.5.1",
     "lwmqn-util": "^0.0.6",
