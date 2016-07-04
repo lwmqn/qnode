@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/lwmqn/mqtt-node",
   "dependencies": {
+    "busyman": "^0.1.1",
     "lodash": "^4.5.1",
     "lwmqn-util": "^0.0.6",
     "mqtt": "^1.5.0",
