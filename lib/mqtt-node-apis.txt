@@ -1,9 +1,7 @@
 
-._has = function (oid, iid, rid)
+.has = function (oid, iid, rid)
 ._target = function (oid, iid, rid)
-._dumpObj = function (oid, iid, callback)
-._getAttrs = function (oid, iid, rid)
-._setAttrs = function (oid, iid, rid, attrs)
+.dump = function (oid, iid, callback)
 
 .setDevAttrs = function (attrs, callback)
 .initResrc = function (oid, iid, resrcs)
@@ -24,6 +22,8 @@
 .pubResponse = function (rsp, callback)
 .pingServer = function (callback)
 
+// .pubLifeUpdate
+
 .enableReport = function (oid, iid, rid)
 .disableReport = function (oid, iid, rid)
 
@@ -35,3 +35,18 @@
 .decrypt = function (msgBuf, clientId, callback)
 
 // to test
+
+// smartobject
+V createIpsoOnly
+V addResources
+V has
+V get
+V setResource
+dump   // dump SO, dump Object, dump Instance
+V objectList
+V readResource
+
+// API Changes
+initResrc = initResources
+readResrc = readResource
+
