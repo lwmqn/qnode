@@ -1,0 +1,37 @@
+
+._has = function (oid, iid, rid)
+._target = function (oid, iid, rid)
+._dumpObj = function (oid, iid, callback)
+._getAttrs = function (oid, iid, rid)
+._setAttrs = function (oid, iid, rid, attrs)
+
+.setDevAttrs = function (attrs, callback)
+.initResrc = function (oid, iid, resrcs)
+
+.readResrc = function (oid, iid, rid, callback) 
+.writeResrc = function (oid, iid, rid, value, callback)
+._readResrc = function (oid, iid, rid, callback)
+._writeResrc = function (oid, iid, rid, value, callback)
+.execResrc = function (oid, iid, rid, argus, callback)
+
+.connect = function (brokerUrl, opts)
+.close = function (force, callback)
+
+.pubRegister = function (callback)
+.pubDeregister = function (callback)
+.pubUpdate = function (devAttrs, callback)
+.pubNotify = function (data, callback)
+.pubResponse = function (rsp, callback)
+.pingServer = function (callback)
+
+.enableReport = function (oid, iid, rid)
+.disableReport = function (oid, iid, rid)
+
+.publish = function (topic, message, options, callback)
+.subscribe = function (topics, opts, callback)
+.unsubscribe = function (topics, callback)
+
+.encrypt = function (msgStr, clientId, callback)
+.decrypt = function (msgBuf, clientId, callback)
+
+// to test
