@@ -1,8 +1,12 @@
 var mqtt = require('mqtt'),
     _ = require('busyman'),
+    chai = require('chai'),
+    expect = chai.expect;
     sinon = require('sinon'),
     sinonChai = require('sinon-chai'),
     expect = require('chai').expect;
+
+chai.use(sinonChai);
 
 var Mqnode = require('../index.js'),
     SmartObject = require('smartobject');
@@ -111,16 +115,12 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.enableReport('x', 1, {}); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport('x', 1, []); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport('x', 1, true); }).to.throw(TypeError);
-            expect(function () { return mqnode.enableReport('x', 1, null); }).to.throw(TypeError);
-            expect(function () { return mqnode.enableReport('x', 1, NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport('x', 1, new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport('x', 1, function () {}); }).to.throw(TypeError);
 
             expect(function () { return mqnode.enableReport(1, 'x', {}); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport(1, 'x', []); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport(1, 'x', true); }).to.throw(TypeError);
-            expect(function () { return mqnode.enableReport(1, 'x', null); }).to.throw(TypeError);
-            expect(function () { return mqnode.enableReport(1, 'x', NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport(1, 'x', new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.enableReport(1, 'x', function () {}); }).to.throw(TypeError);
         });
@@ -160,16 +160,12 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.disableReport('x', 1, {}); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport('x', 1, []); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport('x', 1, true); }).to.throw(TypeError);
-            expect(function () { return mqnode.disableReport('x', 1, null); }).to.throw(TypeError);
-            expect(function () { return mqnode.disableReport('x', 1, NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport('x', 1, new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport('x', 1, function () {}); }).to.throw(TypeError);
 
             expect(function () { return mqnode.disableReport(1, 'x', {}); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport(1, 'x', []); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport(1, 'x', true); }).to.throw(TypeError);
-            expect(function () { return mqnode.disableReport(1, 'x', null); }).to.throw(TypeError);
-            expect(function () { return mqnode.disableReport(1, 'x', NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport(1, 'x', new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.disableReport(1, 'x', function () {}); }).to.throw(TypeError);
         });
@@ -329,8 +325,52 @@ describe('Signature Check', function () {
 
 describe('Functional Check', function () {
     var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-    
     mqnode.connect('mqtt://192.16.0.1');
+
+    describe('#ensure members', function () {
+        it ('should have all correct members when initiated', function () {
+            expect(mqnode.clientId).to.be.equal('foo');
+            expect(mqnode.lifetime).to.be.equal(86400);
+            // expect(mqnode.ip).not.to.be.null; - locally ok. Dont check@CI server, may need root
+            // expect(mqnode.mac).not.to.be.null;- locally ok. dont check@CI server, may need root
+            expect(mqnode.version).to.be.equal('0.0.1');
+            expect(mqnode.mc).not.to.be.null;
+            expect(mqnode.so).to.be.equal(so);
+            expect(mqnode._connected).to.be.false;
+            expect(mqnode._lfsecs).to.be.equal(0);
+            expect(mqnode._pubics).to.be.deep.equal({
+                register: 'register/' + mqnode.clientId,
+                deregister: 'deregister/' + mqnode.clientId,
+                notify: 'notify/' + mqnode.clientId,
+                update: 'update/' + mqnode.clientId,
+                ping: 'ping/' + mqnode.clientId,
+                response: 'response/' + mqnode.clientId
+            });
+            expect(mqnode._subics).to.be.deep.equal({
+                register: 'register/response/' + mqnode.clientId,
+                deregister: 'deregister/response/' + mqnode.clientId,
+                notify: 'notify/response/' + mqnode.clientId,
+                update: 'update/response/' + mqnode.clientId,
+                ping: 'ping/response/' + mqnode.clientId,
+                request: 'request/' + mqnode.clientId,
+                announce: 'announce'
+            });
+            expect(mqnode._tobjs).to.be.deep.equal({});
+            expect(mqnode._updater).to.be.null;
+            expect(mqnode._repAttrs).to.be.deep.equal({});
+            expect(mqnode._reporters).to.be.deep.equal({});
+
+            expect(mqnode.so.has('lwm2mServer')).to.be.true;
+            expect(mqnode.so.has('lwm2mServer', 0)).to.be.true;
+            expect(mqnode.so.has('lwm2mServer', 1)).to.be.false;
+            expect(mqnode.so.has('device')).to.be.true;
+            expect(mqnode.so.has('device', 0)).to.be.true;
+            expect(mqnode.so.has('device', 1)).to.be.false;
+            expect(mqnode.so.has('connMonitor')).to.be.true;
+            expect(mqnode.so.has('connMonitor', 0)).to.be.true;
+            expect(mqnode.so.has('connMonitor', 1)).to.be.false;
+        });
+    });
 
     describe('#.new', function () {
         it ('should emit ready when new done', function (done) {
@@ -514,7 +554,494 @@ describe('Functional Check', function () {
 
     });
 
+    describe('#.close', function () {
+        var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
 
+        it('should return with callback - no connection', function () {
+            var cbSpy = sinon.spy();
+            mqnode.close(cbSpy);
+            expect(cbSpy).to.have.been.called;
+        });
+
+        it('should return with callback - with connection', function (done) {
+            mqnode.connect('mqtt://192.16.0.1');
+
+            var cbSpy1 = sinon.spy();
+            mqnode.close(function () {
+                cbSpy1();
+                expect(cbSpy1).to.have.been.called;
+
+                if (mqnode.mc === null)
+                    done();
+            });
+        });
+    });
+
+    describe('#.publish', function () {
+        var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
+
+        it('should return with callback err - not connect() yet', function (done) {
+            mqnode.publish('x/y/z', { x: 1 }, function (err) {
+                if (err.message === 'No mqtt client established.')
+                    done();
+            });
+        });
+
+        it('should return with callback err - not connected yet', function (done) {
+            mqnode.connect('mqtt://192.16.0.1');
+            mqnode.publish('x/y/z', { x: 1 }, function (err) {
+                if (err.message === 'No connection.')
+                    done();
+            });
+        });
+
+        it('should return with callback err - invalid message', function (done) {
+            mqnode._connected = true;
+            mqnode.publish('x/y/z', true, function (err) {
+                mqnode._connected = false;
+                if (err.message === 'Message should be a string or a buffer.')
+                    done();
+            });
+        });
+
+        it('should call encrypt' , function (done) {
+            mqnode._connected = true;
+            var encryStub = sinon.stub(mqnode, 'encrypt', function (msg, clientId, cb) {
+                cb(null, 'called');
+            });
+            var mcPubStub = sinon.stub(mqnode.mc, 'publish', function (topic, encrypted, options, cbk) {
+                cbk(null, 'pubCalled');
+            });
+
+            mqnode.publish('x/y/z', { x: 1 }, function (err, msg) {
+                mqnode._connected = false;
+                encryStub.restore();
+                mcPubStub.restore();
+                if (msg === 'called')
+                    done();
+            });
+        });
+    });
+
+    describe('#.subscribe', function () {
+        var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
+            mqnode.connect('mqtt://192.16.0.1');
+
+        it('should call mc.subscribe' , function (done) {
+            mqnode._connected = true;
+            var mcSubStub = sinon.stub(mqnode.mc, 'subscribe', function (topics, opts, cbk) {
+                cbk(null, 'subCalled');
+            });
+
+            mqnode.subscribe('x/y/z', { x: 1 }, function (err, msg) {
+                mqnode._connected = false;
+                mcSubStub.restore();
+                if (msg === 'subCalled')
+                    done();
+            });
+        });
+    });
+
+    describe('#.unsubscribe', function () {
+        var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
+            mqnode.connect('mqtt://192.16.0.1');
+
+        it('should call mc.unsubscribe' , function (done) {
+            mqnode._connected = true;
+            var mcUnsubStub = sinon.stub(mqnode.mc, 'unsubscribe', function (topics, cbk) {
+                cbk(null, 'unsubCalled');
+            });
+
+            mqnode.unsubscribe('x/y/z', function (err, msg) {
+                mqnode._connected = false;
+                mcUnsubStub.restore();
+                if (msg === 'unsubCalled')
+                    done();
+            });
+        });
+    });
+
+    describe('#.register', function () {
+        var mqnode = new Mqnode('foox', so, { version: '0.0.3' });
+            mqnode.connect('mqtt://192.16.0.1');
+
+        it('should called when receive response - ok(200)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 200 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 200)
+                    done();
+            });
+        });
+
+        it('should called when receive response - created(201)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 201 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 201)
+                    done();
+            });
+        });
+
+        it('should called when receive response - badreq(400)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 400 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 400)
+                    done();
+            });
+        });
+
+        it('should called when receive response - timeout(408)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 408 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 408)
+                    done();
+            });
+        });
+
+        it('should called when receive response - conflict(409)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 409 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 409)
+                    done();
+            });
+        });
+
+        it('should called when receive response - internal server error(500)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['register'], { transId: mqnode.__transId(), status: 500 });
+                }, 10)
+            });
+
+            mqnode.register(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 500)
+                    done();
+            });
+        });
+    });
+
+    describe('#.deregister', function () {
+        var mqnode = new Mqnode('fooy', so, { version: '0.0.4' });
+            mqnode.connect('mqtt://192.16.0.2');
+
+        it('should called when receive response - deleted(202)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['deregister'], { transId: mqnode.__transId(), status: 202 });
+                }, 10)
+            });
+
+            mqnode.deregister(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 202)
+                    done();
+            });
+        });
+
+        it('should called when receive response - notfound(404)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['deregister'], { transId: mqnode.__transId(), status: 404 });
+                }, 10)
+            });
+
+            mqnode.deregister(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 404)
+                    done();
+            });
+        });
+
+        it('should called when receive response - timeout(408)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['deregister'], { transId: mqnode.__transId(), status: 408 });
+                }, 10)
+            });
+
+            mqnode.deregister(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 408)
+                    done();
+            });
+        });
+
+        it('should called when receive response - internal error(500)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['deregister'], { transId: mqnode.__transId(), status: 500 });
+                }, 10)
+            });
+
+            mqnode.deregister(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 500)
+                    done();
+            });
+        });
+    });
+
+    describe('#.update', function () {
+        var mqnode = new Mqnode('fooz', so, { version: '0.0.4' });
+            mqnode.connect('mqtt://192.16.0.3');
+
+        it('should called when receive response - changed(204)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['update'], { transId: mqnode.__transId(), status: 204 });
+                }, 10)
+            });
+
+            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 204)
+                    done();
+            });
+        });
+
+        it('should called when receive response - badreq(400)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['update'], { transId: mqnode.__transId(), status: 400 });
+                }, 10)
+            });
+
+            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 400)
+                    done();
+            });
+        });
+
+        it('should called when receive response - method not allowed(405)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['update'], { transId: mqnode.__transId(), status: 405 });
+                }, 10)
+            });
+
+            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 405)
+                    done();
+            });
+        });
+
+        it('should called when receive response - method not timeout(408)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['update'], { transId: mqnode.__transId(), status: 408 });
+                }, 10)
+            });
+
+            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 408)
+                    done();
+            });
+        });
+
+        it('should called when receive response - internal error(500)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['update'], { transId: mqnode.__transId(), status: 500 });
+                }, 10)
+            });
+
+            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 500)
+                    done();
+            });
+        });
+    });
+
+    describe('#.notify', function () {
+        var mqnode = new Mqnode('foom', so, { version: '0.0.5' });
+            mqnode.connect('mqtt://192.16.0.3');
+
+        it('should called when receive response - changed(204)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['notify'], { transId: mqnode.__transId(), status: 204 });
+                }, 10)
+            });
+
+            mqnode.notify({ x: 'x' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 204)
+                    done();
+            });
+        });
+
+        it('should called when receive response - badreq(400)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['notify'], { transId: mqnode.__transId(), status: 400 });
+                }, 10)
+            });
+
+            mqnode.notify({ x: 'x' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 400)
+                    done();
+            });
+        });
+
+        it('should called when receive response - notfound(404)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['notify'], { transId: mqnode.__transId(), status: 404 });
+                }, 10)
+            });
+
+            mqnode.notify({ x: 'x' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 404)
+                    done();
+            });
+        });
+
+        it('should called when receive response - internal error(500)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['notify'], { transId: mqnode.__transId(), status: 500 });
+                }, 10)
+            });
+
+            mqnode.notify({ x: 'x' }, function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 500)
+                    done();
+            });
+        });
+    });
+
+    describe('#.ping', function () {
+        var mqnode = new Mqnode('foon', so, { version: '0.0.5' });
+            mqnode.connect('mqtt://192.16.0.3');
+
+        it('should called when receive response - ok(200)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['ping'], { transId: mqnode.__transId(), status: 200 });
+                }, 10)
+            });
+
+            mqnode.ping(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 200 && _.isNumber(rsp.data))
+                    done();
+            });
+        });
+
+        it('should called when receive response - timeout(408)' , function (done) {
+            mqnode._connected = true;
+            var pubStub = sinon.stub(mqnode, 'publish', function (topics, data, cb) {
+                cb(null, 'pubCalled');
+                setTimeout(function () {
+                    emitFakeMessage(mqnode, mqnode._subics['ping'], { transId: mqnode.__transId(), status: 408 });
+                }, 10)
+            });
+
+            mqnode.ping(function (err, rsp) {
+                mqnode._connected = true;
+                pubStub.restore();
+                if (rsp.status === 408)
+                    done();
+            });
+        });
+    });
 });
 
 function emitFakeMessage(qn, intf, msgObj) {
