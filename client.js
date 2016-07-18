@@ -1,3 +1,5 @@
+var SmartObject = require('smartobject');
+
 var util = require('util'),
     crypto = require('crypto'),
     debug = require('debug'),
@@ -13,16 +15,52 @@ var CON = debug('con'),
     ERR = debug('err');
 
 /*************************************************************************************************/
+/*** Init Resources                                                                            ***/
+/*************************************************************************************************/
+var x = 0;
+var so = new SmartObject();
+so.init('temperature', 0, {
+    sensorValue: 1200,
+    units: 'mCel',
+    minMeaValue: 10,
+    maxMeaValue: 2000,
+    minRangeValue: 0,
+    maxRangeValue: 4000,
+    some1: {
+        exec: function (name, cb) { 
+            console.log('hello ' + name);
+            cb(null, 'exec world');
+        }
+    },
+    some2: {
+        write: function (val, cb) {
+            x = val;
+            console.log('write~~~~');
+            console.log(x);
+            cb(null, x);
+        }
+    },
+    some3: {
+        read: function (cb) { cb(null, 'hello'); }
+    }
+});
+
+so.init('temperature', 1, {
+    sensorValue: 100
+});
+
+so.init('temperature', 2, {
+    sensorValue: 101
+});
+/*************************************************************************************************/
 /*** Prepare the Client Node                                                                   ***/
 /*************************************************************************************************/
 var devAttrs = {
     lifetime: 2000,
-    version: '1.0.2',
-    ip: '192.168.1.104',
-    mac: '00:0c:29:71:74:ff'
+    version: '1.0.2'
 };
 
-var qnode = new MqttNode('test_node_01', devAttrs);
+var qnode = new MqttNode('test_node_01', so, devAttrs);
 
 /*********************************************/
 /*** The custom encrption/decryption       ***/
@@ -55,35 +93,6 @@ var qnode = new MqttNode('test_node_01', devAttrs);
 //     }
 // };
 
-/*********************************************/
-/*** Prepare Resources on the Client Node  ***/
-/*********************************************/
-var x = 0;
-qnode.initResrc('temperature', 0, {
-    sensorValue: 1200,
-    units: 'mCel',
-    minMeaValue: 10,
-    maxMeaValue: 2000,
-    minRangeValue: 0,
-    maxRangeValue: 4000,
-    some1: {
-        exec: function (name, cb) { 
-            console.log('hello ' + name);
-            cb(null, 'exec world');
-        }
-    },
-    some2: {
-        write: function (val, cb) {
-            x = val;
-            console.log('write~~~~');
-            console.log(x);
-            cb(null, x);
-        }
-    },
-    some3: {
-        read: function (cb) { cb(null, 'hello'); }
-    }
-});
 
 /*************************************************************************************************/
 /*** Client Node Listeners                                                                     ***/
@@ -124,6 +133,17 @@ qnode.on('message', function (topic, message, packet) {
 
 qnode.on('published', function (msg) {
     PUB('topic: ' + msg.topic + ', msg: ' + msg.message.toString());
+});
+
+qnode.on('ready', function () {
+    console.log('ready');
+    setTimeout(function () {
+        qnode.connect('mqtt://localhost', {
+            // username: 'freebird',
+            // password: 'skynyrd',
+            reconnectPeriod: 5000
+        });
+    }, 1000);
 });
 
 /*********************************************/
@@ -179,19 +199,11 @@ qnode.on('announce', function (msg) {
 });
 
 
-qnode.connect('mqtt://localhost', {
-    username: 'freebird',
-    password: 'skynyrd',
-    reconnectPeriod: 5000
-});
-
-
-
 /*************************************************************************************************/
 /*** Testing Tasks                                                                             ***/
 /*************************************************************************************************/
 function readTemp() {
-    qnode.readResrc('temperature', 0, 'sensorValue', function (err, val) {
+    qnode.so.read('temperature', 0, 'sensorValue', function (err, val) {
         TASK('READ >> read: ' + val + ', sensorValue: ' + qnode.so.temperature[0].sensorValue);
     });
 }
@@ -199,12 +211,12 @@ function readTemp() {
 function writeTemp() {
     var v = Math.floor((Math.random() * 100) + 1),
         x = Math.floor((Math.random() * 100) + 1);
-    qnode.writeResrc('temperature', 0, 'sensorValue', v, function (err, val) {
+    qnode.so.write('temperature', 0, 'sensorValue', v, function (err, val) {
         TASK('WRITE >> write: ' + val + ', sensorValue: ' + qnode.so.temperature[0].sensorValue);
     });
 
 
-    qnode.writeResrc('temperature', 0, 'minRangeValue', x, function (err, val) {
+    qnode.so.write('temperature', 0, 'minRangeValue', x, function (err, val) {
         TASK('WRITE >> write: ' + val + ', minRangeValue: ' + qnode.so.temperature[0].sensorValue);
     });
 }
