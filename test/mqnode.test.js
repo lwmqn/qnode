@@ -23,56 +23,54 @@ describe('Signature Check', function () {
          mqnode.mac = '00:0c:29:c2:dc:8e';
      }
 
-    describe.skip('#new mqnode', function () {
-        try {
-            it('should throw TypeError if clientId is not a string', function () {
-                expect(function () { return new Mqnode(null, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(undefined, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(true, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(NaN, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(12, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode({}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode([], so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(new Date(), so, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode(function () {}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    /*********************************************************************************/
+    /****  This test cannot work on travis. Uncomment it only with local testing. ****/
+    /*********************************************************************************/
+    // describe('#new mqnode', function () {
+    //     it('should throw TypeError if clientId is not a string', function () {
+    //         expect(function () { return new Mqnode(null, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(undefined, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(true, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(NaN, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(12, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode({}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode([], so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(new Date(), so, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode(function () {}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
 
-                expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-            });
+    //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
+    //     });
 
-            it('should throw TypeError if so is not an instance of SmartObject class', function () {
-                expect(function () { return new Mqnode('foo', 'x', { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', 12, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', null, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', undefined, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', NaN, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', true, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', new Date(), { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', {}, { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', [], { version: '0.0.1' } ); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', function () {}, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //     it('should throw TypeError if so is not an instance of SmartObject class', function () {
+    //         expect(function () { return new Mqnode('foo', 'x', { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', 12, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', null, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', undefined, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', NaN, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', true, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', new Date(), { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', {}, { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', [], { version: '0.0.1' } ); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', function () {}, { version: '0.0.1' } ); }).to.throw(TypeError);
 
-                expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-            });
+    //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
+    //     });
 
-            it('should throw TypeError if devAttrs is not an object if given', function () {
-                expect(function () { return new Mqnode('foo', so, 'x'); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, 12); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, true); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, new Date()); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, []); }).to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, function () {}); }).to.throw(TypeError);
+    //     it('should throw TypeError if devAttrs is not an object if given', function () {
+    //         expect(function () { return new Mqnode('foo', so, 'x'); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, 12); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, true); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, new Date()); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, []); }).to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, function () {}); }).to.throw(TypeError);
 
-                expect(function () { return new Mqnode('foo', so, null); }).not.to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, undefined); }).not.to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, NaN); }).not.to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, {}); }).not.to.throw(TypeError);
-                expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-            });
-        } catch(e) {
-            console.log('Network module cannot be used on Travis, but that is ok.');
-        }
-
-    });
+    //         expect(function () { return new Mqnode('foo', so, null); }).not.to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, undefined); }).not.to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, NaN); }).not.to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, {}); }).not.to.throw(TypeError);
+    //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
+    //     });
+    // });
 
     describe('#.setDevAttrs', function () {
         // mqnode.on('error', function (e) {
