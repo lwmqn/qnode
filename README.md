@@ -1,6 +1,13 @@
 mqtt-node
 ========================
+Client node of lightweight MQTT machine network (LWMQN)  
+  
+[![NPM](https://nodei.co/npm/mqtt-node.png?downloads=true)](https://nodei.co/npm/mqtt-node/)  
 
+[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-node)
+[![npm](https://img.shields.io/npm/v/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
+[![npm](https://img.shields.io/npm/l/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
+  
 ## Table of Contents
 
 1. [Overiew](#Overiew)    
