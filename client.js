@@ -153,8 +153,8 @@ qnode.on('registered', function (rsp) {
     REG('registered: ');
     REG(rsp);
 
-    runTask(readTemp, { interval: 1000, repeat: 1 });
-    runTask(writeTemp, { interval: 5000, repeat: 1 });
+    runTask(readTemp, { interval: 4000, repeat: 1 });
+    runTask(writeTemp, { interval: 2000, repeat: 1 });
     // runTask(function () {
     //     qnode.pingServer(function (err, r) {
     //         console.log(err);
@@ -217,7 +217,7 @@ function writeTemp() {
 
 
     qnode.so.write('temperature', 0, 'minRangeValue', x, function (err, val) {
-        TASK('WRITE >> write: ' + val + ', minRangeValue: ' + qnode.so.temperature[0].sensorValue);
+        TASK('WRITE >> write: ' + val + ', minRangeValue: ' + qnode.so.temperature[0].minRangeValue);
     });
 }
 /*************************************************************************************************/
