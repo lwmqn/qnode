@@ -6,7 +6,6 @@ var mqtt = require('mqtt'),
     sinonChai = require('sinon-chai'),
     expect = require('chai').expect;
 
-var USE_TRAVIS = true;
 chai.use(sinonChai);
 
 var Mqnode = require('../index.js'),
@@ -18,11 +17,6 @@ describe('Signature Check', function () {
      var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
 
      // for travis-ci, since network module cannot run on it
-     if (USE_TRAVIS) {
-         mqnode.ip = '192.168.0.100';
-         mqnode.mac = '00:0c:29:c2:dc:8e';
-     }
-
     /*********************************************************************************/
     /****  This test cannot work on travis. Uncomment it only with local testing. ****/
     /*********************************************************************************/
@@ -335,10 +329,6 @@ describe('Signature Check', function () {
 
 describe('Functional Check', function () {
     var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-     if (USE_TRAVIS) {
-         mqnode.ip = '192.168.0.100';
-         mqnode.mac = '00:0c:29:c2:dc:8e';
-     }
     mqnode.connect('mqtt://192.16.0.1');
 
     describe('#ensure members', function () {
@@ -389,10 +379,6 @@ describe('Functional Check', function () {
     describe('#.new', function () {
         it ('should emit ready when new done', function (done) {
             var mqnode1 = new Mqnode('foo1', so, { version: '0.0.1' });
-             if (USE_TRAVIS) {
-                 mqnode1.ip = '192.168.0.100';
-                 mqnode1.mac = '00:0c:29:c2:dc:8e';
-             }
             mqnode1.on('ready', function () {
                 if (mqnode1.clientId === 'foo1')
                     done();
@@ -498,10 +484,6 @@ describe('Functional Check', function () {
 
     describe('#.connect', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.1');
 
         it('should turn _connected to true when receive connect event from this.mc', function (done) {
@@ -578,10 +560,6 @@ describe('Functional Check', function () {
 
     describe('#.close', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         it('should return with callback - no connection', function () {
             var cbSpy = sinon.spy();
             mqnode.close(cbSpy);
@@ -604,10 +582,6 @@ describe('Functional Check', function () {
 
     describe('#.publish', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         it('should return with callback err - not connect() yet', function (done) {
             mqnode.publish('x/y/z', { x: 1 }, function (err) {
                 if (err.message === 'No mqtt client established.')
@@ -653,10 +627,6 @@ describe('Functional Check', function () {
 
     describe('#.subscribe', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.1');
 
         it('should call mc.subscribe' , function (done) {
@@ -676,10 +646,6 @@ describe('Functional Check', function () {
 
     describe('#.unsubscribe', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.1');
 
         it('should call mc.unsubscribe' , function (done) {
@@ -699,10 +665,6 @@ describe('Functional Check', function () {
 
     describe('#.register', function () {
         var mqnode = new Mqnode('foox', so, { version: '0.0.3' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.1');
 
         it('should called when receive response - ok(200)' , function (done) {
@@ -810,10 +772,6 @@ describe('Functional Check', function () {
 
     describe('#.deregister', function () {
         var mqnode = new Mqnode('fooy', so, { version: '0.0.4' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.2');
 
         it('should called when receive response - deleted(202)' , function (done) {
@@ -887,10 +845,6 @@ describe('Functional Check', function () {
 
     describe('#.update', function () {
         var mqnode = new Mqnode('fooz', so, { version: '0.0.4' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - changed(204)' , function (done) {
@@ -981,10 +935,6 @@ describe('Functional Check', function () {
 
     describe('#.notify', function () {
         var mqnode = new Mqnode('foom', so, { version: '0.0.5' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - changed(204)' , function (done) {
@@ -1058,10 +1008,6 @@ describe('Functional Check', function () {
 
     describe('#.ping', function () {
         var mqnode = new Mqnode('foon', so, { version: '0.0.5' });
-         if (USE_TRAVIS) {
-             mqnode.ip = '192.168.0.100';
-             mqnode.mac = '00:0c:29:c2:dc:8e';
-         }
         mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - ok(200)' , function (done) {
