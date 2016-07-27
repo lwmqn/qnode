@@ -120,6 +120,7 @@ qnode.on('error', function (err) {
     ERR(err);
 });
 
+
 /*********************************************/
 /*** TRX Message Events                    ***/
 /*********************************************/
@@ -196,6 +197,17 @@ qnode.on('request', function (msg) {
 qnode.on('announce', function (msg) {
     console.log('announce');
     console.log(msg);
+    if (msg === 'resetting') {
+        qnode.close(true, function () {
+            setTimeout(function () {
+                qnode.connect('mqtt://localhost', {
+                    // username: 'freebird',
+                    // password: 'skynyrd',
+                    reconnectPeriod: 5000
+                });
+            }, 6000);
+        });
+    }
 });
 
 
