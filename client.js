@@ -154,6 +154,20 @@ qnode.on('registered', function (rsp) {
     REG('registered: ');
     REG(rsp);
 
+    runTask(function () {
+        qnode.checkIn(function (err, rsp) {
+            console.log(err);
+            console.log(rsp);
+        });
+    }, { interval: 4000, repeat: 1 });
+
+    runTask(function () {
+        qnode.checkOut(60, function (err, rsp) {
+            console.log(err);
+            console.log(rsp);
+        });
+    }, { interval: 5000, repeat: 1 });
+
     runTask(readTemp, { interval: 4000, repeat: 1 });
     runTask(writeTemp, { interval: 2000, repeat: 1 });
     // runTask(function () {
