@@ -14,15 +14,15 @@ Client node of lightweight MQTT machine network (LWMQN)
 2. [Features](#Features) 
 3. [Installation](#Installation) 
 4. [Basic Usage](#Basic)
-5. [APIs](#APIs)
+5. [APIs and Events](#APIs)
 
 <a name="Overiew"></a>
 ## 1. Overview
 
 Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
-* This module, **mqtt-node**, is an implementation of LWMQN Client.  
-* [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) is an implementation of LWMQN Server. **mqtt-shepherd** and **mqtt-node** are working together to form an IoT machine network.  
+* This module, **mqtt-node**, is an implementation of LWMQN Client to be used at machine-side.  
+* [**mqtt-shepherd** (LWMQN Server)](https://github.com/simenkid/mqtt-shepherd) and **mqtt-node** are working together to form an IoT machine network.  
 * **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
 * This module uses [smartobject](https://github.com/PeterEB/smartobject) as its fundamental of resource organizing on devices. **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may like to use **smartobject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light control.  
 * **mqtt-node** is trying to let you build IoT peripheral machines with less pain.  
@@ -71,29 +71,26 @@ var MqttNode = require('mqtt-node');
 var so = new SmartObject();
 
 // We have two humidity sensors here
-// oid = 'humidity', iid = 0
-so.init('humidity', 0, {
+so.init('humidity', 0, {    // oid = 'humidity', iid = 0
     sensorValue: 20,
     units: 'percent'
 });
 
-// oid = 'humidity', iid = 1
-so.init('humidity', 1, {
+so.init('humidity', 1, {    // oid = 'humidity', iid = 1
     sensorValue: 16,
     units: 'percent'
 });
 
 // Initialize a custom Resource
-so.init('myObject', 0, {
+so.init('myObject', 0, {    // oid = 'myObject', iid = 0
     myResrc1: 20,
     myResrc2: 'hello world!'
 });
 
-// If the Resouces have been bundle into a plugin or a separated module, 
-// you can require and use it directly  
-// var so = require('foo-ipso-temperature-plugin');
-// or
-// var so = require('./hal/my_temp_sensor.js');
+// If the Resouces have been bundle into a plugin or a separated module, you can require and 
+// use it directly, like:  
+//     var so = require('foo-ipso-temperature-plugin');
+// or, var so = require('./hal/my_temp_sensor.js');
 
 /*********************************************/
 /*** Client Device Initialzation           ***/
@@ -112,6 +109,7 @@ qnode.on('ready', function () {
 qnode.on('registered', function () {
     // If the registration procedure completes successfully, 'registered' will be fired.  
     // Now your device has joined a network, and managed by a LWMQN server.  
+    // This event only fires once 
 
     // Device is now ready to accept some remote requests from the server (qnode itself will 
     // handle with those requests and make the response, so don't worry about the REQ/RSP things).  
@@ -121,15 +119,16 @@ qnode.on('registered', function () {
     // MQTT broker.  
 });
 
+qnode.on('login', function () {
+    // Each time qnode successfully connects to a LWMQN server, 'login' event will be fired.  
+});
+
+qnode.on('logout', function () {
+    // Each time qnode disconnects from a LWMQN server, 'logout' event will be fired.  
+});
+
 // Connect and register to a LWMQN Server
 qnode.connect('mqtt://192.168.0.2');
-
-// If the server requires an account to login, you should connect with your account:
-// qnode.connect('mqtt://192.168.0.2', {
-//     username: 'skynyrd',
-//     password: 'freebird'
-// });
-
 ```
 
 * Server-side example (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
@@ -157,19 +156,19 @@ if (qnode) {
 * [getSmartObject()](#API_getSmartObject)
 * [isConnected()](#API_isConnected)
 * [setDevAttrs()](#API_setDevAttrs)
-
-* LWMQN Interface  
+* LWMQN Interface
     * [connect()](#API_connect)
     * [close()](#API_close)
     * [register()](#API_register)
     * [deregister()](#API_deregister)
+    * [checkout()](#API_checkout)
+    * [checkin()](#API_checkin)
     * [notify()](#API_notify)
     * [ping()](#API_ping)
-
-* MQTT Interface  
+* MQTT Interface
     * [publish()](#API_publish)
     * [subscribe()](#API_subscribe)
-    * [unsubscribe()](#API_unsubscribe)  
+    * [unsubscribe()](#API_unsubscribe)
 
 *************************************************
 
@@ -186,19 +185,19 @@ Create an instance of `MqttNode` class.
   
 **Arguments:**  
 
-1. `clientId` (_String_): clientId should be a string and should be unique in the network. Using mac address (with a prefix or suffix) as the clientId would be a good idea.  
-2. `so` (_Object_): An smart object that holds all Resources on the device. This object should be an instance of the [SmartObject](https://github.com/PeterEB/smartobject) class.  
+1. `clientId` (_String_): It should be a string and should be unique in the network. If it is not unique, you will get an response of conflict when trying to connect to a LWMQN server. Using mac address (with a prefix or suffix) as the `clientId` would be a good idea.  
+2. `so` (_Object_): A smart object that maintains all _Resources_ on the device. This object should be an instance of the [SmartObject](https://github.com/PeterEB/smartobject) class.  
 3. `devAttrs` (_Object_): Optional. An object to describe information about the device. The following table shows details of each property within `devAttrs` object.  
 
 | Property | Type   | Mandatory | Description                                                                            |  
 |----------|--------|-----------|----------------------------------------------------------------------------------------|  
 | lifetime | Number | optional  | Default is 86400. Unit: seconds                                                        |  
-| version  | String | optional  | Minimum supported LWMQN version (this is not really effective at this moment)          |  
+| version  | String | optional  | Minimum supported LWMQN version (this is not really functional at this moment)         |  
 | ip       | String | optional  | Device ip address. By default, mqtt-node itself will query this parameter from system  |  
   
 **Returns:**  
   
-* (_Object_) qnode
+* (_Object_): qnode
 
 **Examples:**
 
@@ -206,7 +205,7 @@ Create an instance of `MqttNode` class.
 var MqttNode = require('mqtt-node');
 var qnode = new MqttNode('my_foo_client_id', {
     lifetime: 21600,
-    version: 'v0.0.6'
+    version: 'v0.0.2'
 });
     
 qnode.on('ready', function () {
@@ -214,20 +213,20 @@ qnode.on('ready', function () {
     console.log(qnode.lifetime);    // 21600
     console.log(qnode.ip);          // '192.168.0.99'
     console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-    console.log(qnode.version);     // 'v0.0.6'
+    console.log(qnode.version);     // 'v0.0.2'
 });
 
 // Do not change the device attributes with direct assigments, 
 // i.e., qnode.lifetime = 2000.
 
-// Use qnode.setDevAttrs() to change attributes, and qnode will 
-// automatically check if it needs to publish an update message to the Server.
+// Use qnode.setDevAttrs() to change attributes, and qnode will automatically check 
+// if it needs to publish an update message to the server.
 ```
   
 ********************************************
 <a name="API_getSmartObject"></a>
 ### .getSmartObject()
-Initialize the Resources on qnode.  
+Get the smart object on this qnode.  
 
 **Arguments:**  
 
@@ -240,14 +239,24 @@ Initialize the Resources on qnode.
 **Examples:**  
   
 ```js
-// use oid and rids in string
+var so = qnode.getSmartObject();
 
+// after got the so, you can access its Resources with few convenient methods
+so.read('humidity', 1, 'sensorValue', function (err, data) {
+    if (!err)
+        console.log(data);  // 16
+});
+
+so.write('humidity', 0, 'sensorValue', 15.4, function (err, data) {
+    if (!err)
+        console.log(data);  // 15.4
+});
 ```
   
 ********************************************
 <a name="API_isConnected"></a>
 ### .isConnected()
-Initialize the Resources on qnode.  
+Checks if qnode is connected to a server.  
 
 **Arguments:**  
 
@@ -255,33 +264,75 @@ Initialize the Resources on qnode.
   
 **Returns:**  
   
-* (_Object_): so
+* (_Boolean_): Returns `true` if it is connected, else `false`.  
 
 **Examples:**  
   
 ```js
-// use oid and rids in string
+qnode.isConnected();    // false
+```
+  
+********************************************
+<a name="API_setDevAttrs"></a>
+### .setDevAttrs(devAttrs[, callback])
+Set device attribues of the qnode, and qnode will automatically check if it needs to publish an update message to the server (if registered and connected).  
 
+**Arguments:**
+  
+1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of MqttNode constructor, but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the server and then re-connect to the server. Any change of the device attributes will be published with an update message to the server.  
+2. `callback` (_Function_): Optional. `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
+
+| rsp.status | Status Code         | Description                                                                        |
+|------------|---------------------|------------------------------------------------------------------------------------|
+| 204        | Changed             | The Server accepted this update message successfully                               |
+| 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
+| 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
+| 408        | Timeout             | No response from the Server in 10 secs                                             |
+| 500        | InternalServerError | The Server has some trouble                                                        |
+
+**Returns:**  
+
+* (_Object_): qnode
+
+**Examples:**  
+  
+```js
+// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
+qnode.setDevAttrs({
+    ip: '192.168.0.211'
+}, function (err, rsp) {
+    console.log(rsp);   // { status: 204 }
+});
 ```
   
 ********************************************
 <a name="API_connect"></a>
-### .connect(url[, opts])
-Connect and register to a LWMQN Server with the given url. If succeeds, qnode will fire a `registered` event.  
-  
+### .connect(url[, opts][, callback])
+Connect and register to a LWMQN Server with the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each successful connection.  
+
 **Arguments:**  
 
-1. `url` (_String_): Url of the LWMQN Server, e.g. `mqtt://localhost`, `mqtt://192.168.0.100`, `mqtt://192.168.0.20:3000`.  
-2. `opts` (_Object_): Optional. The connect options with properties given in the following table.  
-  
-| Property        | Type             | Default      | Description                                             |  
-|-----------------|------------------|--------------|---------------------------------------------------------|  
-| username        | String           | `'freebird'` | The username required by your broker, if any            |  
-| password        | String \| Buffer | `'skynyrd'`  | the password required by your broker, if any            |  
-| keepalive       | Number           | 10           | 10 seconds, set to 0 to disable                         |  
-| reconnectPeriod | Number           | 3000         | milliseconds, interval between two reconnections        |  
-| connectTimeout  | Number           | 30000        | milliseconds, time to wait before a CONNACK is received |  
+1. `url` (_String_): Url of the LWMQN Server, e.g. `'mqtt://localhost'`, `'mqtt://192.168.0.100'`, `'mqtt://192.168.0.20:3000'`.  
+2. `opts` (_Object_): Optional. The connect options with possible properties given in the following table.  
 
+| Property        | Type             | Default      | Description                                                     |
+|-----------------|------------------|--------------|-----------------------------------------------------------------|
+| username        | String           | none         | The username required by your broker, if any                    |
+| password        | String \| Buffer | none         | The password required by your broker, if any                    |
+| keepalive       | Number           | 10           | 10 seconds, set to 0 to disable                                 |
+| reconnectPeriod | Number           | 3000         | milliseconds, interval between two reconnections                |
+| connectTimeout  | Number           | 30000        | milliseconds, time to wait before a CONNACK is received         |
+
+3. `callback` (_Function_): Optional. `function (err, rsp)` will be called when connects to a Server successfully. `rsp` is an object with a property `status` to tell the result of connection and registration.  
+
+| rsp.status | Status              | Description                                                                      |
+|------------|---------------------|----------------------------------------------------------------------------------|
+| 200        | OK                  | qnode was registered before and the record is successfully renewed on the Server |
+| 201        | Created             | qnode is a new Client registered to the Server successfully                      |
+| 400        | BadRequest          | Invalid paramter(s) for registration                                             |
+| 408        | Timeout             | No response from the Server in 10 secs                                           |
+| 409        | Conflict            | There is a duplicate Client exists (`clientId` or `mac` conflicts)               |
+| 500        | InternalServerError | The Server has some trouble                                                      |
   
 **Returns:**  
 
@@ -289,36 +340,47 @@ Connect and register to a LWMQN Server with the given url. If succeeds, qnode wi
 
 **Examples:**  
   
+* Connect without an account  
+  
 ```js
-qnode.on('ready', function () {
-    // do your work here
+qnode.on('logout', function () {
+    console.log('Disconnected from the Server.');
 });
 
-// use default account
-qnode.connect('mqtt://192.168.0.100');
-
-// use your own account
+// connect without an account
+qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
+    if (!err)
+        console.log(rsp);   // { status: 201 }
+});
+```
+  
+* If an account is required  
+  
+```js
 qnode.connect('mqtt://192.168.0.100', {
     username: 'someone',
     password: 'somepassword'
 });
+```
 
+* Use the MQTT connection options other than defaults  
+  
+```js
 // use the MQTT connection options other than defaults
-qnode.connect('mqtt://192.168.0.100', {
-    keepalive: 30,
-    reconnectPeriod: 5000
-});
+    qnode.connect('mqtt://192.168.0.100', {
+        keepalive: 30,
+        reconnectPeriod: 5000
+    });
 ```
   
 ********************************************
 <a name="API_close"></a>
-### .close([force,] [callback])
-Disconnect from the Server. qnode will fire a `close` event if it is disconnected.  
+### .close([callback])
+Disconnect from the Server. qnode will also fire a `'logout'` event if it is disconnected.  
   
 **Arguments:**  
 
-1. `force` (_Boolean_): `true` will close the client right away, without waiting for the in-flight messages to be acked. This parameter is optional.  
-2. `callback` (_Function_): Will be called when the Client is closed.  
+1. `callback` (_Function_): Will be called when the Client is closed.  
   
 **Returns:**  
 
@@ -327,7 +389,7 @@ Disconnect from the Server. qnode will fire a `close` event if it is disconnecte
 **Examples:**  
   
 ```js
-qnode.on('close', function () {
+qnode.on('logout', function () {
     console.log('Disconnected from the Server.');
 });
 
@@ -337,7 +399,7 @@ qnode.close();
 ********************************************
 <a name="API_register"></a>
 ### .register([callback])
-Publish a registering request to the Server. Everytime you invoke connect(), qnode will do regiseter to the Server as well.  
+Publish a registering request to the Server. Every time you invoke connect(), qnode will do regiseter to the Server as well. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
   
 **Arguments:**  
 
@@ -348,7 +410,7 @@ Publish a registering request to the Server. Everytime you invoke connect(), qno
 | 200        | OK                  | The Client was registered before and the record is successfully renewed on the Server |
 | 201        | Created             | Registration is successful for this new Client                                        |
 | 400        | BadRequest          | Invalid paramter(s) for registration                                                  |
-| 408        | Timeout             | No response from the Server in 60 secs                                                |
+| 408        | Timeout             | No response from the Server in 10 secs                                                |
 | 409        | Conflict            | Client Id conflicts                                                                   |
 | 500        | InternalServerError | The Server has some trouble                                                           |
 
@@ -357,9 +419,9 @@ Publish a registering request to the Server. Everytime you invoke connect(), qno
 * (_Object_): qnode
 
 **Examples:**  
-  
+
 ```js
-qnode.pubRegister(function (err, rsp) {
+qnode.register(function (err, rsp) {
     console.log(rsp);  // { status: 201 }
 });
 ```
@@ -367,7 +429,7 @@ qnode.pubRegister(function (err, rsp) {
 ********************************************
 <a name="API_deregister"></a>
 ### .deregister([callback])
-Publish a deregistering request to the Server for the Client to leave the network.  
+Publish a deregistering request to the Server for the Client to leave the network. The Server will remove the Client from the registry and returns a status code of 202 to the Client when succeeds, and a `'deregistered'` event will also be fired.  
   
 **Arguments:**  
 
@@ -387,42 +449,79 @@ Publish a deregistering request to the Server for the Client to leave the networ
 **Examples:**  
   
 ```js
-qnode.pubDeregister(function (err, rsp) {
+qnode.on('deregistered', function () {
+    console.log('qnode has left from the network.');
+});
+
+qnode.deregister(function (err, rsp) {
     console.log(rsp);  // { status: 202 }
 });
 ```
   
 ********************************************
-<a name="API_setDevAttrs"></a>
-### .setDevAttrs(devAttrs[, callback])
-Set device attribues on the qnode.  
-
-**Arguments:**
+<a name="API_checkout"></a>
+### .checkout([duration, ][callback])
+Publish a checkout request to tell the Server that qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout. After a successful acknowledgement, qnode can then close its connection from the Server and even power down. 
   
-1. `devAttrs` (_Object_): Device attributes.  
-    It is just like the `devAttrs` in the arguments of MqttNode constructor, but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then re-register to it again. Any change of the device attributes will be published with an update message to the Server.  
-2. `callback` (_Function_): `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
+**NOTICE**: After checkout, qnode will not only stop reporting but also clear all report settings. The Server should re-issue the observeReq() if needed.  
 
-| rsp.status | Status Code         | Description                                                                        |
-|------------|---------------------|------------------------------------------------------------------------------------|
-| 204        | Changed             | The Server successfuly accepted this update message                                |
-| 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
-| 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
-| 408        | Timeout             | No response from the Server in 60 secs                                             |
-| 500        | InternalServerError | The Server has some trouble                                                        |
+**Arguments:**  
+
+1. `duration` (_Function_): `function (err, rsp)` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
+1. `callback` (_Function_): `function (err, rsp)` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
+  
+| rsp.status | Status              | Description                                |
+|------------|---------------------|--------------------------------------------|
+| 200        | OK                  | The Client was successfully deregistered   |
+| 404        | NotFound            | The Client is not found on the Server      |
+| 408        | Timeout             | No response from the Server in 60 secs     |
+| 500        | InternalServerError | The Server has some trouble                |
 
 **Returns:**  
 
-* (_Object_): qnode
+* (_Object_) qnode
 
 **Examples:**  
   
 ```js
-// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
-qnode.setDevAttrs({
-    ip: '192.168.0.211'
-}, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
+qnode.on('deregistered', function () {
+    console.log('qnode has left from the network.');
+});
+
+qnode.deregister(function (err, rsp) {
+    console.log(rsp);  // { status: 202 }
+});
+```
+  
+********************************************
+<a name="API_checkin"></a>
+### .checkin([callback]) [TODO]
+Publish a deregistering request to the Server for the Client to leave the network. The Server will remove the Client from the registry and returns a status code of 202 to the Client when succeeds, and a `'deregistered'` event will also be fired.  
+  
+**Arguments:**  
+
+1. `callback` (_Function_): `function (err, rsp)` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
+  
+| rsp.status | Status              | Description                                |
+|------------|---------------------|--------------------------------------------|
+| 202        | Deleted             | The Client was successfully deregistered   |
+| 404        | NotFound            | The Client is not found on the Server      |
+| 408        | Timeout             | No response from the Server in 60 secs     |
+| 500        | InternalServerError | The Server has some trouble                |
+
+**Returns:**  
+
+* (_Object_) qnode
+
+**Examples:**  
+  
+```js
+qnode.on('deregistered', function () {
+    console.log('qnode has left from the network.');
+});
+
+qnode.deregister(function (err, rsp) {
+    console.log(rsp);  // { status: 202 }
 });
 ```
   

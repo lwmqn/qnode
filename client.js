@@ -101,26 +101,32 @@ var qnode = new MqttNode('test_node_01', so, devAttrs);
 /*** Fundamental Events                    ***/
 /*********************************************/
 qnode.on('connect', function () {
-    CON('connect');
+    console.log('connect');
 });
 
 qnode.on('reconnect', function () {
-    CON('reconnect');
+    console.log('reconnect');
 });
 
 qnode.on('offline', function () {
-    CON('offline');
+    console.log('offline');
 });
 
 qnode.on('close', function () {
-    CON('close');
+    console.log('close');
 });
 
 qnode.on('error', function (err) {
-    ERR(err);
+    console.log(err);
 });
 
+qnode.on('login', function () {
+    console.log('login');
+});
 
+qnode.on('logout', function () {
+    console.log('logout');
+});
 /*********************************************/
 /*** TRX Message Events                    ***/
 /*********************************************/
@@ -143,6 +149,9 @@ qnode.on('ready', function () {
             // username: 'freebird',
             // password: 'skynyrd',
             reconnectPeriod: 5000
+        }, function (err, rsp) {
+            console.log(err);
+            console.log(rsp);
         });
     }, 1000);
 });
@@ -150,7 +159,6 @@ qnode.on('ready', function () {
 /*********************************************/
 /*** Registered Events                     ***/
 /*********************************************/
-var isFire = false;
 qnode.on('registered', function (rsp) {
     REG('registered: ');
     REG(rsp);
@@ -162,15 +170,16 @@ qnode.on('registered', function (rsp) {
     //     });
     // }, { interval: 4000, repeat: 1 });
 
-    if (!isFire) {
-        isFire = true;
         runTask(function () {
-            qnode.checkout(function (err, rsp) {
+            qnode.checkout(5, function (err, rsp) {
                 console.log(err);
                 console.log(rsp);
                 qnode.close();
                 setTimeout(function () {
-                    qnode.connect('mqtt://localhost');
+                    qnode.connect('mqtt://localhost', function (err, rsp) {
+                       console.log(err);
+                        console.log(rsp);
+                    });
                     setTimeout(function () {
                         qnode.checkin();
                     }, 2000);
@@ -178,7 +187,6 @@ qnode.on('registered', function (rsp) {
                 }, 10000);
             });
         }, { interval: 20000, repeat: 1 });
-    }
 
     runTask(readTemp, { interval: 4000, repeat: 1 });
     runTask(writeTemp, { interval: 2000, repeat: 1 });
