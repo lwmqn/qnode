@@ -150,23 +150,35 @@ qnode.on('ready', function () {
 /*********************************************/
 /*** Registered Events                     ***/
 /*********************************************/
+var isFire = false;
 qnode.on('registered', function (rsp) {
     REG('registered: ');
     REG(rsp);
+    console.log('registered');
+    // runTask(function () {
+    //     qnode.checkin(function (err, rsp) {
+    //         console.log(err);
+    //         console.log(rsp);
+    //     });
+    // }, { interval: 4000, repeat: 1 });
 
-    runTask(function () {
-        qnode.checkIn(function (err, rsp) {
-            console.log(err);
-            console.log(rsp);
-        });
-    }, { interval: 4000, repeat: 1 });
-
-    runTask(function () {
-        qnode.checkOut(60, function (err, rsp) {
-            console.log(err);
-            console.log(rsp);
-        });
-    }, { interval: 5000, repeat: 1 });
+    if (!isFire) {
+        isFire = true;
+        runTask(function () {
+            qnode.checkout(function (err, rsp) {
+                console.log(err);
+                console.log(rsp);
+                qnode.close();
+                setTimeout(function () {
+                    qnode.connect('mqtt://localhost');
+                    setTimeout(function () {
+                        qnode.checkin();
+                    }, 2000);
+                    
+                }, 10000);
+            });
+        }, { interval: 20000, repeat: 1 });
+    }
 
     runTask(readTemp, { interval: 4000, repeat: 1 });
     runTask(writeTemp, { interval: 2000, repeat: 1 });
