@@ -344,6 +344,7 @@ describe('Functional Check', function () {
             expect(mqnode._lfsecs).to.be.equal(0);
             expect(mqnode._pubics).to.be.deep.equal({
                 register: 'register/' + mqnode.clientId,
+                check: 'check/' + mqnode.clientId,
                 deregister: 'deregister/' + mqnode.clientId,
                 notify: 'notify/' + mqnode.clientId,
                 update: 'update/' + mqnode.clientId,
@@ -353,6 +354,7 @@ describe('Functional Check', function () {
             expect(mqnode._subics).to.be.deep.equal({
                 register: 'register/response/' + mqnode.clientId,
                 deregister: 'deregister/response/' + mqnode.clientId,
+                check: 'check/response/' + mqnode.clientId,
                 notify: 'notify/response/' + mqnode.clientId,
                 update: 'update/response/' + mqnode.clientId,
                 ping: 'ping/response/' + mqnode.clientId,
