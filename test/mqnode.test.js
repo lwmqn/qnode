@@ -196,7 +196,6 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.connect('mqtt://192.168.0.1', true); }).to.throw(TypeError);
             expect(function () { return mqnode.connect('mqtt://192.168.0.1', []); }).to.throw(TypeError);
             expect(function () { return mqnode.connect('mqtt://192.168.0.1', new Date()); }).to.throw(TypeError);
-            expect(function () { return mqnode.connect('mqtt://192.168.0.1', function () {}); }).to.throw(TypeError);
         });
     });
 
@@ -344,7 +343,7 @@ describe('Functional Check', function () {
             expect(mqnode._lfsecs).to.be.equal(0);
             expect(mqnode._pubics).to.be.deep.equal({
                 register: 'register/' + mqnode.clientId,
-                check: 'check/' + mqnode.clientId,
+                schedule: 'schedule/' + mqnode.clientId,
                 deregister: 'deregister/' + mqnode.clientId,
                 notify: 'notify/' + mqnode.clientId,
                 update: 'update/' + mqnode.clientId,
@@ -354,7 +353,7 @@ describe('Functional Check', function () {
             expect(mqnode._subics).to.be.deep.equal({
                 register: 'register/response/' + mqnode.clientId,
                 deregister: 'deregister/response/' + mqnode.clientId,
-                check: 'check/response/' + mqnode.clientId,
+                schedule: 'schedule/response/' + mqnode.clientId,
                 notify: 'notify/response/' + mqnode.clientId,
                 update: 'update/response/' + mqnode.clientId,
                 ping: 'ping/response/' + mqnode.clientId,
@@ -510,9 +509,9 @@ describe('Functional Check', function () {
             }, 5);
         });
 
-        it('should receive close event from this.mc, get close and _unconnected events', function (done) {
+        it('should receive logout event from this.mc, get close and _unconnected events', function (done) {
             var count = 0;
-            mqnode.once('close', function () {
+            mqnode.once('logout', function () {
                 count += 1;
                 if (count === 2)
                     done();
@@ -562,20 +561,16 @@ describe('Functional Check', function () {
 
     describe('#.close', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-        it('should return with callback - no connection', function () {
-            var cbSpy = sinon.spy();
-            mqnode.close(cbSpy);
-            expect(cbSpy).to.have.been.called;
+        it('should return with callback - no connection', function (done) {
+            mqnode.close(function (err) {
+                done();
+            });
         });
 
         it('should return with callback - with connection', function (done) {
             mqnode.connect('mqtt://192.16.0.1');
 
-            var cbSpy1 = sinon.spy();
-            mqnode.close(function () {
-                cbSpy1();
-                expect(cbSpy1).to.have.been.called;
-
+            mqnode.close(true, function () {    // force true, don't wait ack
                 if (mqnode.mc === null)
                     done();
             });

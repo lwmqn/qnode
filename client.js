@@ -175,16 +175,16 @@ qnode.on('registered', function (rsp) {
                 console.log(err);
                 console.log(rsp);
                 qnode.close();
-                // setTimeout(function () {
-                //     qnode.connect('mqtt://localhost', function (err, rsp) {
-                //         console.log(err);
-                //         console.log(rsp);
-                //     });
-                //     setTimeout(function () {
-                //         qnode.checkin();
-                //     }, 3000);
+                setTimeout(function () {
+                    qnode.connect('mqtt://localhost', function (err, rsp) {
+                        console.log(err);
+                        console.log(rsp);
+                    });
+                    setTimeout(function () {
+                        qnode.checkin();
+                    }, 3000);
                     
-                // }, 2000);
+                }, 2000);
             });
         }, { interval: 10000, repeat: 0 });
 
