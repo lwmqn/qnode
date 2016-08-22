@@ -27,8 +27,8 @@ Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an archi
 * This module is an implementation of LWMQN Client to be used at machine-side.  
 * **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
 * **mqtt-node** uses [SmartObject](https://github.com/PeterEB/smartobject) class as its fundamental of resource organization on devices.
-    - **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you abstract your hardware into smart objects. You may also like to use **SmartObject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light controller.
-    - Here is a [tutorual of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
+    - **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you with abstracting your hardware into smart objects. You may also like to use **SmartObject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light controller.
+    - Here is a [tutorial of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
 **Note**:  
 * IPSO uses **_Object_**, **_Object Instance_** and **_Resource_** to describe the hierarchical structure of resources on a Client Device, where **oid**, **iid**, and **rid** are identifiers of them respectively to allocate resources on a Client Device.  
@@ -43,6 +43,8 @@ Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an archi
 * **SmartObject**: Class exposed by `require('smartobject')`  
 * **qnode**: Instance of MqttNode class  
 * **so**: Instance of SmartObject class  
+
+<br />
 
 <a name="Features"></a>
 ## 2. Features
@@ -60,81 +62,63 @@ Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an archi
 <a name="Basic"></a>
 ## 4. Basic Usage
 
-* Client-side exmaple (here is how you use `mqtt-node` on a machine node):  
+Here is an quick example to show you how to use **mqtt-node** and **smartobject** on your machine node:  
 
-```js
-var SmartObject = require('smartobject');
-var MqttNode = require('mqtt-node');
+* **Step 1**: Import the modules and initialize two humidity sensors and one custom Object within the smart object `so`:
+    ```js
+    var MqttNode = require('mqtt-node'),
+        SmartObject = require('smartobject');
 
-/*********************************************/
-/*** Smart Object: Resources Initialzation ***/
-/*********************************************/
-// Initialize Resources that follow IPSO definition
-var so = new SmartObject();
+    var so = new SmartObject();
 
-// We have two humidity sensors here
-so.init('humidity', 0, {    // oid = 'humidity', iid = 0
-    sensorValue: 20,
-    units: 'percent'
-});
+    // Humidity sensor - the first instance
+    so.init('humidity', 0, {    // oid = 'humidity', iid = 0
+        sensorValue: 20,
+        units: 'percent'
+    });
 
-so.init('humidity', 1, {    // oid = 'humidity', iid = 1
-    sensorValue: 16,
-    units: 'percent'
-});
+    // Humidity sensor - the second instance
+    so.init('humidity', 1, {    // oid = 'humidity', iid = 1
+        sensorValue: 16,
+        units: 'percent'
+    });
 
-// Initialize a custom Resource
-so.init('myObject', 0, {    // oid = 'myObject', iid = 0
-    myResrc1: 20,
-    myResrc2: 'hello world!'
-});
+    // A custom Object with two Resources: myResrc1 and myResrc2
+    so.init('myObject', 0, {    // oid = 'myObject', iid = 0
+        myResrc1: 20,
+        myResrc2: 'hello world!'
+    });
+    ```
+    - You can bundle your smart object into a plugin or a separated module, and then use it like:
+    ```js
+        var so = require('foo-ipso-temperature-plugin');
+        // or
+        var so = require('./hal/my_temp_sensor.js');
+    ```
 
-// If the Resouces are bundled into a plugin or a separated module,
-// you can require and use it directly, like:  
-//          var so = require('foo-ipso-temperature-plugin');
-//      or, var so = require('./hal/my_temp_sensor.js');
+* **Step 2**: Create a qnode with a client id and your smart object. And have your 'ready' and 'registered' event listeners:  
+    - **'ready'** event fires when the device is ready, but not yet remotely register to a Server.
+    - **'registered'** event fires when registration procedure completes successfully, whicn means your device has joined the network and managed by the Server. After a success of registration, you can take the LWMQN Server as a simple MQTT broker. Your device can subscribe to any topic or publish any topic to the network (if authorized).
+    ```js
+    var qnode = new MqttNode('my_foo_client_id', so);
 
-/*********************************************/
-/*** Client Device Initialzation           ***/
-/*********************************************/
-// Instantiate a machine node with your smart object
-var qnode = new MqttNode('my_foo_client_id', so);
+    qnode.on('ready', function () {
+        // You can start to run your local app, such as showing the sensed value on an OLED monitor.
+        // To interact with your Resources, simply use the handy APIs provided by SmartObject class.
+    });
 
-qnode.on('ready', function () {
-    // Device is ready now, but not yet remotely register to a Server.  
+    qnode.on('registered', function () {
+        // Your qnode is now ready to accept remote requests from the Server. Don't worry about the 
+        // REQ/RSP things, qnode itself will handle them for you.  
+    });
+    ```
 
-    // You can start to run your application, such as temperature sensing and display the
-    // sensed value with a small OLED monitor on the device. To interact with your resources,
-    // simply use the APIs provided by SmartObject class. It's handy and convenient.  
-});
+* **Step 3**: Connect and register to a Sever, that's it!
+    ```js
+    qnode.connect('mqtt://192.168.0.2');
+    ```
 
-qnode.on('registered', function () {
-    // 'registered' event will be fired when registration procedure completes successfully.  
-    // Now your device has joined the network and managed by the Server.  
-
-    // It is now ready to accept some remote requests from the Server. Don't worry about the 
-    // REQ/RSP things, qnode itself will handle those requests and make the corresponding responses.  
-
-    // After a success of registration, you can take the LWMQN Server as a simple MQTT broker.  
-    // Your device can subscribe to any topic or publish any topic to the network.  
-});
-
-qnode.on('login', function () {
-    // When qnode successfully connects to a LWMQN server, 'login' event will be fired.  
-
-    // Note: 1. 'registered' event only fires at the first time of successful connection.
-             2. 'login' event fires at each time of successful connection.
-});
-
-qnode.on('logout', function () {
-    // When qnode disconnects from a LWMQN server, 'logout' event will be fired.  
-});
-
-// Call qnode.connect() to connect and register to a LWMQN server.  
-qnode.connect('mqtt://192.168.0.2');
-```
-
-* Server-side example (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
+At server-side, you can operate upon this qnode like (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):   
 
 ```js
 var qnode = qserver.find('my_foo_client_id');   // find the registered device by its client id
@@ -142,12 +126,12 @@ var qnode = qserver.find('my_foo_client_id');   // find the registered device by
 if (qnode) {
     qnode.readReq('humidity/0/sensorValue', function (err, rsp) {
         if (!err)
-            console.log(rsp.data);      // 20
+            console.log(rsp);   // { status: 205, data: 20 }
     });
 
     qnode.readReq('myObject/0/myResrc2', function (err, rsp) {
         if (!err)
-            console.log(rsp.data);      // 'hello world!'
+            console.log(rsp);   // { status: 205, data: 'hello world!' }
     });
 }
 ```
@@ -193,8 +177,8 @@ Create an instance of `MqttNode` class.
     | Property | Type   | Mandatory | Description                                                                            |  
     |----------|--------|-----------|----------------------------------------------------------------------------------------|  
     | lifetime | Number | optional  | Default is 86400 (unit: seconds).                                                      |  
-    | version  | String | optional  | Minimum supported LWMQN version (this is not really functional at this moment)         |  
-    | ip       | String | optional  | Device ip address. By default, mqtt-node itself will query this parameter from system  |  
+    | version  | String | optional  | Minimum supported LWMQN version (this is not really functional at this moment).        |  
+    | ip       | String | optional  | Device ip address. By default, mqtt-node itself will query this parameter from system. |  
   
 **Returns:**  
   
@@ -226,7 +210,7 @@ qnode.on('ready', function () {
 ********************************************
 <a name="API_getSmartObject"></a>
 ### .getSmartObject()
-Get the smart object used on this qnode.  
+Get the smart object used on this qnode. You can access its Resources with [read](https://github.com/PeterEB/smartobject#API_read)/[write](https://github.com/PeterEB/smartobject#API_write)/[exec](https://github.com/PeterEB/smartobject#API_exec) methods provieded by SmartObject class. Use these method to access you smart object, and qnode itself will check if it needs to report the changes to the Server according to the settings of obsevation.  
 
 **Arguments:**  
 
@@ -240,8 +224,6 @@ Get the smart object used on this qnode.
   
 ```js
 var so = qnode.getSmartObject();
-
-// after got the so, you can access its Resources with few convenient methods
 so.read('humidity', 1, 'sensorValue', function (err, data) {
     if (!err)
         console.log(data);  // 16
@@ -279,8 +261,8 @@ Set device attribues of the qnode, and qnode will automatically check if it need
 
 **Arguments:**
   
-1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of [MqttNode constructor](#API_MqttNode), but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then connect to the Server again. Any change of device attributes will be published with an update message to the Server.  
-2. `callback` (_Function_): Optional. `function (err, rsp)` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
+1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of [MqttNode constructor](#API_MqttNode), but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then connect to the Server again.  
+2. `callback` (_Function_): Optional. `function (err, rsp) {}` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
 
     | rsp.status | Status Code         | Description                                                                        |
     |------------|---------------------|------------------------------------------------------------------------------------|
@@ -323,7 +305,7 @@ Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode 
     | reconnectPeriod | Number           | 3000         | milliseconds, interval between two reconnections                |
     | connectTimeout  | Number           | 30000        | milliseconds, time to wait before a CONNACK is received         |
 
-3. `callback` (_Function_): Optional. `function (err, rsp)` will be called when connects to a Server successfully. `rsp` is an object with a property `status` to tell the result of connection and registration.
+3. `callback` (_Function_): Optional. `function (err, rsp) {}` will be called when connects to a Server successfully. `rsp` is an object with a property `status` to tell the result of connection and registration.
 
     | rsp.status | Status              | Description                                                                      |
     |------------|---------------------|----------------------------------------------------------------------------------|
@@ -399,11 +381,11 @@ qnode.close();
 ********************************************
 <a name="API_register"></a>
 ### .register([callback])
-Publish a registering request to the Server. Every time you invoke connect(), qnode will do regiseter to the Server as well. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
+Publish a registering request to the Server. **Every time you invoke connect(), qnode will do regiseter to the Server as well.** When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)`. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of registration. The descriptions of possible `rsp.status` are given in the following table.  
+1. `callback` (_Function_): `function (err, rsp) {}`. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of registration. The descriptions of possible `rsp.status` are given in the following table.  
   
     | rsp.status | Status              | Description                                                                           |
     |------------|---------------------|---------------------------------------------------------------------------------------|
@@ -429,17 +411,17 @@ qnode.register(function (err, rsp) {
 ********************************************
 <a name="API_deregister"></a>
 ### .deregister([callback])
-Publish a deregistering request to the Server for the Client to leave the network. The Server will remove the Client from the registry and returns a status code of 202 to the Client when succeeds, and qnode will also fire a `'deregistered'` event.  
+Publish a deregistering request to the Server for the Client to leave the network. The Server will remove the Client from the registry and returns a status code of 202 to the Client when succeeds, and qnode will fire a `'deregistered'` event as well.  
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
+1. `callback` (_Function_): `function (err, rsp) {}` will be called when deregistering is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of deregistration.  
   
     | rsp.status | Status              | Description                                |
     |------------|---------------------|--------------------------------------------|
     | 202        | Deleted             | The Client was successfully deregistered   |
     | 404        | NotFound            | The Client is not found on the Server      |
-    | 408        | Timeout             | No response from the Server in 60 secs     |
+    | 408        | Timeout             | No response from the Server in 10 secs     |
     | 500        | InternalServerError | The Server has some trouble                |
 
 **Returns:**  
@@ -462,14 +444,12 @@ qnode.deregister(function (err, rsp) {
 <a name="API_checkout"></a>
 ### .checkout([duration, ][callback])
 
-[TBD]
+Publish a checkout message to inform the Server that this qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout message. A `'logout'` event will be fired when it checks out successfully.  
 
-Publish a checkout message to indicate the Server that this qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout indication. After received a successful acknowledgement, qnode can then close its connection from the Server, power down, or even power off.  
-  
-* When qnode publishes a checkout indication without the `duration`, the Server will take this qnode as a sleeping one and it has no idea about when this qnode will wake up and check in again.  
-* When qnode publishes a checkout indication with the `duration`, for example 600 seconds, the Server will take this qnode as a sleeping one and it will expect that this qnode will wake up and check in at 600 seconds later. If qnode does not then check in (within 2 seconds at that moment) or have a connect with the Server, the Server will take it as an offline Client.  
-
-**NOTICE**: After a success of checkout, qnode will not only stop reporting but also clear all the report settings. The Server should re-issue the observeReq() if needed.  
+* After received a successful acknowledgement, qnode can then close its connection from the Server, power down, or even power off.  
+* If qnode checks out with the `duration` given, for example 600 seconds, the Server knows this qnode is going to sleep and expects that this qnode will wake up and check in at 600 seconds later. If qnode does not then check in (within 2 seconds at that moment) or reconnect to the Server, the Server will take it as an offline Client.  
+* If qnode checks out without the `duration`, the Server knows this qnode is going to sleep but has no idea about when it will wake up and check in again. The Server will always take it as a sleeping Client. (This is okay, since each time when the Server likes to send something to a sleeping Client, it will do a quick test to see if the Client is up.)  
+* **NOTE**: After a success of checkout, qnode will not only stop reporting but also clear all the report settings. The Server should re-issue the observeReq(), when the Client goes online again, if needed.  
 
 **Arguments:**  
 
@@ -478,9 +458,9 @@ Publish a checkout message to indicate the Server that this qnode is going to sl
   
     | rsp.status | Status              | Description                                |
     |------------|---------------------|--------------------------------------------|
-    | 200        | OK                  | The Client was successfully deregistered   |
+    | 200        | OK                  | The checkout message is acknowledged       |
     | 404        | NotFound            | The Client is not found on the Server      |
-    | 408        | Timeout             | No response from the Server in 60 secs     |
+    | 408        | Timeout             | No response from the Server in 10 secs     |
     | 500        | InternalServerError | The Server has some trouble                |
 
 **Returns:**  
@@ -499,7 +479,10 @@ qnode.checkout(function (err, rsp) {
 
     if (rsp.status === 200) {
         console.log('qnode has checked out from the network.');
-        qnode.close();     // close the connection. The Server will take this qnode as a sleeping Client but not an offline one.  
+
+        qnode.close();  // close the connection.
+                        // The Server will take this qnode as a sleeping Client
+                        // but not an offline one.
     }
 });
 ```
@@ -508,9 +491,7 @@ qnode.checkout(function (err, rsp) {
 <a name="API_checkin"></a>
 ### .checkin([callback])
 
-[TODO]
-
-Publish a checkin message to indicate the Server that this qnode is going online from sleep. The Server will returns a status code of 200 to acknowledge this checkin indication and take this qnode as an online Client. After received a successful acknowledgement, qnode can do something and schedule another checkout later.  
+Publish a checkin message to inform the Server that this qnode is up from sleep. The Server will returns a status code of 200 to acknowledge this checkin message and take this qnode as an online Client. After received a successful acknowledgement, qnode can do something and schedule another checkout later. A `'login'` event will be fired when the qnode checks in successfully.   
   
 **Arguments:**  
 
@@ -518,9 +499,9 @@ Publish a checkin message to indicate the Server that this qnode is going online
 
     | rsp.status | Status              | Description                                |
     |------------|---------------------|--------------------------------------------|
-    | 200        | OK                  | The Client was successfully deregistered   |
+    | 200        | OK                  | The checkin message is acknowledged        |
     | 404        | NotFound            | The Client is not found on the Server      |
-    | 408        | Timeout             | No response from the Server in 60 secs     |
+    | 408        | Timeout             | No response from the Server in 10 secs     |
     | 500        | InternalServerError | The Server has some trouble                |
 
 **Returns:**  
@@ -554,14 +535,14 @@ if (qnode.isConnected()) {
 ### .notify(note[, callback])
 Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
 
-* Notice that **mqtt-node** will automatically report notifications to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
+* Notice that **mqtt-node will automatically report notifications** to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
 * If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid` and `data`, where `data` is the Resource value.  
-* If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid` and `data` fields, where `data` is the Object Instance containing all its Resources. Please refer to [LWMQN Notify Channel(TODO)](#LWMQN_PAGE) for more info.  
+* If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid` and `data` fields, where `data` is the Object Instance containing all its Resources.  
 
 **Arguments:**  
 
 1. `note` (_Object_): A Resource or an Object Instance you like to report to the Server.  
-2. `callback` (_Function_): `function (err, rsp)` will be called when the acknowledgement is coming back from the Server.  
+2. `callback` (_Function_): `function (err, rsp) {}` will be called when the acknowledgement is coming back from the Server.  
   
     | rsp.status | Status              | Description                                                  |
     |------------|---------------------|--------------------------------------------------------------|
@@ -622,12 +603,12 @@ Ping the Server.
   
 **Arguments:**  
 
-1. `callback` (_Function_): `function (err, rsp)` will be called upon receiving the response. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round trip time in milliseconds.  
+1. `callback` (_Function_): `function (err, rsp) {}` will be called upon receiving the response. An `err` occurs if qnode has no connection to the Server. `rsp` is a response object with a status code to tell the result of pinging. `rsp.data` is the approximate round-trip time in milliseconds.  
   
     | rsp.status | Status              | Description                                                     |
     |------------|---------------------|-----------------------------------------------------------------|
     | 200        | OK                  | Pinging is successful with `rsp.data` roundtrip time in ms      |
-    | 408        | Timeout             | No response from the Server in 60 secs. `rsp.data` will be null |
+    | 408        | Timeout             | No response from the Server in 10 secs. `rsp.data` will be null |
 
 **Returns:**  
 
@@ -637,7 +618,7 @@ Ping the Server.
   
 ```js
 qnode.ping(function (err, rsp) {
-    console.log(rsp);   // { status: 200, data: 16 }, 16ms
+    console.log(rsp);   // { status: 200, data: 16 }, round-trip time is 16 ms
 });
 ```
   
@@ -646,14 +627,14 @@ qnode.ping(function (err, rsp) {
 ### .publish(topic, message[, options][, callback])
 This is a generic method to publish a message to a topic.  
   
-If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered Client to publish any message to any topic. In this case, the Server simply acts as an MQTT broker. The publishment is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered Client to publish any message to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The publishment is not allowed at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
 1. `topic` (_String_): Topic to publish to.  
 2. `message` (_String | Buffer_): Message to publish with.  
 3. `options` (_Object_): Option to publish with, including the properties shown in the following table.  
-4. `callback` (_Function_): Will be called when the QoS handling completes, or at the next tick if QoS 0.  
+4. `callback` (_Function_): `function (err) {}`, will be called when the QoS handling completes, or at the next tick if QoS 0. An error occurs if client is disconnecting.  
   
     | Property | Type    | Default | Description |
     |----------|---------|---------|-------------|
@@ -675,13 +656,13 @@ qnode.publish('foo/bar/greet', 'Hello World!');
 ### .subscribe(topics[, options][, callback])
 This is a generic method to subscribe to a topic or topics listed in an array.  
   
-If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registered Client to subscribe to any topic. In this case, the Server simply acts as an MQTT broker. The generic subscription is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registered Client to subscribe to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The generic subscription is not allowed at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
 1. `topics` (_String_ | _String[]_): The topic(s) to subscribe to.  
 2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a Qos level of the subscription. `qos` is 0 by default.  
-3. `callback` (_Function_): `function (err, granted)` callback will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`  
+3. `callback` (_Function_): `function (err, granted) {}`, will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`. An error occurs if client is disconnecting.  
   
 **Returns:**  
 
@@ -700,12 +681,12 @@ qnode.subscribe('foo/bar/score', function (err, granted) {
 ### .unsubscribe(topics[, callback])
 This is a generic method to unsubscribe from a topic or topics.  
 
-If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscription is not authorized at the Server if the Client was not successfully registered.  
+If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscription is not allowed at the Server if the Client was not successfully registered.  
   
 **Arguments:**  
 
 1. `topic` (_String_|_String[]_): Topic(s) to unsubscribe from.  
-2. `callback` (_Function_): Callback will be fired on unsuback  
+2. `callback` (_Function_): `function (err) {}`, will be called on unsuback. An error occurs if client is disconnecting.  
   
 **Returns:**  
 
