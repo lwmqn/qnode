@@ -171,9 +171,7 @@ qnode.on('registered', function (rsp) {
     // }, { interval: 4000, repeat: 1 });
 
         runTask(function () {
-            qnode.checkout(5, function (err, rsp) {
-                console.log(err);
-                console.log(rsp);
+            qnode.checkout(function (err, rsp) {
                 qnode.close();
                 setTimeout(function () {
                     qnode.connect('mqtt://localhost', function (err, rsp) {
@@ -186,7 +184,7 @@ qnode.on('registered', function (rsp) {
                     
                 }, 2000);
             });
-        }, { interval: 10000, repeat: 0 });
+        }, { interval: 10000, repeat: 1 });
 
     runTask(readTemp, { interval: 4000, repeat: 1 });
     runTask(writeTemp, { interval: 2000, repeat: 1 });
