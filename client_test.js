@@ -113,7 +113,7 @@ qnode.on('request', function (msg) {
 });
 
 qnode.on('announce', function (msg) {
-    console.log('announce');
+    console.log('announcexxxxxxxxxxx');
     console.log(msg);
 });
 

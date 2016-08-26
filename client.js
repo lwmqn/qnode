@@ -26,13 +26,13 @@ so.init('temperature', 0, {
     maxMeaValue: 2000,
     minRangeValue: 0,
     maxRangeValue: 4000,
-    some1: {
+    foo: {
         exec: function (name, cb) { 
             console.log('hello ' + name);
-            cb(null, 'exec world');
+            cb(null, 'hello ' + name + ': you are executed. XD');
         }
     },
-    some2: {
+    bar: {
         write: function (val, cb) {
             x = val;
             console.log('write~~~~');
@@ -40,7 +40,7 @@ so.init('temperature', 0, {
             cb(null, x);
         }
     },
-    some3: {
+    foobar: {
         read: function (cb) { cb(null, 'hello'); }
     }
 });
@@ -101,19 +101,19 @@ var qnode = new MqttNode('test_node_01', so, devAttrs);
 /*** Fundamental Events                    ***/
 /*********************************************/
 qnode.on('connect', function () {
-    console.log('connect');
+    // console.log('connect');
 });
 
 qnode.on('reconnect', function () {
-    console.log('reconnect');
+    // console.log('reconnect');
 });
 
 qnode.on('offline', function () {
-    console.log('offline');
+    // console.log('offline');
 });
 
 qnode.on('close', function () {
-    console.log('close');
+    // console.log('close');
 });
 
 qnode.on('error', function (err) {
@@ -121,11 +121,11 @@ qnode.on('error', function (err) {
 });
 
 qnode.on('login', function () {
-    console.log('login');
+    // console.log('login');
 });
 
 qnode.on('logout', function () {
-    console.log('logout');
+    // console.log('logout');
 });
 /*********************************************/
 /*** TRX Message Events                    ***/
@@ -150,8 +150,8 @@ qnode.on('ready', function () {
             // password: 'skynyrd',
             reconnectPeriod: 5000
         }, function (err, rsp) {
-            console.log(err);
-            console.log(rsp);
+            // console.log(err);
+            // console.log(rsp);
         });
     }, 1000);
 });
@@ -159,10 +159,10 @@ qnode.on('ready', function () {
 /*********************************************/
 /*** Registered Events                     ***/
 /*********************************************/
-qnode.on('registered', function (rsp) {
+qnode.on('login', function (rsp) {
     REG('registered: ');
     REG(rsp);
-    console.log('registered');
+    // console.log('registered');
     // runTask(function () {
     //     qnode.checkin(function (err, rsp) {
     //         console.log(err);
@@ -170,21 +170,34 @@ qnode.on('registered', function (rsp) {
     //     });
     // }, { interval: 4000, repeat: 1 });
 
-        runTask(function () {
-            qnode.checkout(function (err, rsp) {
-                qnode.close();
-                setTimeout(function () {
-                    qnode.connect('mqtt://localhost', function (err, rsp) {
-                        console.log(err);
-                        console.log(rsp);
-                    });
-                    setTimeout(function () {
-                        qnode.checkin();
-                    }, 3000);
+    setTimeout(function () {
+        // qnode.so.read(3303, 0, 5700, function (err, data) {
+        //     qnode.notify({
+        //         oid: 3303,
+        //         iid: 0,
+        //         rid: 5700,
+        //         data: data
+        //     },function (err, rsp) {
+        //         console.log('#########');
+        //         console.log(rsp);
+        //     });
+        // });
+    }, 5000);
+        // runTask(function () {
+        //     qnode.checkout(function (err, rsp) {
+        //         qnode.close();
+        //         setTimeout(function () {
+        //             qnode.connect('mqtt://localhost', function (err, rsp) {
+        //                 // console.log(err);
+        //                 // console.log(rsp);
+        //             });
+        //             setTimeout(function () {
+        //                 qnode.checkin();
+        //             }, 3000);
                     
-                }, 2000);
-            });
-        }, { interval: 10000, repeat: 1 });
+        //         }, 2000);
+        //     });
+        // }, { interval: 10000, repeat: 1 });
 
     runTask(readTemp, { interval: 4000, repeat: 1 });
     runTask(writeTemp, { interval: 2000, repeat: 1 });
@@ -227,8 +240,8 @@ qnode.on('request', function (msg) {
 });
 
 qnode.on('announce', function (msg) {
-    console.log('announce');
-    console.log(msg);
+    // console.log('announce');
+    // console.log(msg);
     if (msg === 'resetting') {
         qnode.close(true, function () {
             setTimeout(function () {
