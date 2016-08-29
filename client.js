@@ -1,3 +1,5 @@
+'use strict';
+
 var SmartObject = require('smartobject');
 
 var util = require('util'),

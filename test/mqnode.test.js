@@ -79,8 +79,9 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.setDevAttrs(undefined); }).to.throw(TypeError);
             expect(function () { return mqnode.setDevAttrs(NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.setDevAttrs(new Date()); }).to.throw(TypeError);
+            expect(function () { return mqnode.setDevAttrs({}); }).to.throw(TypeError);
 
-            expect(function () { return mqnode.setDevAttrs({}); }).not.to.throw(TypeError);
+            expect(function () { return mqnode.setDevAttrs({}, function () {}); }).not.to.throw(TypeError);
             expect(function () { return mqnode.setDevAttrs({}, function (e, r) {}); }).not.to.throw(TypeError);
         });
     });
@@ -239,32 +240,32 @@ describe('Signature Check', function () {
         });
     });
 
-    describe('#.update', function () {
+    describe('#._update', function () {
         it('should throw TypeError if devAttrs is not an object', function () {
-            expect(function () { return mqnode.update('xxx'); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(null); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(NaN); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(true); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(1); }).to.throw(TypeError);
-            expect(function () { return mqnode.update([]); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(new Date()); }).to.throw(TypeError);
-            expect(function () { return mqnode.update(function () {}); }).to.throw(TypeError);
+            expect(function () { return mqnode._update('xxx'); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(null); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(NaN); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(true); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(1); }).to.throw(TypeError);
+            expect(function () { return mqnode._update([]); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(new Date()); }).to.throw(TypeError);
+            expect(function () { return mqnode._update(function () {}); }).to.throw(TypeError);
 
-            expect(function () { return mqnode.update({}); }).not.to.throw(TypeError);
+            expect(function () { return mqnode._update({}); }).not.to.throw(TypeError);
         });
 
         it('should throw TypeError if callback is not a function when given', function () {
-            expect(function () { return mqnode.update({}, 'xxx'); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, null); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, NaN); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, true); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, 1); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, []); }).to.throw(TypeError);
-            expect(function () { return mqnode.update({}, new Date()); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, 'xxx'); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, null); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, NaN); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, true); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, 1); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, []); }).to.throw(TypeError);
+            expect(function () { return mqnode._update({}, new Date()); }).to.throw(TypeError);
 
-            expect(function () { return mqnode.update({}, function () {}); }).not.to.throw(TypeError);
-            expect(function () { return mqnode.update({}); }).not.to.throw(TypeError);
+            expect(function () { return mqnode._update({}, function () {}); }).not.to.throw(TypeError);
+            expect(function () { return mqnode._update({}); }).not.to.throw(TypeError);
         });
     });
 
@@ -396,7 +397,7 @@ describe('Functional Check', function () {
     describe('#.setDevAttrs', function () {
         it ('should equal to this', function () {
             mqnode._connected = true;
-            expect(mqnode.setDevAttrs({})).to.be.equal(mqnode);
+            expect(mqnode.setDevAttrs({}, function () {})).to.be.equal(mqnode);
             mqnode._connected = false;
         });
 
@@ -406,6 +407,7 @@ describe('Functional Check', function () {
                 if (rsp.status === 200)
                     done();
             });
+            emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 200 });
             mqnode._connected = false;
         });
 
@@ -853,7 +855,7 @@ describe('Functional Check', function () {
                 }, 10)
             });
 
-            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+            mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
                 mqnode._connected = true;
                 pubStub.restore();
                 if (rsp.status === 204)
@@ -870,7 +872,7 @@ describe('Functional Check', function () {
                 }, 10)
             });
 
-            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+            mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
                 mqnode._connected = true;
                 pubStub.restore();
                 if (rsp.status === 400)
@@ -887,7 +889,7 @@ describe('Functional Check', function () {
                 }, 10)
             });
 
-            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+            mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
                 mqnode._connected = true;
                 pubStub.restore();
                 if (rsp.status === 405)
@@ -904,7 +906,7 @@ describe('Functional Check', function () {
                 }, 10)
             });
 
-            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+            mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
                 mqnode._connected = true;
                 pubStub.restore();
                 if (rsp.status === 408)
@@ -921,7 +923,7 @@ describe('Functional Check', function () {
                 }, 10)
             });
 
-            mqnode.update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
+            mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, function (err, rsp) {
                 mqnode._connected = true;
                 pubStub.restore();
                 if (rsp.status === 500)

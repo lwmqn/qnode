@@ -141,15 +141,17 @@ if (qnode) {
 * [new MqttNode()](#API_MqttNode)
 * [getSmartObject()](#API_getSmartObject)
 * [isConnected()](#API_isConnected)
-* [setDevAttrs()](#API_setDevAttrs)
-* LWMQN Interface
+* [setDevAttrs() ](#API_setDevAttrs) -- _**Deprecated**_
+* LWMQN Interfaces
     * [connect()](#API_connect), [close()](#API_close)
-    * [register()](#API_register), [deregister()](#API_deregister)
+    * [register()](#API_register), [deregister()](#API_deregister), [update()](#API_update)
     * [checkout()](#API_checkout), [checkin()](#API_checkin)
     * [notify()](#API_notify)
     * [ping()](#API_ping)
-* Generic MQTT Interface
+* Generic MQTT Interfaces
     * [publish()](#API_publish), [subscribe()](#API_subscribe), [unsubscribe()](#API_unsubscribe)
+* Events
+    * ['registered'](#EVT_registered), ['deregistered'](#EVT_deregistered), ['login'](#EVT_login), ['logout'](#EVT_logout), ['offline'](#EVT_offline), ['reconnect'](#EVT_reconnect), ['message'](#EVT_message), ['error'](#EVT_error)
 
 *************************************************
 
@@ -197,7 +199,7 @@ qnode.on('ready', function () {
 
 // Do not change the device attributes with direct assigments, i.e., qnode.lifetime = 2000.
 
-// Use qnode.setDevAttrs() to change attributes, and qnode will automatically check if it 
+// Use qnode.update() to change attributes, and qnode will automatically check if it 
 // needs to publish an update message to the Server.
 ```
   
@@ -250,38 +252,14 @@ qnode.isConnected();    // false
   
 ********************************************
 <a name="API_setDevAttrs"></a>
-### .setDevAttrs(devAttrs[, callback])
+### .setDevAttrs(devAttrs, callback) [_Deprecated_]
 Set device attribues of the qnode, and qnode will automatically check if it needs to publish an update message to the Server.  
-
-**Arguments:**
   
-1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of [MqttNode constructor](#API_MqttNode), but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then connect to the Server again.  
-2. `callback` (_Function_): Optional. `function (err, rsp) {}` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.  
+This API is deprecated, please use **[update()](#API_update)** instead.
 
-    | rsp.status | Status Code         | Description                                                                        |
-    |------------|---------------------|------------------------------------------------------------------------------------|
-    | 204        | Changed             | The Server accepted this update message successfully                               |
-    | 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
-    | 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
-    | 408        | Timeout             | No response from the Server in 10 secs                                             |
-    | 500        | InternalServerError | The Server has some trouble                                                        |
+*************************************************
+### LWMQN Interfaces
 
-**Returns:**  
-
-* (_Object_): qnode
-
-**Examples:**  
-  
-```js
-// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
-qnode.setDevAttrs({
-    ip: '192.168.0.211'
-}, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
-});
-```
-  
-********************************************
 <a name="API_connect"></a>
 ### .connect(url[, opts][, callback])
 Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired at each success of connection.  
@@ -434,6 +412,39 @@ qnode.deregister(function (err, rsp) {
 });
 ```
   
+********************************************
+<a name="API_update"></a>
+### .update(devAttrs, callback)
+Set device attribues of the qnode, and qnode will automatically check what attributes have been changed and publish an update message to the Server.  
+
+**Arguments:**
+  
+1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of [MqttNode constructor](#API_MqttNode), but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then connect to the Server again.
+2. `callback` (_Function_): `function (err, rsp) {}` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.
+
+    | rsp.status | Status Code         | Description                                                                        |
+    |------------|---------------------|------------------------------------------------------------------------------------|
+    | 204        | Changed             | The Server accepted this update message successfully                               |
+    | 400        | BadRequest          | There is an unrecognized attribute in the update message                           |
+    | 405        | MethodNotAllowed    | If you are trying to change either `clientId` or `mac`, you will get this response |
+    | 408        | Timeout             | No response from the Server in 10 secs                                             |
+    | 500        | InternalServerError | The Server has some trouble                                                        |
+
+**Returns:**  
+
+* (_Object_): qnode
+
+**Examples:**  
+  
+```js
+// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
+qnode.update({
+    ip: '192.168.0.211'
+}, function (err, rsp) {
+    console.log(rsp);   // { status: 204 }
+});
+```
+
 ********************************************
 <a name="API_checkout"></a>
 ### .checkout([duration, ][callback])
@@ -616,7 +627,9 @@ qnode.ping(function (err, rsp) {
 });
 ```
   
-********************************************
+*************************************************
+### Generic MQTT Interfaces
+
 <a name="API_publish"></a>
 ### .publish(topic, message[, options][, callback])
 This is a generic method to publish a message to a topic.  
@@ -691,7 +704,60 @@ If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscripti
 ```js
 qnode.unsubscribe('foo/bar/score');
 ```
-  
+
+********************************************
+### Events
+
+<a name="EVT_registered"></a>
+#### Event: 'registered'  
+Listener: `function (rsp) {}`  
+Fires when qnode is at its first time of registering to the LWMQN Server successfully. If qnode has registered before, only the 'login' event will be fired at each success of registration.  
+
+********************************************
+<a name="EVT_deregistered"></a>
+#### Event: 'deregistered'  
+Listener: `function (rsp) {}`  
+Fires when qnode deregisters from the LWMQN Server successfully.  
+
+********************************************
+<a name="EVT_login"></a>
+#### Event: 'login'  
+Listener: `function (rsp) {}`  
+Fires when qnode connects and login to the Server successfully.  
+
+********************************************
+<a name="EVT_logout"></a>
+#### Event: 'logout'  
+Listener: `function (rsp) {}`  
+Fires when qnode disconnects and logout from the Server successfully.  
+
+********************************************
+<a name="EVT_reconnect"></a>
+#### Event: 'reconnect'  
+Listener: `function () {}`  
+Fires when qnode starts to reconnect to the Server.  
+
+********************************************
+<a name="EVT_offline"></a>
+#### Event: 'offline'  
+Listener: `function () {}`  
+Fires when qnode looses connection to the Server, e.g., the Server is down or qnode goes offline.  
+
+********************************************
+<a name="EVT_message"></a>
+#### Event: 'message'  
+Listener: `function (topic, message) {}`  
+Fires when qnode receives a generic publish packet. You should have your own message listener if you'd like to subscribe to generic MQTT topics.  
+* `topic` (_String_): topic of the received packet
+* `message` (_Buffer_ | _String_): payload of the received packet
+* `packet` (_Object_): received packet, as defined in [mqtt-packet](https://github.com/mqttjs/mqtt-packet#publish)
+
+********************************************
+<a name="EVT_error"></a>
+#### Event: 'error'
+xxxxxxxx
+
+********************************************
 <a name="Debug"></a>
 ## 6. Debug Messages
 

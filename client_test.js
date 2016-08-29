@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util'),
     crypto = require('crypto'),
     debug = require('debug'),
