@@ -10,12 +10,13 @@ Client node of lightweight MQTT machine network (LWMQN)
   
 ## Table of Contents
 
-1. [Overiew](#Overiew)    
-2. [Features](#Features) 
-3. [Installation](#Installation) 
+1. [Overiew](#Overiew)
+2. [Features](#Features)
+3. [Installation](#Installation)
 4. [Basic Usage](#Basic)
 5. [APIs and Events](#APIs)
-6. [Debug Messages](#Debug)
+6. [Message Encryption](#Encryption)
+7. [Debug Messages](#Debug)
 
 <a name="Overiew"></a>
 ## 1. Overview
@@ -109,9 +110,14 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
     });
 
     qnode.on('registered', function () {
+        // Your qnode is now in the netwrok. This event only fires at the first time of qnode registered to the Server.
+    });
+
+    qnode.on('login', function () {
         // Your qnode is now ready to accept remote requests from the Server. Don't worry about the 
         // REQ/RSP things, qnode itself will handle them for you.  
     });
+
     ```
 
 * **Step 3**: Connect and register to a Sever, that's it!
@@ -261,7 +267,7 @@ This API is deprecated, please use **[update()](#API_update)** instead.
 ### LWMQN Interfaces
 
 <a name="API_connect"></a>
-### .connect(url[, opts], callback)
+### .connect(url[, opts][, callback])
 Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired at each success of connection.  
 
 **Arguments:**  
@@ -324,23 +330,20 @@ qnode.connect('mqtt://192.168.0.100', {
   
 ```js
 // use the MQTT connection options other than defaults
-    qnode.connect('mqtt://192.168.0.100', {
-        keepalive: 30,
-        reconnectPeriod: 5000
-    }, function (err, rsp) {
-        if (!err)
-            console.log(rsp);   // { status: 201 }
-    });
+qnode.connect('mqtt://192.168.0.100', {
+    keepalive: 30,
+    reconnectPeriod: 5000
+});
 ```
   
 ********************************************
 <a name="API_close"></a>
-### .close(callback)
-Disconnect from the Server. qnode will also fire a `'logout'` event if it is disconnected.  
+### .close([callback])
+Disconnect from the Server. qnode will also fire a `'logout'` event if it is disconnected from the Server.  
   
 **Arguments:**  
 
-1. `callback` (_Function_): Will be called when the Client is closed.  
+1. `callback` (_Function_): Optional. `function (err) {}` will be called when the Client is closed.  
   
 **Returns:**  
 
@@ -358,7 +361,7 @@ qnode.close();
   
 ********************************************
 <a name="API_register"></a>
-### .register([callback])
+### .register(callback)
 Publish a registering request to the Server. **Every time you invoke connect(), qnode will do regiseter to the Server as well.** When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
   
 **Arguments:**  
@@ -388,7 +391,7 @@ qnode.register(function (err, rsp) {
   
 ********************************************
 <a name="API_deregister"></a>
-### .deregister([callback])
+### .deregister(callback)
 Publish a deregistering request to the Server for the Client to leave the network. The Server will remove the Client from the registry and returns a status code of 202 to the Client when succeeds, and qnode will fire a `'deregistered'` event as well.  
   
 **Arguments:**  
@@ -453,7 +456,7 @@ qnode.update({
 
 ********************************************
 <a name="API_checkout"></a>
-### .checkout([duration, ][callback])
+### .checkout([duration, ]callback)
 
 Publish a checkout message to inform the Server that this qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout message. A `'logout'` event will be fired when it checks out successfully.  
 
@@ -464,7 +467,7 @@ Publish a checkout message to inform the Server that this qnode is going to slee
 
 **Arguments:**  
 
-1. `duration` (_Number_): How many seconds from now that this qnode will check in again.  
+1. `duration` (_Number_): Optional. How many seconds from now that this qnode will check in again.  
 1. `callback` (_Function_): `function (err, rsp)` will be called when checkout is acknowledged. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of checkout.  
   
     | rsp.status | Status              | Description                                |
@@ -500,7 +503,7 @@ qnode.checkout(function (err, rsp) {
   
 ********************************************
 <a name="API_checkin"></a>
-### .checkin([callback])
+### .checkin(callback)
 
 Publish a checkin message to inform the Server that this qnode is up from sleep. The Server will returns a status code of 200 to acknowledge this checkin message and take this qnode as an online Client. After received a successful acknowledgement, qnode can do something and schedule another checkout later. A `'login'` event will be fired when the qnode checks in successfully.   
   
@@ -543,7 +546,7 @@ if (qnode.isConnected()) {
   
 ********************************************
 <a name="API_notify"></a>
-### .notify(note[, callback])
+### .notify(note, callback)
 Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
 
 * Notice that **mqtt-node will automatically report notifications** to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
@@ -609,7 +612,7 @@ qnode.notify('Hello World', function (err, rsp) {
   
 ********************************************
 <a name="API_ping"></a>
-### .ping([callback])
+### .ping(callback)
 Ping the Server.  
   
 **Arguments:**  
@@ -644,15 +647,17 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
   
 **Arguments:**  
 
-1. `topic` (_String_): Topic to publish to.  
-2. `message` (_String | Buffer_): Message to publish with.  
-3. `options` (_Object_): Option to publish with, including the properties shown in the following table.  
-4. `callback` (_Function_): `function (err) {}`, will be called when the QoS handling completes, or at the next tick if QoS 0. An error occurs if client is disconnecting.  
-  
+1. `topic` (_String_): Topic to publish to.
+2. `message` (_String | Buffer_): Message to publish with.
+3. `options` (_Object_): Optional. Option to publish with, including the properties shown in the following table.
+
     | Property | Type    | Default | Description |
     |----------|---------|---------|-------------|
     | `qos`    | Number  | 0       | QoS level   |
     | `retain` | Boolean | false   | Retain flag |
+
+4. `callback` (_Function_): `function (err, encMsg) {}`, will be called when the QoS handling completes, or at the next tick if QoS 0. An error occurs if client is disconnecting. `encMsg` is the encryted message to publish out.
+
   
 **Returns:**  
 
@@ -661,15 +666,17 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
 **Examples:**  
   
 ```js
-qnode.publish('foo/bar/greet', 'Hello World!', function (err) {
+qnode.publish('foo/bar/greet', 'Hello World!', function (err, encMsg) {
     if (err)
         console.log(err);
+    else
+        console.log(encMsg);    // 'Hello World!' if you don't implement the encryption
 });
 ```
   
 ********************************************
 <a name="API_subscribe"></a>
-### .subscribe(topics[, options][, callback])
+### .subscribe(topics[, options], callback)
 This is a generic method to subscribe to a topic or topics listed in an array.  
   
 If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registered Client to subscribe to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The generic subscription is not allowed at the Server if the Client was not successfully registered.  
@@ -677,7 +684,7 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registere
 **Arguments:**  
 
 1. `topics` (_String_ | _String[]_): The topic(s) to subscribe to.  
-2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a Qos level of the subscription. `qos` is 0 by default.  
+2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a QoS level of the subscription. `qos` is 0 by default.  
 3. `callback` (_Function_): `function (err, granted) {}`, will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`. An error occurs if client is disconnecting.  
   
 **Returns:**  
@@ -694,7 +701,7 @@ qnode.subscribe('foo/bar/score', function (err, granted) {
   
 ********************************************
 <a name="API_unsubscribe"></a>
-### .unsubscribe(topics[, callback])
+### .unsubscribe(topics, callback)
 This is a generic method to unsubscribe from a topic or topics.  
 
 If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscription is not allowed at the Server if the Client was not successfully registered.  
@@ -711,7 +718,10 @@ If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscripti
 **Examples:**  
   
 ```js
-qnode.unsubscribe('foo/bar/score');
+qnode.unsubscribe('foo/bar/score', function (err) {
+    if (err)
+        console.log(err);
+});
 ```
 
 ********************************************
@@ -719,25 +729,25 @@ qnode.unsubscribe('foo/bar/score');
 
 <a name="EVT_registered"></a>
 #### Event: 'registered'  
-Listener: `function (rsp) {}`  
+Listener: `function () {}`  
 Fires when qnode is at its first time of registering to the LWMQN Server successfully. If qnode has registered before, only the 'login' event will be fired at each success of registration.  
 
 ********************************************
 <a name="EVT_deregistered"></a>
 #### Event: 'deregistered'  
-Listener: `function (rsp) {}`  
+Listener: `function () {}`  
 Fires when qnode deregisters from the LWMQN Server successfully.  
 
 ********************************************
 <a name="EVT_login"></a>
 #### Event: 'login'  
-Listener: `function (rsp) {}`  
+Listener: `function () {}`  
 Fires when qnode connects and login to the Server successfully.  
 
 ********************************************
 <a name="EVT_logout"></a>
 #### Event: 'logout'  
-Listener: `function (rsp) {}`  
+Listener: `function () {}`  
 Fires when qnode disconnects and logout from the Server successfully.  
 
 ********************************************
@@ -750,12 +760,12 @@ Fires when qnode starts to reconnect to the Server.
 <a name="EVT_offline"></a>
 #### Event: 'offline'  
 Listener: `function () {}`  
-Fires when qnode looses connection to the Server, e.g., the Server is down or qnode goes offline.  
+Fires when qnode loses its connection to the Server, e.g., the Server is down or qnode goes offline.  
 
 ********************************************
 <a name="EVT_message"></a>
 #### Event: 'message'  
-Listener: `function (topic, message) {}`  
+Listener: `function (topic, message, packet) {}`  
 Fires when qnode receives a generic publish packet. You should have your own message listener if you'd like to subscribe to generic MQTT topics.  
 * `topic` (_String_): topic of the received packet
 * `message` (_Buffer_ | _String_): payload of the received packet
@@ -764,11 +774,74 @@ Fires when qnode receives a generic publish packet. You should have your own mes
 ********************************************
 <a name="EVT_error"></a>
 #### Event: 'error'
-[TBD]
+Listener: `function (err) {}`  
+* The low-layer errors from mqtt.js will propagate through this event.
+* When invoking `connect()` or `close()` methods without a callback, the error occurring in these methods will be fired along with the `error` event instead.
+* **Most importantly, if there is no `error` event listener attached on qnode, errors will be rethrown to crash your program.**
+
+********************************************
+<a name="Encryption"></a>
+## 6. Message Encryption  
+
+By default, the qnode won't encrypt the message. You can override the encrypt() and decrypt() methods to implement your own message encryption and decryption. If you did, you should implement the encrypt() and decrypt() methods at your Server as well.  
+
+***********************************************
+### qnode.encrypt(msg, cb)
+Method of encryption. Overridable.  
+
+**Arguments:**  
+
+1. `msg` (_String_ | _Buffer_): The outgoing message.  
+2. `cb` (_Function_): `function (err, encrypted) {}`, the callback you should call and pass the encrypted message to it after encryption.  
+  
+
+***********************************************
+### qnode.decrypt(msg, cb)
+Method of decryption. Overridable.  
+
+**Arguments:**  
+
+1. `msg` (_Buffer_): The incoming message which is a raw buffer.  
+2. `cb` (_Function_): `function (err, decrypted) {}`, the callback you should call and pass the decrypted message to it after decryption.  
+  
+***********************************************
+**Encryption/Decryption Example:**  
+
+```js
+// In this example, I simply encrypt the message with a constant password 'mysecrete'.
+
+qnode.encrypt = function (msg, callback) {
+    var msgBuf = new Buffer(msg),
+        cipher = crypto.createCipher('aes128', 'mysecrete'),
+        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+    try {
+        encrypted += cipher.final('base64');
+        callback(null, encrypted);
+    } catch (err) {
+        callback(err);
+    }
+};
+
+qnode.decrypt = function (msg, callback) {
+    msg = msg.toString();
+    var decipher = crypto.createDecipher('aes128', 'mypassword'),
+        decrypted = decipher.update(msg, 'base64', 'utf8');
+
+    try {
+        decrypted += decipher.final('utf8');
+        callback(null, decrypted);
+    } catch (e) {
+        // log 'decrytion fails'
+        console.log('decrytion fails.');
+        callback(e);
+    }
+};
+
+```
 
 ********************************************
 <a name="Debug"></a>
-## 6. Debug Messages
+## 7. Debug Messages
 
 Like many node.js modules do, **mqtt-node** utilizes [debug](https://www.npmjs.com/package/debug) module to print out messages that may help in debugging. The namespaces include `mqtt-node`, `mqtt-node:init`, `mqtt-node:request`, and `mqtt-node:msgHdlr`. The `mqtt-node:request` logs requests that qnode sends to the Server, and `mqtt-node:msgHdlr` logs the requests that comes from the Server.  
 

@@ -187,8 +187,8 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.connect(NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.connect(new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.connect(function () {}); }).to.throw(TypeError);
-            expect(function () { return mqnode.connect('mqtt://192.168.0.1'); }).to.throw(TypeError);
-
+            
+            expect(function () { return mqnode.connect('mqtt://192.168.0.1'); }).not.to.throw(TypeError);
             expect(function () { return mqnode.connect('mqtt://192.168.0.1', function () {}); }).not.to.throw(Error);
         });
 
@@ -209,8 +209,8 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.close(null); }).to.throw(TypeError);
             expect(function () { return mqnode.close(NaN); }).to.throw(TypeError);
             expect(function () { return mqnode.close(new Date()); }).to.throw(TypeError);
-            expect(function () { return mqnode.close(true); }).to.throw(TypeError);
 
+            expect(function () { return mqnode.close(true); }).not.to.throw(TypeError);
             expect(function () { return mqnode.close(function () {}); }).not.to.throw(Error);
             expect(function () { return mqnode.close(true, function () {}); }).not.to.throw(Error);
         });
@@ -282,8 +282,9 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.notify([]); }).to.throw(TypeError);
             expect(function () { return mqnode.notify(new Date()); }).to.throw(TypeError);
             expect(function () { return mqnode.notify(function () {}); }).to.throw(TypeError);
+            expect(function () { return mqnode.notify({}); }).to.throw(TypeError);
 
-            expect(function () { return mqnode.notify({}); }).not.to.throw(TypeError);
+            expect(function () { return mqnode.notify({}, function () {}); }).not.to.throw(TypeError);
         });
 
         it('should throw TypeError if callback is not a function when given', function () {
@@ -294,9 +295,9 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.notify({}, 1); }).to.throw(TypeError);
             expect(function () { return mqnode.notify({}, []); }).to.throw(TypeError);
             expect(function () { return mqnode.notify({}, new Date()); }).to.throw(TypeError);
+            expect(function () { return mqnode.notify({}); }).to.throw(TypeError);
 
             expect(function () { return mqnode.notify({}, function () {}); }).not.to.throw(TypeError);
-            expect(function () { return mqnode.notify({}); }).not.to.throw(TypeError);
         });
     });
 
@@ -323,6 +324,7 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.ping({}); }).to.throw(TypeError);
             expect(function () { return mqnode.ping([]); }).to.throw(TypeError);
             expect(function () { return mqnode.ping(new Date()); }).to.throw(TypeError);
+            expect(function () { return mqnode.ping(); }).to.throw(TypeError);
 
             expect(function () { return mqnode.ping(function () {}); }).not.to.throw(TypeError);
         });
@@ -331,7 +333,7 @@ describe('Signature Check', function () {
 
 describe('Functional Check', function () {
     var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-    mqnode.connect('mqtt://192.16.0.1', function () {});
+    mqnode.connect('mqtt://192.16.0.1');
 
     describe('#ensure members', function () {
         it ('should have all correct members when initiated', function () {
@@ -489,7 +491,7 @@ describe('Functional Check', function () {
 
     describe('#.connect', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.1' });
-        mqnode.connect('mqtt://192.16.0.1', function (){});
+        mqnode.connect('mqtt://192.16.0.1');
 
         it('should turn _connected to true when receive connect event from this.mc', function (done) {
             setTimeout(function () {
@@ -572,7 +574,7 @@ describe('Functional Check', function () {
         });
 
         it('should return with callback - with connection', function (done) {
-            mqnode.connect('mqtt://192.16.0.1', function () {});
+            mqnode.connect('mqtt://192.16.0.1');
 
             mqnode.close(true, function () {    // force true, don't wait ack
                 if (mqnode.mc === null)
@@ -591,7 +593,7 @@ describe('Functional Check', function () {
         });
 
         it('should return with callback err - not connected yet', function (done) {
-            mqnode.connect('mqtt://192.16.0.1', function () {});
+            mqnode.connect('mqtt://192.16.0.1');
             mqnode.publish('x/y/z', { x: 1 }, function (err) {
                 if (err.message === 'No connection.')
                     done();
@@ -609,7 +611,7 @@ describe('Functional Check', function () {
 
         it('should call encrypt' , function (done) {
             mqnode._connected = true;
-            var encryStub = sinon.stub(mqnode, 'encrypt', function (msg, clientId, cb) {
+            var encryStub = sinon.stub(mqnode, 'encrypt', function (msg, cb) {
                 cb(null, 'called');
             });
             var mcPubStub = sinon.stub(mqnode.mc, 'publish', function (topic, encrypted, options, cbk) {
@@ -628,7 +630,7 @@ describe('Functional Check', function () {
 
     describe('#.subscribe', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
-        mqnode.connect('mqtt://192.16.0.1', function (){});
+        mqnode.connect('mqtt://192.16.0.1');
 
         it('should call mc.subscribe' , function (done) {
             mqnode._connected = true;
@@ -647,7 +649,7 @@ describe('Functional Check', function () {
 
     describe('#.unsubscribe', function () {
         var mqnode = new Mqnode('foo', so, { version: '0.0.2' });
-        mqnode.connect('mqtt://192.16.0.1', function (){});
+        mqnode.connect('mqtt://192.16.0.1');
 
         it('should call mc.unsubscribe' , function (done) {
             mqnode._connected = true;
@@ -666,7 +668,7 @@ describe('Functional Check', function () {
 
     describe('#.register', function () {
         var mqnode = new Mqnode('foox', so, { version: '0.0.3' });
-        mqnode.connect('mqtt://192.16.0.1', function (){});
+        mqnode.connect('mqtt://192.16.0.1');
 
         it('should called when receive response - ok(200)' , function (done) {
             mqnode._connected = true;
@@ -773,7 +775,7 @@ describe('Functional Check', function () {
 
     describe('#.deregister', function () {
         var mqnode = new Mqnode('fooy', so, { version: '0.0.4' });
-        mqnode.connect('mqtt://192.16.0.2', function (){});
+        mqnode.connect('mqtt://192.16.0.2');
 
         it('should called when receive response - deleted(202)' , function (done) {
             mqnode._connected = true;
@@ -875,7 +877,7 @@ describe('Functional Check', function () {
 
     describe('#.update', function () {
         var mqnode = new Mqnode('fooz', so, { version: '0.0.4' });
-        mqnode.connect('mqtt://192.16.0.3', function (){});
+        mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - changed(204)' , function (done) {
             mqnode._connected = true;
@@ -965,7 +967,7 @@ describe('Functional Check', function () {
 
     describe('#.notify', function () {
         var mqnode = new Mqnode('foom', so, { version: '0.0.5' });
-        mqnode.connect('mqtt://192.16.0.3', function (){});
+        mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - changed(204)' , function (done) {
             mqnode._connected = true;
@@ -1038,7 +1040,7 @@ describe('Functional Check', function () {
 
     describe('#.ping', function () {
         var mqnode = new Mqnode('foon', so, { version: '0.0.5' });
-        mqnode.connect('mqtt://192.16.0.3', function (){});
+        mqnode.connect('mqtt://192.16.0.3');
 
         it('should called when receive response - ok(200)' , function (done) {
             mqnode._connected = true;

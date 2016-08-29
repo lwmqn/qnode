@@ -67,7 +67,7 @@ var qnode = new MqttNode('test_node_01', so, devAttrs);
 /*********************************************/
 /*** The custom encrption/decryption       ***/
 /*********************************************/
-// qnode.encrypt = function (msg, clientId, callback) {
+// qnode.encrypt = function (msg, callback) {
 //     var msgBuf = new Buffer(msg),
 //         cipher = crypto.createCipher('aes128', 'mypassword'),
 //         encrypted = cipher.update(msgBuf, 'binary', 'base64');
@@ -80,7 +80,7 @@ var qnode = new MqttNode('test_node_01', so, devAttrs);
 
 // };
 
-// qnode.decrypt = function (msg, clientId, callback) {
+// qnode.decrypt = function (msg, callback) {
 //     msg = msg.toString();
 //     var decipher = crypto.createDecipher('aes128', 'mypassword'),
 //         decrypted = decipher.update(msg, 'base64', 'utf8');
