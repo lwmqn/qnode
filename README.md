@@ -261,7 +261,7 @@ This API is deprecated, please use **[update()](#API_update)** instead.
 ### LWMQN Interfaces
 
 <a name="API_connect"></a>
-### .connect(url[, opts][, callback])
+### .connect(url[, opts], callback)
 Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired at each success of connection.  
 
 **Arguments:**  
@@ -314,6 +314,9 @@ qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
 qnode.connect('mqtt://192.168.0.100', {
     username: 'someone',
     password: 'somepassword'
+}, function (err, rsp) {
+    if (!err)
+        console.log(rsp);   // { status: 201 }
 });
 ```
 
@@ -324,12 +327,15 @@ qnode.connect('mqtt://192.168.0.100', {
     qnode.connect('mqtt://192.168.0.100', {
         keepalive: 30,
         reconnectPeriod: 5000
+    }, function (err, rsp) {
+        if (!err)
+            console.log(rsp);   // { status: 201 }
     });
 ```
   
 ********************************************
 <a name="API_close"></a>
-### .close([callback])
+### .close(callback)
 Disconnect from the Server. qnode will also fire a `'logout'` event if it is disconnected.  
   
 **Arguments:**  
@@ -631,7 +637,7 @@ qnode.ping(function (err, rsp) {
 ### Generic MQTT Interfaces
 
 <a name="API_publish"></a>
-### .publish(topic, message[, options][, callback])
+### .publish(topic, message[, options], callback)
 This is a generic method to publish a message to a topic.  
   
 If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered Client to publish any message to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The publishment is not allowed at the Server if the Client was not successfully registered.  
@@ -655,7 +661,10 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
 **Examples:**  
   
 ```js
-qnode.publish('foo/bar/greet', 'Hello World!');
+qnode.publish('foo/bar/greet', 'Hello World!', function (err) {
+    if (err)
+        console.log(err);
+});
 ```
   
 ********************************************
@@ -755,7 +764,7 @@ Fires when qnode receives a generic publish packet. You should have your own mes
 ********************************************
 <a name="EVT_error"></a>
 #### Event: 'error'
-xxxxxxxx
+[TBD]
 
 ********************************************
 <a name="Debug"></a>
