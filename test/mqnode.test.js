@@ -310,8 +310,8 @@ describe('Signature Check', function () {
             expect(function () { return mqnode.respond({}, 1); }).to.throw(TypeError);
             expect(function () { return mqnode.respond({}, []); }).to.throw(TypeError);
             expect(function () { return mqnode.respond({}, new Date()); }).to.throw(TypeError);
-            expect(function () { return mqnode.respond({}); }).to.throw(TypeError);
 
+            expect(function () { return mqnode.respond({}); }).not.to.throw(TypeError);
             expect(function () { return mqnode.respond({}, function () {}); }).not.to.throw(TypeError);
         });
     });
