@@ -165,12 +165,15 @@ qnode.on('login', function (rsp) {
     REG('registered: ');
     REG(rsp);
     // console.log('registered');
-    // runTask(function () {
-    //     qnode.checkin(function (err, rsp) {
-    //         console.log(err);
-    //         console.log(rsp);
-    //     });
-    // }, { interval: 4000, repeat: 1 });
+    runTask(function () {
+        qnode.checkin(function (err, rsp) {
+            console.log(err);
+            console.log(rsp);
+        });
+        setTimeout(function () {
+            qnode.checkout(function () {});
+        }, 2000);
+    }, { interval: 4000, repeat: 1 });
 
     setTimeout(function () {
         // qnode.so.read(3303, 0, 5700, function (err, data) {
