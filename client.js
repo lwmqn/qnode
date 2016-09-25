@@ -90,6 +90,7 @@ qnode.decrypt = function (msg, callback) {
         callback(null, decrypted);
     } catch (e) {
         // log 'decrytion fails'
+        console.log(e);
         console.log('decrytion fails.');
         callback(e);
     }
