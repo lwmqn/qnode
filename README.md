@@ -21,14 +21,22 @@ Client node of lightweight MQTT machine network (LWMQN)
 <a name="Overiew"></a>
 ## 1. Overview
 
-Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an architecture that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management. LWMQN is also an open source project that offers a solution of establishing a local area machine network with MQTT, and it can be a replacement of the cloud-based solution if you don't really need the cloud (which becomes an option). Not only has LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.  
+Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
+Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a simple smart home application built with LWMQN.  
 ![LWMQN Network](https://github.com/lwmqn/documents/blob/master/media/lwmqn_net.png)
 
-* LWMQN project provides you with a server-side [**mqtt-shepherd**](https://github.com/simenkid/mqtt-shepherd) library and a client-side **mqtt-node** library to run your machine network with JavaScript and node.js. LWMQN project is trying to let you build an IoT machine network with less pain. In addition, with these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily.  
-* This module is an implementation of LWMQN Client to be used at machine-side.  
-* **mqtt-node** is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
-* **mqtt-node** uses [SmartObject](https://github.com/PeterEB/smartobject) class as its fundamental of resource organization on devices.
+* **LWM2M-like Interfaces and Smart Object Model**
+    - Not only has the LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
+
+* **mqtt-shepherd and mqtt-node libraries**
+   - LWMQN project provides you with a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library and a machine-side **mqtt-node** library to run your machine network with JavaScript and node.js. By these two libraries and node.js, you can have your own authentication, authorization and encryption subsystems to secure your network easily.
+
+## LWMQN Client: mqtt-node
+
+* This module, **mqtt-node**, is an implementation of LWMQN Client to be used at machine-side.  
+* It is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
+* It uses [SmartObject](https://github.com/PeterEB/smartobject) class as its fundamental of resource organization on devices.
     - **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you with abstracting your hardware into smart objects. You may also like to use **SmartObject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light controller.
     - Here is a [tutorial of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
@@ -149,15 +157,24 @@ if (qnode) {
 * [isConnected()](#API_isConnected)
 * [setDevAttrs() ](#API_setDevAttrs) -- _**Deprecated**_
 * LWMQN Interfaces
-    * [connect()](#API_connect), [close()](#API_close)
-    * [register()](#API_register), [deregister()](#API_deregister), [update()](#API_update)
-    * [checkout()](#API_checkout), [checkin()](#API_checkin)
+    * [connect()](#API_connect)
+    * [close()](#API_close)
+    * [register()](#API_register)
+    * [deregister()](#API_deregister)
+    * [update()](#API_update)
+    * [checkout()](#API_checkout)
+    * [checkin()](#API_checkin)
     * [notify()](#API_notify)
     * [ping()](#API_ping)
 * Generic MQTT Interfaces
-    * [publish()](#API_publish), [subscribe()](#API_subscribe), [unsubscribe()](#API_unsubscribe)
+    * [publish()](#API_publish)
+    * [subscribe()](#API_subscribe)
+    * [unsubscribe()](#API_unsubscribe)
 * Events
-    * ['registered'](#EVT_registered), ['deregistered'](#EVT_deregistered), ['login'](#EVT_login), ['logout'](#EVT_logout), ['offline'](#EVT_offline), ['reconnect'](#EVT_reconnect), ['message'](#EVT_message), ['error'](#EVT_error)
+    * ['registered'](#EVT_registered), ['deregistered'](#EVT_deregistered)
+    * ['login'](#EVT_login), ['logout'](#EVT_logout), ['offline'](#EVT_offline), ['reconnect'](#EVT_reconnect)
+    * ['message'](#EVT_message)
+    * ['error'](#EVT_error)
 
 *************************************************
 
@@ -258,7 +275,7 @@ qnode.isConnected();    // false
   
 ********************************************
 <a name="API_setDevAttrs"></a>
-### .setDevAttrs(devAttrs, callback) [_Deprecated_]
+### .setDevAttrs(devAttrs, callback) -- **_Deprecated_**
 Set device attribues of the qnode, and qnode will automatically check if it needs to publish an update message to the Server.  
   
 This API is deprecated, please use **[update()](#API_update)** instead.
@@ -461,7 +478,7 @@ qnode.update({
 Publish a checkout message to inform the Server that this qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout message. A `'logout'` event will be fired when it checks out successfully.  
 
 * After received a successful acknowledgement, qnode can then close its connection from the Server, power down, or even power off.  
-* If qnode checks out with the `duration` given, for example 600 seconds, the Server knows this qnode is going to sleep and expects that this qnode will wake up and check in at 600 seconds later. If qnode does not then check in (within 2 seconds at that moment) or reconnect to the Server, the Server will take it as an offline Client.  
+* If qnode checks out with a given `duration` , for example 600 seconds, the Server knows this qnode is going to sleep and expects that this qnode will wake up and check in at 600 seconds later. If qnode does not then check in (within 2 seconds at that moment) or reconnect to the Server, the Server will take it as an offline Client.  
 * If qnode checks out without the `duration`, the Server knows this qnode is going to sleep but has no idea about when it will wake up and check in again. The Server will always take it as a sleeping Client. (This is okay, since each time when the Server likes to send something to a sleeping Client, it will do a quick test to see if the Client is up.)  
 * **NOTE**: After a success of checkout, qnode will not only stop reporting but also clear all the report settings. The Server should re-issue the observeReq(), when the Client goes online again, if needed.  
 

@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.3.13",
+  "version": "0.3.14",
   "description": "A client library for a light-weight MQTT machine network",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/lwmqn/mqtt-node",
   "dependencies": {
-    "busyman": "^0.2.0",
+    "busyman": "^0.2.1",
     "debug": "^2.2.0",
     "lwmqn-util": "^0.2.2",
     "mqtt": "^1.5.0",
