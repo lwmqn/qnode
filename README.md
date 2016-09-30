@@ -1,16 +1,21 @@
 mqtt-node
 ========================
-Client node of lightweight MQTT machine network (LWMQN)  
+Client machine node for the lightweight MQTT machine network (LWMQN)  
   
 [![NPM](https://nodei.co/npm/mqtt-node.png?downloads=true)](https://nodei.co/npm/mqtt-node/)  
 
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-node)
 [![npm](https://img.shields.io/npm/v/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
+[![PyPI](https://img.shields.io/pypi/status/Django.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
 [![npm](https://img.shields.io/npm/l/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
-  
+
+Make sure you are with version >= 0.6.0, the old bumps before 0.6.0 are all deprecated.
+
+<br />
+
 ## Table of Contents
 
-1. [Overiew](#Overiew)
+1. [Overview](#Overview)
 2. [Features](#Features)
 3. [Installation](#Installation)
 4. [Basic Usage](#Basic)
@@ -18,7 +23,7 @@ Client node of lightweight MQTT machine network (LWMQN)
 6. [Message Encryption](#Encryption)
 7. [Debug Messages](#Debug)
 
-<a name="Overiew"></a>
+<a name="Overview"></a>
 ## 1. Overview
 
 Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
@@ -118,7 +123,7 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
     });
 
     qnode.on('registered', function () {
-        // Your qnode is now in the netwrok. This event only fires at the first time of qnode registered to the Server.
+        // Your qnode is now in the network. This event only fires at the first time of qnode registered to the Server.
     });
 
     qnode.on('login', function () {
@@ -128,12 +133,12 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
 
     ```
 
-* **Step 3**: Connect and register to a Sever, that's it!
+* **Step 3**: Connect and register to a Server, that's it!
     ```js
     qnode.connect('mqtt://192.168.0.2');
     ```
 
-The following exmaple shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
+The following example shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/simenkid/mqtt-shepherd) document for details):  
 
 ```js
 var qnode = qserver.find('my_foo_client_id');   // find the registered device by its client id
@@ -189,7 +194,7 @@ Create an instance of `MqttNode` class.
   
 **Arguments:**  
 
-1. `clientId` (_String_): It should be a string and should be unique in the network. If it is not unique, you will get an response of conflict when trying to connect to a LWMQN Server. Using mac address (with a prefix or suffix) as the `clientId` would be a good idea.  
+1. `clientId` (_String_): It should be a string and should be unique in the network. If it is not unique, you will get a response of conflict when trying to connect to a LWMQN Server. Using mac address (with a prefix or suffix) as the `clientId` would be a good idea.  
 2. `so` (_Object_): A smart object that maintains all _Resources_ on the device. This object should be an instance of the [SmartObject](https://github.com/PeterEB/smartobject) class.  
 3. `devAttrs` (_Object_): Optional. An object to describe information about the device. The following table shows details of each property within `devAttrs` object.  
 
@@ -220,7 +225,7 @@ qnode.on('ready', function () {
     console.log(qnode.version);     // '0.0.2'
 });
 
-// Do not change the device attributes with direct assigments, i.e., qnode.lifetime = 2000.
+// Do not change the device attributes with direct assignments, i.e., qnode.lifetime = 2000.
 
 // Use qnode.update() to change attributes, and qnode will automatically check if it 
 // needs to publish an update message to the Server.
@@ -229,7 +234,7 @@ qnode.on('ready', function () {
 ********************************************
 <a name="API_getSmartObject"></a>
 ### .getSmartObject()
-Get the smart object used on this qnode. You can access its Resources with [read](https://github.com/PeterEB/smartobject#API_read)/[write](https://github.com/PeterEB/smartobject#API_write)/[exec](https://github.com/PeterEB/smartobject#API_exec) methods provieded by SmartObject class. Use these method to access you smart object, and qnode itself will check if it needs to report the changes to the Server according to the settings of obsevation.  
+Get the smart object used on this qnode. You can access its Resources with [read](https://github.com/PeterEB/smartobject#API_read)/[write](https://github.com/PeterEB/smartobject#API_write)/[exec](https://github.com/PeterEB/smartobject#API_exec) methods provided by SmartObject class. Use these methods to access you smart object, and qnode itself will check if it needs to report the changes to the Server according to the settings of observation.  
 
 **Arguments:**  
 
@@ -276,7 +281,7 @@ qnode.isConnected();    // false
 ********************************************
 <a name="API_setDevAttrs"></a>
 ### .setDevAttrs(devAttrs, callback) -- **_Deprecated_**
-Set device attribues of the qnode, and qnode will automatically check if it needs to publish an update message to the Server.  
+Set device attributes of the qnode, and qnode will automatically check if it needs to publish an update message to the Server.  
   
 This API is deprecated, please use **[update()](#API_update)** instead.
 
@@ -306,7 +311,7 @@ Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode 
     |------------|---------------------|----------------------------------------------------------------------------------|
     | 200        | OK                  | qnode was registered before and the record is successfully renewed on the Server |
     | 201        | Created             | qnode is a new Client registered to the Server successfully                      |
-    | 400        | BadRequest          | Invalid paramter(s) for registration                                             |
+    | 400        | BadRequest          | Invalid parameter(s) for registration                                            |
     | 408        | Timeout             | No response from the Server in 10 secs                                           |
     | 409        | Conflict            | There is a duplicate Client exists (`clientId` or `mac` conflicts)               |
     | 500        | InternalServerError | The Server has some trouble                                                      |
@@ -379,7 +384,7 @@ qnode.close();
 ********************************************
 <a name="API_register"></a>
 ### .register(callback)
-Publish a registering request to the Server. **Every time you invoke connect(), qnode will do regiseter to the Server as well.** When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
+Publish a registering request to the Server. **Every time you invoke connect(), qnode will do register to the Server as well.** When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired after each success of registration.   
   
 **Arguments:**  
 
@@ -389,7 +394,7 @@ Publish a registering request to the Server. **Every time you invoke connect(), 
     |------------|---------------------|---------------------------------------------------------------------------------------|
     | 200        | OK                  | The Client was registered before and the record is successfully renewed on the Server |
     | 201        | Created             | Registration is successful for this new Client                                        |
-    | 400        | BadRequest          | Invalid paramter(s) for registration                                                  |
+    | 400        | BadRequest          | Invalid parameter(s) for registration                                                 |
     | 408        | Timeout             | No response from the Server in 10 secs                                                |
     | 409        | Conflict            | Client Id conflicts                                                                   |
     | 500        | InternalServerError | The Server has some trouble                                                           |
@@ -441,12 +446,12 @@ qnode.deregister(function (err, rsp) {
 ********************************************
 <a name="API_update"></a>
 ### .update(devAttrs, callback)
-Set device attribues of the qnode, and qnode will automatically check what attributes have been changed and publish an update message to the Server.  
+Set device attributes of the qnode, and qnode will automatically check what attributes have been changed and publish an update message to the Server.  
 
 **Arguments:**
   
 1. `devAttrs` (_Object_): An object of device attributes. It is just like the `devAttrs` argument of [MqttNode constructor](#API_MqttNode), but any change of `clientId` and `mac` is not allowed. If you want to change either `clientId` or `mac`, please deregister qnode from the Server and then connect to the Server again.
-2. `callback` (_Function_): `function (err, rsp) {}` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attribues updating.
+2. `callback` (_Function_): `function (err, rsp) {}` will be called when updating procedure is done. An `err` occurs if qnode has no connection to a Server. `rsp` is a response object with a status code to tell the result of device attributes updating.
 
     | rsp.status | Status Code         | Description                                                                        |
     |------------|---------------------|------------------------------------------------------------------------------------|
@@ -475,7 +480,7 @@ qnode.update({
 <a name="API_checkout"></a>
 ### .checkout([duration, ]callback)
 
-Publish a checkout message to inform the Server that this qnode is going to sleep. The Server will returns a status code of 200 to acknowledge this checkout message. A `'logout'` event will be fired when it checks out successfully.  
+Publish a checkout message to inform the Server that this qnode is going to sleep. The Server will return a status code of 200 to acknowledge this checkout message. A `'logout'` event will be fired when it checks out successfully.  
 
 * After received a successful acknowledgement, qnode can then close its connection from the Server, power down, or even power off.  
 * If qnode checks out with a given `duration` , for example 600 seconds, the Server knows this qnode is going to sleep and expects that this qnode will wake up and check in at 600 seconds later. If qnode does not then check in (within 2 seconds at that moment) or reconnect to the Server, the Server will take it as an offline Client.  
@@ -564,7 +569,7 @@ if (qnode.isConnected()) {
 ********************************************
 <a name="API_notify"></a>
 ### .notify(note, callback)
-Publish a notificatoin to the Server. The message `note` should be a well-formatted data object.  
+Publish a notification to the Server. The message `note` should be a well-formatted data object.  
 
 * Notice that **mqtt-node will automatically report notifications** to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.  
 * If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid` and `data`, where `data` is the Resource value.  
@@ -673,7 +678,7 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
     | `qos`    | Number  | 0       | QoS level   |
     | `retain` | Boolean | false   | Retain flag |
 
-4. `callback` (_Function_): `function (err, encMsg) {}`, will be called when the QoS handling completes, or at the next tick if QoS 0. An error occurs if client is disconnecting. `encMsg` is the encryted message to publish out.
+4. `callback` (_Function_): `function (err, encMsg) {}`, will be called when the QoS handling completes, or at the next tick if QoS 0. An error occurs if client is disconnecting. `encMsg` is the encrypted message to publish out.
 
   
 **Returns:**  
@@ -702,7 +707,7 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registere
 
 1. `topics` (_String_ | _String[]_): The topic(s) to subscribe to.  
 2. `options` (_Object_): Option to subscribe with, including the property `qos` which is a QoS level of the subscription. `qos` is 0 by default.  
-3. `callback` (_Function_): `function (err, granted) {}`, will be called on suback, where `err` is a subscrtiption error and `granted` is an array of objects formatted in `{ topic, qos }`. An error occurs if client is disconnecting.  
+3. `callback` (_Function_): `function (err, granted) {}`, will be called on suback, where `err` is a subscription error and `granted` is an array of objects formatted in `{ topic, qos }`. An error occurs if client is disconnecting.  
   
 **Returns:**  
 
@@ -862,7 +867,7 @@ qnode.decrypt = function (msg, callback) {
 
 Like many node.js modules do, **mqtt-node** utilizes [debug](https://www.npmjs.com/package/debug) module to print out messages that may help in debugging. The namespaces include `mqtt-node`, `mqtt-node:init`, `mqtt-node:request`, and `mqtt-node:msgHdlr`. The `mqtt-node:request` logs requests that qnode sends to the Server, and `mqtt-node:msgHdlr` logs the requests that comes from the Server.  
 
-If you like to print the debug messages, run your app.js with the DEBUG environment varaible:
+If you like to print the debug messages, run your app.js with the DEBUG environment variable:
 
 ```sh
 $ DEBUG=mqtt-node* app.js          # use wildcard to print all mqtt-node messages
