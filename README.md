@@ -29,7 +29,7 @@ Make sure you are with version >= 0.6.0, the old bumps before 0.6.0 are all depr
 Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
 
 Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a simple smart home application built with LWMQN.  
-![LWMQN Network](https://github.com/lwmqn/documents/blob/master/media/lwmqn_net.png)
+![LWMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
 
 * **LWM2M-like Interfaces and Smart Object Model**
     - Not only has the LWM2M-like interfaces, LWMQN also utilizes the [IPSO Smart Object](http://www.ipso-alliance.org/) as its fundamental of resource organization, this leads to a comprehensive and consistent way in describing real-world gadgets.
