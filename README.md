@@ -43,6 +43,7 @@ Here is a [**demo webapp**](https://github.com/lwmqn/lwmqn-demo) that shows a si
 * It is suitable for devices that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.  
 * It uses [SmartObject](https://github.com/PeterEB/smartobject) class as its fundamental of resource organization on devices.
     - **smartobject** can help you create smart objects with IPSO data model, and it also provides a scheme to help you with abstracting your hardware into smart objects. You may also like to use **SmartObject** to create many plugins for your own hardware or modules, i.e., temperature sensor, humidity sensor, light controller.
+    - The **smartobject** library has a nice tutorial to show you [how to abstract your hardware into a smart object](https://github.com/PeterEB/smartobject/wiki/Hardware-Abstraction-with-mraa).
     - Here is a [tutorial of how to plan resources](https://github.com/PeterEB/smartobject/blob/master/docs/resource_plan.md) with smartobject.
 
 **Note**:  
