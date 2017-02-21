@@ -30,7 +30,7 @@ Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an open 
 
 <br />
 
-Installation
+## Installation
 
 > $ npm install mqtt-node --save
   
