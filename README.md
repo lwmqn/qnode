@@ -17,6 +17,7 @@ Make sure you are with version >= 0.6.0, the old bumps before 0.6.0 are all depr
 
 Please visit the [Wiki](https://github.com/lwmqn/mqtt-node/wiki).
 
+<br />
 
 ## Overview
 
