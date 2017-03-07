@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.6.7",
+  "version": "0.6.8",
   "description": "Client machine node for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,8 @@
     "debug": "^2.2.0",
     "lwmqn-util": "^0.4.0",
     "mqtt": "^1.5.0",
-    "smartobject": "^1.4.0"
+    "smartobject": "^1.4.0",
+    "network": "^0.2.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
