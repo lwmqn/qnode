@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/lwmqn/documents/master/media/mqtt_node.png" align="right" height="96" width="96" />
+  
 mqtt-node
 ========================
 Client machine node for the lightweight MQTT machine network (LWMQN)  
