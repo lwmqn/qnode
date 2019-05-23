@@ -1,7 +1,6 @@
 language: node_js
 node_js:
-  - "lts/argon"
-  - "lts/boron"
-  - "lts/carbon"
-  - "lts/dubnium"
-  - "stable"
+  - "8"
+  - "10"
+  - "11"
+  - "12"
