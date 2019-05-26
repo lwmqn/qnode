@@ -1,3 +1,2 @@
-'use strict';
 
-module.exports = require('./lib/mqnode');
+module.exports = require('./lib/mqnode')
