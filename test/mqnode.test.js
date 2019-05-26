@@ -504,7 +504,7 @@ describe('Functional Check', () => {
     })
 
     it('should receive logout event from this.mc, get close and _unconnected events', (done) => {
-      let count = 0
+      var count = 0
       mqnode.once('logout', () => {
         count += 1
         if (count === 2) done()
@@ -521,7 +521,7 @@ describe('Functional Check', () => {
     })
 
     it('should receive offline event from this.mc, get offine and _unconnected events', (done) => {
-      let count = 0
+      var count = 0
       mqnode.once('offline', () => {
         count += 1
         if (count === 2) done()
