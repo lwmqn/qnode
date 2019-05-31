@@ -405,6 +405,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 200 (ok) when nothing to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({}, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 200) done()
       })
       emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 200 })
@@ -414,6 +415,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 405 (notallow) when mac to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ mac: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 405) done()
       })
       mqnode._connected = false
@@ -422,6 +424,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 405 (notallow) when clientId to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ clientId: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 405) done()
       })
       mqnode._connected = false
@@ -430,6 +433,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 400 (badreq) when unkown attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ gg: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 400) done()
       })
       mqnode._connected = false
@@ -438,6 +442,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 400 (badreq) when unkown attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ gg: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 400) done()
       })
       mqnode._connected = false
@@ -446,6 +451,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when lifetime attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ lifetime: 12345 }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 204) done()
       })
 
@@ -456,6 +462,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when ip attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ ip: '192.168.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 204 && mqnode.ip === '192.168.1.1') done()
       })
 
@@ -466,6 +473,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when version attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ version: '1.2.3' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         if (rsp.status === 204 && mqnode.version === '1.2.3') done()
       })
 
@@ -552,6 +560,8 @@ describe('Functional Check', () => {
     const mqnode = new Mqnode('foo', so, { version: '0.0.1' })
     it('should return with callback - no connection', (done) => {
       mqnode.close((err) => {
+        expect(err).to.be.an('error')
+        expect(err.message).to.equal('No mqtt client attached on qnode, cannot close connection.')
         done()
       })
     })
@@ -598,6 +608,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.publish('x/y/z', { x: 1 }, (err, msg) => {
+        expect(err).to.be.a('null')
         mqnode._connected = false
         encryStub.restore()
         mcPubStub.restore()
@@ -617,6 +628,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.subscribe('x/y/z', { x: 1 }, (err, msg) => {
+        expect(err).to.be.a('null')
         mqnode._connected = false
         mcSubStub.restore()
         if (msg === 'subCalled') done()
@@ -635,6 +647,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.unsubscribe('x/y/z', (err, msg) => {
+        expect(err).to.be.a('null')
         mqnode._connected = false
         mcUnsubStub.restore()
         if (msg === 'unsubCalled') done()
@@ -656,6 +669,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 200) done()
@@ -672,6 +686,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 201) done()
@@ -688,6 +703,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -704,6 +720,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
@@ -720,6 +737,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 409) done()
@@ -736,6 +754,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -763,6 +782,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -785,6 +805,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -809,6 +830,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -833,6 +855,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -855,6 +878,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 204) done()
@@ -871,6 +895,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -887,6 +912,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 405) done()
@@ -903,6 +929,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
@@ -919,6 +946,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -940,6 +968,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 204) done()
@@ -956,6 +985,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -972,6 +1002,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 404) done()
@@ -988,6 +1019,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -1009,6 +1041,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.ping((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 200 && _.isNumber(rsp.data)) done()
@@ -1025,6 +1058,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.ping((err, rsp) => {
+        expect(err).to.be.a('null')
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
