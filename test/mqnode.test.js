@@ -600,10 +600,10 @@ describe('Functional Check', () => {
 
     it('should call encrypt', (done) => {
       mqnode._connected = true
-      const encryStub = sinon.stub(mqnode, 'encrypt', (msg, cb) => {
+      const encryStub = sinon.stub(mqnode, 'encrypt').callsFake((msg, cb) => {
         cb(null, 'called')
       })
-      const mcPubStub = sinon.stub(mqnode.mc, 'publish', (topic, encrypted, options, cbk) => {
+      const mcPubStub = sinon.stub(mqnode.mc, 'publish').callsFake((topic, encrypted, options, cbk) => {
         cbk(null, 'pubCalled')
       })
 
@@ -623,7 +623,7 @@ describe('Functional Check', () => {
 
     it('should call mc.subscribe', (done) => {
       mqnode._connected = true
-      const mcSubStub = sinon.stub(mqnode.mc, 'subscribe', (topics, opts, cbk) => {
+      const mcSubStub = sinon.stub(mqnode.mc, 'subscribe').callsFake((topics, opts, cbk) => {
         cbk(null, 'subCalled')
       })
 
@@ -642,7 +642,7 @@ describe('Functional Check', () => {
 
     it('should call mc.unsubscribe', (done) => {
       mqnode._connected = true
-      const mcUnsubStub = sinon.stub(mqnode.mc, 'unsubscribe', (topics, cbk) => {
+      const mcUnsubStub = sinon.stub(mqnode.mc, 'unsubscribe').callsFake((topics, cbk) => {
         cbk(null, 'unsubCalled')
       })
 
@@ -661,7 +661,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - ok(200)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 200 })
@@ -678,7 +678,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - created(201)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 201 })
@@ -695,7 +695,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - badreq(400)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 400 })
@@ -712,7 +712,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - timeout(408)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 408 })
@@ -729,7 +729,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - conflict(409)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 409 })
@@ -746,7 +746,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - internal server error(500)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.register, { transId: mqnode.__transId(), status: 500 })
@@ -768,14 +768,14 @@ describe('Functional Check', () => {
 
     it('should called when receive response - deleted(202)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.deregister, { transId: mqnode.__transId(), status: 202 })
         }, 10)
       })
 
-      const closeStub = sinon.stub(mqnode, 'close', (force, cb) => {
+      const closeStub = sinon.stub(mqnode, 'close').callsFake((force, cb) => {
         setTimeout(() => {
           cb()
         }, 10)
@@ -792,13 +792,13 @@ describe('Functional Check', () => {
 
     it('should called when receive response - notfound(404)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.deregister, { transId: mqnode.__transId(), status: 404 })
         }, 10)
       })
-      const closeStub = sinon.stub(mqnode, 'close', (force, cb) => {
+      const closeStub = sinon.stub(mqnode, 'close').callsFake((force, cb) => {
         setTimeout(() => {
           cb()
         }, 10)
@@ -816,14 +816,14 @@ describe('Functional Check', () => {
 
     it('should called when receive response - timeout(408)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.deregister, { transId: mqnode.__transId(), status: 408 })
         }, 10)
       })
 
-      const closeStub = sinon.stub(mqnode, 'close', (force, cb) => {
+      const closeStub = sinon.stub(mqnode, 'close').callsFake((force, cb) => {
         setTimeout(() => {
           cb()
         }, 10)
@@ -841,14 +841,14 @@ describe('Functional Check', () => {
 
     it('should called when receive response - internal error(500)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.deregister, { transId: mqnode.__transId(), status: 500 })
         }, 10)
       })
 
-      const closeStub = sinon.stub(mqnode, 'close', (force, cb) => {
+      const closeStub = sinon.stub(mqnode, 'close').callsFake((force, cb) => {
         setTimeout(() => {
           cb()
         }, 10)
@@ -870,7 +870,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - changed(204)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 204 })
@@ -887,7 +887,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - badreq(400)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 400 })
@@ -904,7 +904,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - method not allowed(405)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 405 })
@@ -921,7 +921,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - method not timeout(408)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 408 })
@@ -938,7 +938,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - internal error(500)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 500 })
@@ -960,7 +960,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - changed(204)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.notify, { transId: mqnode.__transId(), status: 204 })
@@ -977,7 +977,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - badreq(400)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.notify, { transId: mqnode.__transId(), status: 400 })
@@ -994,7 +994,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - notfound(404)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.notify, { transId: mqnode.__transId(), status: 404 })
@@ -1011,7 +1011,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - internal error(500)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.notify, { transId: mqnode.__transId(), status: 500 })
@@ -1033,7 +1033,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - ok(200)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.ping, { transId: mqnode.__transId(), status: 200 })
@@ -1050,7 +1050,7 @@ describe('Functional Check', () => {
 
     it('should called when receive response - timeout(408)', (done) => {
       mqnode._connected = true
-      const pubStub = sinon.stub(mqnode, 'publish', (topics, data, cb) => {
+      const pubStub = sinon.stub(mqnode, 'publish').callsFake((topics, data, cb) => {
         cb(null, 'pubCalled')
         setTimeout(() => {
           emitFakeMessage(mqnode, mqnode._subics.ping, { transId: mqnode.__transId(), status: 408 })
