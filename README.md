@@ -7,21 +7,20 @@ Client machine node for the lightweight MQTT machine network (LWMQN)
 [![NPM](https://nodei.co/npm/mqtt-node.png?downloads=true)](https://nodei.co/npm/mqtt-node/)
 
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-node)
-[![npm](https://img.shields.io/npm/v/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
-[![PyPI](https://img.shields.io/pypi/status/Django.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
+[![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-node/badge.svg?branch=master)](https://coveralls.io/github/lwmqn/mqtt-node?branch=master)
 [![npm](https://img.shields.io/npm/l/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
 [![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg)](https://gitter.im/lwmqn/Lobby)
 
 Make sure you are with version `>= 0.7.0`, the old bumps before `0.7.0` are all deprecated.
 For Node.js `< 6.4.x` please use `0.7.x`.
 
-<br />
+-------
 
 ## Documentation
 
 Please visit the [Wiki](https://github.com/lwmqn/mqtt-node/wiki).
 
-<br />
+-------
 
 ## Overview
 
@@ -33,19 +32,19 @@ Lightweight MQTT machine network [**LWMQN**](http://lwmqn.github.io) is an open 
 
 ![LWMQN Network](https://raw.githubusercontent.com/lwmqn/documents/master/media/lwmqn_net.png)
 
-<br />
+-------
 
 ## Installation
 
 > $ npm install mqtt-node --save
 
-<br />
+-------
 
 ## Basic Usage
 
 See [Basic Usage](https://github.com/lwmqn/mqtt-node/wiki#Step1) on the Wiki.
 
-<br />
+-------
 
 ## License
 
