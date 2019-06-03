@@ -50,7 +50,9 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 Currently Node.js 8.x LTS or higher is required.
 
-> $ npm install mqtt-node --save
+```bash
+$ npm install mqtt-node
+```
 
 -------
 
