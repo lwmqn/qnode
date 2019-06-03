@@ -55,10 +55,8 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 ## Basic Usage
 
 
-Here is a quick example to show you how to use **mqtt-node** and **smartobject** on your machine node.  
+Here is a quick example, with two humidity sensors and one custom object, which shows how to use **mqtt-node** and **smartobject** on your client machine.  
 
-
-* **Step 1**: [Initialize](https://github.com/PeterEB/smartobject#Usage) two humidity sensors and one custom Object within the smart object `so`:
     ```js
     var MqttNode = require('mqtt-node'),
         SmartObject = require('smartobject');
@@ -82,30 +80,21 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
         myResrc1: 20,
         myResrc2: 'hello world!'
     });
-    ```
-    - You can bundle your smart object into a plugin or a separated module, and then use it like:
-    ```js
-        var so = require('foo-ipso-temperature-plugin');
-        // or
-        var so = require('./hal/my_temp_sensor.js');
-    ```
-
-
-* **Step 2**: Create a qnode with a client id and your smart object. And attach your 'ready' and 'registered' event listeners:  
-    - **'ready'** event fires when the device is ready, but not yet remotely register to a Server.
-    - **'registered'** event fires when registration procedure completes successfully, whicn means your device has joined the network and managed by the Server. After a success of registration, you can take the LWMQN Server as a simple MQTT broker. Your device can subscribe to any topic or publish any topic to the network (if authorized).
-
-    ```js
+    
+    // Create a qnode with a client id and your smart object. And attach your 'ready' and 'registered' event listeners
     var qnode = new MqttNode('my_foo_client_id', so);
 
     qnode.on('ready', function () {
+        // The ready event fires when the device is ready, but not yet remotely register to a Server.
         // You can start to run your local app, such as showing the sensed value on an OLED monitor.
         // To interact with your Resources, simply use the handy APIs provided by SmartObject class.
     });
 
     qnode.on('registered', function () {
-        // Your qnode is now in the network. This event only fires at the first time 
-        // of qnode registering to the Server.
+        // The event fires when registration procedure completes successfully, which means your device
+        // has joined the network and managed by the Server. After a success of registration, you can 
+        // take the LWMQN Server as a simple MQTT broker. Your device can subscribe to any topic or 
+        // publish any topic to the network (if authorized).
     });
 
     qnode.on('login', function () {
@@ -113,15 +102,9 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
         // REQ/RSP things, qnode itself will handle them for you.  
     });
 
-    ```
-
-
-* **Step 3**: Connect and register to a Server, that's it!  
-
-    ```js
+    // Connect and register to a Server, that's it! 
     qnode.connect('mqtt://192.168.0.2');
     ```
-
 
 The following example shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/lwmqn/mqtt-shepherd/wiki#Major) document for details):  
 
