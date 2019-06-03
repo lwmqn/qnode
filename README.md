@@ -4,13 +4,14 @@
 
 **mqtt-node** is a client machine node for the lightweight MQTT machine network (LWMQN)
   
-[![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-node.svg)](https://greenkeeper.io/)
-[![NPM version](https://img.shields.io/npm/v/mqtt-node.svg?style=flat)](https://www.npmjs.com/package/mqtt-node)
-[![NPM downloads](https://img.shields.io/npm/dm/mqtt-node.svg?style=flat)](https://www.npmjs.com/package/mqtt-node)
-[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000)](https://travis-ci.org/lwmqn/mqtt-node)
-[![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-node/badge.svg?branch=master)](https://coveralls.io/github/lwmqn/mqtt-node?branch=master)
-[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg)](https://gitter.im/lwmqn/Lobby) 
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-node.svg?style=flat-square)](https://greenkeeper.io/)
+[![NPM version](https://img.shields.io/npm/v/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
+[![NPM downloads](https://img.shields.io/npm/dm/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
+[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/mqtt-node)
+[![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-node/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/mqtt-node?branch=master)
+[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby) 
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
+![pr-welcoming-image](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
 
 </div>
 
@@ -121,6 +122,7 @@ Here is a quick example to show you how to use **mqtt-node** and **smartobject**
     qnode.connect('mqtt://192.168.0.2');
     ```
 
+
 The following example shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/lwmqn/mqtt-shepherd/wiki#Major) document for details):  
 
 ```js
@@ -135,13 +137,9 @@ if (qnode) {
         if (!err) console.log(rsp);   // { status: 205, data: 'hello world!' }
     });
 }
-```
-  
+``` 
 
 -------
-
-## Documentation
-
 
 ## Documentation
 * <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Basic-APIs.md"><code><b>Basic APIs</b></code></a>
@@ -151,7 +149,7 @@ if (qnode) {
 * <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Message-Encryption.md"><code><b>Message Encryption</b></code></a>
 * <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Identifying-Mode.md"><code><b>Identifying Mode</b></code></a>
 * <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Debug-Messages.md"><code><b>Debug messages</b></code></a>
- 
+
 -------
 
 ## License
