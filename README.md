@@ -10,7 +10,7 @@ Client machine node for the lightweight MQTT machine network (LWMQN)
 [![npm](https://img.shields.io/npm/v/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
 [![PyPI](https://img.shields.io/pypi/status/Django.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
 [![npm](https://img.shields.io/npm/l/mqtt-node.svg?maxAge=2592000)](https://www.npmjs.com/package/mqtt-node)
-[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg)](https://gitter.im/lwmqn/Lobby)
+[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg)](https://gitter.im/lwmqn/Lobby) [![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-node.svg)](https://greenkeeper.io/)
 
 Make sure you are with version `>= 0.7.0`, the old bumps before `0.7.0` are all deprecated.
 For Node.js `< 6.4.x` please use `0.7.x`.
