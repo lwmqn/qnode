@@ -48,10 +48,11 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 ## Installation
 
-Currently Node.js 8.x LTS or higher is required.
+Currently [Node.js 8.x LTS](https://nodejs.org/en/about/releases/) or higher is required.
 
 ```bash
 $ npm install mqtt-node
+$ npm install smartobject
 ```
 
 -------
