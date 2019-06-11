@@ -11,7 +11,7 @@ afterEach(() => {
   sinon.restore()
 })
 
-describe('Signature Check', () => {
+describe('mqnode -> Signature Check', () => {
   const mqnode = new Mqnode('foo', so, { version: '0.0.1' })
 
   describe('#new mqnode', function () {
@@ -319,7 +319,7 @@ describe('Signature Check', () => {
   })
 })
 
-describe('Functional Check', () => {
+describe('mqnode -> Functional Check', () => {
   const mqnode = new Mqnode('foo', so, { version: '0.0.1' })
   mqnode.connect('mqtt://192.16.0.1')
 
