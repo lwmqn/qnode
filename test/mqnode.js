@@ -1,330 +1,320 @@
 /* eslint-env mocha */
 const _ = require('busyman')
-const chai = require('chai')
 const sinon = require('sinon')
-const expect = require('chai').expect
-
-chai.use(require('sinon-chai'))
-
+const assert = require('assert')
 const SmartObject = require('smartobject')
 const Mqnode = require('../index.js')
 
 const so = new SmartObject()
 
+afterEach(() => {
+  sinon.restore()
+})
+
 describe('Signature Check', () => {
   const mqnode = new Mqnode('foo', so, { version: '0.0.1' })
 
-  // for travis-ci, since network module cannot run on it
-  /** ****************************************************************************** */
-  /** **  This test cannot work on travis. Uncomment it only with local testing. *** */
-  /** ****************************************************************************** */
-  // describe('#new mqnode', function () {
-  //     it('should throw TypeError if clientId is not a string', function () {
-  //         expect(function () { return new Mqnode(null, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(undefined, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(true, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(NaN, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(12, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode({}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode([], so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(new Date(), so, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode(function () {}, so, { version: '0.0.1' } ); }).to.throw(TypeError);
+  describe('#new mqnode', function () {
+    // for travis-ci, since network module cannot run on it
+    if (process.env.NODE_ENV === 'development') {
+      it('should throw TypeError if clientId is not a string', function () {
+        assert.throws(() => new Mqnode(null, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(undefined, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(true, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(NaN, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(12, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode({}, so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode([], so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(new Date(), so, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode(function () {}, so, { version: '0.0.1' }), TypeError)
 
-  //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-  //     });
+        assert.doesNotThrow(() => new Mqnode('foo', so, { version: '0.0.1' }), Error)
+      })
 
-  //     it('should throw TypeError if so is not an instance of SmartObject class', function () {
-  //         expect(function () { return new Mqnode('foo', 'x', { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', 12, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', null, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', undefined, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', NaN, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', true, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', new Date(), { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', {}, { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', [], { version: '0.0.1' } ); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', function () {}, { version: '0.0.1' } ); }).to.throw(TypeError);
+      it('should throw TypeError if so is not an instance of SmartObject class', function () {
+        assert.throws(() => new Mqnode('foo', 'x', { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', 12, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', null, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', undefined, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', NaN, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', true, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', new Date(), { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', {}, { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', [], { version: '0.0.1' }), TypeError)
+        assert.throws(() => new Mqnode('foo', function () {}, { version: '0.0.1' }), TypeError)
 
-  //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-  //     });
+        assert.doesNotThrow(() => new Mqnode('foo', so, { version: '0.0.1' }), Error)
+      })
 
-  //     it('should throw TypeError if devAttrs is not an object if given', function () {
-  //         expect(function () { return new Mqnode('foo', so, 'x'); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, 12); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, true); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, new Date()); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, []); }).to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, function () {}); }).to.throw(TypeError);
-
-  //         expect(function () { return new Mqnode('foo', so, null); }).not.to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, undefined); }).not.to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, NaN); }).not.to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, {}); }).not.to.throw(TypeError);
-  //         expect(function () { return new Mqnode('foo', so, { version: '0.0.1' } ); }).not.to.throw(Error);
-  //     });
-  // });
+      it('should throw TypeError if devAttrs is not an object if given', function () {
+        assert.throws(() => new Mqnode('foo', so, 'x'), TypeError)
+        assert.throws(() => new Mqnode('foo', so, 12), TypeError)
+        assert.throws(() => new Mqnode('foo', so, true), TypeError)
+        assert.throws(() => new Mqnode('foo', so, new Date()), TypeError)
+        assert.throws(() => new Mqnode('foo', so, []), TypeError)
+        assert.throws(() => new Mqnode('foo', so, function () {}), TypeError)
+      })
+    }
+  })
 
   describe('#.setDevAttrs', () => {
-    // mqnode.on('error', function (e) {
-    //     console.log(e);
-    // });
     it('should throw TypeError if devAttrs is not an object', () => {
-      expect(() => mqnode.setDevAttrs('x')).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(1)).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(true)).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs([])).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(null)).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(undefined)).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(NaN)).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs(new Date())).to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs({})).to.throw(TypeError)
+      assert.throws(() => mqnode.setDevAttrs('x'), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(1), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(true), TypeError)
+      assert.throws(() => mqnode.setDevAttrs([]), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(null), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(undefined), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(NaN), TypeError)
+      assert.throws(() => mqnode.setDevAttrs(new Date()), TypeError)
+      assert.throws(() => mqnode.setDevAttrs({}), TypeError)
 
-      expect(() => mqnode.setDevAttrs({}, () => {})).not.to.throw(TypeError)
-      expect(() => mqnode.setDevAttrs({}, (e, r) => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.setDevAttrs({}, () => {}), TypeError)
+      assert.doesNotThrow(() => mqnode.setDevAttrs({}, (e, r) => {}), TypeError)
     })
   })
 
   describe('#.enableReport', () => {
     it('should throw TypeError if oid is not a number or a string', () => {
-      expect(() => mqnode.enableReport()).to.throw(TypeError)
-      expect(() => mqnode.enableReport({})).to.throw(TypeError)
-      expect(() => mqnode.enableReport([])).to.throw(TypeError)
-      expect(() => mqnode.enableReport(true)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(null)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(NaN)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(new Date())).to.throw(TypeError)
-      expect(() => mqnode.enableReport(() => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.enableReport(), TypeError)
+      assert.throws(() => mqnode.enableReport({}), TypeError)
+      assert.throws(() => mqnode.enableReport([]), TypeError)
+      assert.throws(() => mqnode.enableReport(true), TypeError)
+      assert.throws(() => mqnode.enableReport(null), TypeError)
+      assert.throws(() => mqnode.enableReport(NaN), TypeError)
+      assert.throws(() => mqnode.enableReport(new Date()), TypeError)
+      assert.throws(() => mqnode.enableReport(() => {}), TypeError)
     })
 
     it('should throw TypeError if iid is not a number or a string', () => {
-      expect(() => mqnode.enableReport(1, {})).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, [])).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, true)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, null)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, NaN)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, new Date())).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.enableReport(1, {}), TypeError)
+      assert.throws(() => mqnode.enableReport(1, []), TypeError)
+      assert.throws(() => mqnode.enableReport(1, true), TypeError)
+      assert.throws(() => mqnode.enableReport(1, null), TypeError)
+      assert.throws(() => mqnode.enableReport(1, NaN), TypeError)
+      assert.throws(() => mqnode.enableReport(1, new Date()), TypeError)
+      assert.throws(() => mqnode.enableReport(1, () => {}), TypeError)
 
-      expect(() => mqnode.enableReport('x', {})).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', [])).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', true)).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', null)).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', NaN)).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', new Date())).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.enableReport('x', {}), TypeError)
+      assert.throws(() => mqnode.enableReport('x', []), TypeError)
+      assert.throws(() => mqnode.enableReport('x', true), TypeError)
+      assert.throws(() => mqnode.enableReport('x', null), TypeError)
+      assert.throws(() => mqnode.enableReport('x', NaN), TypeError)
+      assert.throws(() => mqnode.enableReport('x', new Date()), TypeError)
+      assert.throws(() => mqnode.enableReport('x', () => {}), TypeError)
     })
 
     it('should throw TypeError if rid is not a number or a string', () => {
-      expect(() => mqnode.enableReport('x', 1, {})).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', 1, [])).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', 1, true)).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', 1, new Date())).to.throw(TypeError)
-      expect(() => mqnode.enableReport('x', 1, () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.enableReport('x', 1, {}), TypeError)
+      assert.throws(() => mqnode.enableReport('x', 1, []), TypeError)
+      assert.throws(() => mqnode.enableReport('x', 1, true), TypeError)
+      assert.throws(() => mqnode.enableReport('x', 1, new Date()), TypeError)
+      assert.throws(() => mqnode.enableReport('x', 1, () => {}), TypeError)
 
-      expect(() => mqnode.enableReport(1, 'x', {})).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, 'x', [])).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, 'x', true)).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, 'x', new Date())).to.throw(TypeError)
-      expect(() => mqnode.enableReport(1, 'x', () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.enableReport(1, 'x', {}), TypeError)
+      assert.throws(() => mqnode.enableReport(1, 'x', []), TypeError)
+      assert.throws(() => mqnode.enableReport(1, 'x', true), TypeError)
+      assert.throws(() => mqnode.enableReport(1, 'x', new Date()), TypeError)
+      assert.throws(() => mqnode.enableReport(1, 'x', () => {}), TypeError)
     })
   })
 
   describe('#.disableReport', () => {
     it('should throw TypeError if oid is not a number or a string', () => {
-      expect(() => mqnode.disableReport()).to.throw(TypeError)
-      expect(() => mqnode.disableReport({})).to.throw(TypeError)
-      expect(() => mqnode.disableReport([])).to.throw(TypeError)
-      expect(() => mqnode.disableReport(true)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(null)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(NaN)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(new Date())).to.throw(TypeError)
-      expect(() => mqnode.disableReport(() => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.disableReport(), TypeError)
+      assert.throws(() => mqnode.disableReport({}), TypeError)
+      assert.throws(() => mqnode.disableReport([]), TypeError)
+      assert.throws(() => mqnode.disableReport(true), TypeError)
+      assert.throws(() => mqnode.disableReport(null), TypeError)
+      assert.throws(() => mqnode.disableReport(NaN), TypeError)
+      assert.throws(() => mqnode.disableReport(new Date()), TypeError)
+      assert.throws(() => mqnode.disableReport(() => {}), TypeError)
     })
 
     it('should throw TypeError if iid is not a number or a string', () => {
-      expect(() => mqnode.disableReport(1, {})).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, [])).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, true)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, null)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, NaN)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, new Date())).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.disableReport(1, {}), TypeError)
+      assert.throws(() => mqnode.disableReport(1, []), TypeError)
+      assert.throws(() => mqnode.disableReport(1, true), TypeError)
+      assert.throws(() => mqnode.disableReport(1, null), TypeError)
+      assert.throws(() => mqnode.disableReport(1, NaN), TypeError)
+      assert.throws(() => mqnode.disableReport(1, new Date()), TypeError)
+      assert.throws(() => mqnode.disableReport(1, () => {}), TypeError)
 
-      expect(() => mqnode.disableReport('x', {})).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', [])).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', true)).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', null)).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', NaN)).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', new Date())).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.disableReport('x', {}), TypeError)
+      assert.throws(() => mqnode.disableReport('x', []), TypeError)
+      assert.throws(() => mqnode.disableReport('x', true), TypeError)
+      assert.throws(() => mqnode.disableReport('x', null), TypeError)
+      assert.throws(() => mqnode.disableReport('x', NaN), TypeError)
+      assert.throws(() => mqnode.disableReport('x', new Date()), TypeError)
+      assert.throws(() => mqnode.disableReport('x', () => {}), TypeError)
     })
 
     it('should throw TypeError if rid is not a number or a string', () => {
-      expect(() => mqnode.disableReport('x', 1, {})).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', 1, [])).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', 1, true)).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', 1, new Date())).to.throw(TypeError)
-      expect(() => mqnode.disableReport('x', 1, () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.disableReport('x', 1, {}), TypeError)
+      assert.throws(() => mqnode.disableReport('x', 1, []), TypeError)
+      assert.throws(() => mqnode.disableReport('x', 1, true), TypeError)
+      assert.throws(() => mqnode.disableReport('x', 1, new Date()), TypeError)
+      assert.throws(() => mqnode.disableReport('x', 1, () => {}), TypeError)
 
-      expect(() => mqnode.disableReport(1, 'x', {})).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, 'x', [])).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, 'x', true)).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, 'x', new Date())).to.throw(TypeError)
-      expect(() => mqnode.disableReport(1, 'x', () => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.disableReport(1, 'x', {}), TypeError)
+      assert.throws(() => mqnode.disableReport(1, 'x', []), TypeError)
+      assert.throws(() => mqnode.disableReport(1, 'x', true), TypeError)
+      assert.throws(() => mqnode.disableReport(1, 'x', new Date()), TypeError)
+      assert.throws(() => mqnode.disableReport(1, 'x', () => {}), TypeError)
     })
   })
 
   describe('#.connect', () => {
     it('should throw TypeError if brokerUrl is not a string', () => {
-      expect(() => mqnode.connect()).to.throw(TypeError)
-      expect(() => mqnode.connect(1)).to.throw(TypeError)
-      expect(() => mqnode.connect({})).to.throw(TypeError)
-      expect(() => mqnode.connect([])).to.throw(TypeError)
-      expect(() => mqnode.connect(true)).to.throw(TypeError)
-      expect(() => mqnode.connect(null)).to.throw(TypeError)
-      expect(() => mqnode.connect(NaN)).to.throw(TypeError)
-      expect(() => mqnode.connect(new Date())).to.throw(TypeError)
-      expect(() => mqnode.connect(() => {})).to.throw(TypeError)
+      assert.throws(() => mqnode.connect(), TypeError)
+      assert.throws(() => mqnode.connect(1), TypeError)
+      assert.throws(() => mqnode.connect({}), TypeError)
+      assert.throws(() => mqnode.connect([]), TypeError)
+      assert.throws(() => mqnode.connect(true), TypeError)
+      assert.throws(() => mqnode.connect(null), TypeError)
+      assert.throws(() => mqnode.connect(NaN), TypeError)
+      assert.throws(() => mqnode.connect(new Date()), TypeError)
+      assert.throws(() => mqnode.connect(() => {}), TypeError)
 
-      expect(() => mqnode.connect('mqtt://192.168.0.1')).not.to.throw(TypeError)
-      expect(() => mqnode.connect('mqtt://192.168.0.1', () => {})).not.to.throw(Error)
+      assert.doesNotThrow(() => mqnode.connect('mqtt://192.168.0.1'), TypeError)
+      assert.doesNotThrow(() => mqnode.connect('mqtt://192.168.0.1', () => {}), Error)
     })
 
     it('should throw TypeError if opt is not an object when given', () => {
-      expect(() => mqnode.connect('mqtt://192.168.0.1', 1)).to.throw(TypeError)
-      expect(() => mqnode.connect('mqtt://192.168.0.1', '1')).to.throw(TypeError)
-      expect(() => mqnode.connect('mqtt://192.168.0.1', true)).to.throw(TypeError)
-      expect(() => mqnode.connect('mqtt://192.168.0.1', [])).to.throw(TypeError)
-      expect(() => mqnode.connect('mqtt://192.168.0.1', new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode.connect('mqtt://192.168.0.1', 1), TypeError)
+      assert.throws(() => mqnode.connect('mqtt://192.168.0.1', '1'), TypeError)
+      assert.throws(() => mqnode.connect('mqtt://192.168.0.1', true), TypeError)
+      assert.throws(() => mqnode.connect('mqtt://192.168.0.1', []), TypeError)
+      assert.throws(() => mqnode.connect('mqtt://192.168.0.1', new Date()), TypeError)
     })
   })
 
   describe('#.close', () => {
     it('should throw TypeError if force is not a boolean when given', () => {
-      expect(() => mqnode.close(1)).to.throw(TypeError)
-      expect(() => mqnode.close({})).to.throw(TypeError)
-      expect(() => mqnode.close([])).to.throw(TypeError)
-      expect(() => mqnode.close(null)).to.throw(TypeError)
-      expect(() => mqnode.close(NaN)).to.throw(TypeError)
-      expect(() => mqnode.close(new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode.close(1), TypeError)
+      assert.throws(() => mqnode.close({}), TypeError)
+      assert.throws(() => mqnode.close([]), TypeError)
+      assert.throws(() => mqnode.close(null), TypeError)
+      assert.throws(() => mqnode.close(NaN), TypeError)
+      assert.throws(() => mqnode.close(new Date()), TypeError)
 
-      expect(() => mqnode.close(true)).not.to.throw(TypeError)
-      expect(() => mqnode.close(() => {})).not.to.throw(Error)
-      expect(() => mqnode.close(true, () => {})).not.to.throw(Error)
+      assert.doesNotThrow(() => mqnode.close(true), TypeError)
+      assert.doesNotThrow(() => mqnode.close(() => {}), Error)
+      assert.doesNotThrow(() => mqnode.close(true, () => {}), Error)
     })
   })
 
   describe('#.register', () => {
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode.register('xxx')).to.throw(TypeError)
-      expect(() => mqnode.register(true)).to.throw(TypeError)
-      expect(() => mqnode.register(1)).to.throw(TypeError)
-      expect(() => mqnode.register({})).to.throw(TypeError)
-      expect(() => mqnode.register([])).to.throw(TypeError)
-      expect(() => mqnode.register(new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode.register('xxx'), TypeError)
+      assert.throws(() => mqnode.register(true), TypeError)
+      assert.throws(() => mqnode.register(1), TypeError)
+      assert.throws(() => mqnode.register({}), TypeError)
+      assert.throws(() => mqnode.register([]), TypeError)
+      assert.throws(() => mqnode.register(new Date()), TypeError)
 
-      expect(() => mqnode.register(() => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.register(() => {}), TypeError)
     })
   })
 
   describe('#.deregister', () => {
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode.deregister('xxx')).to.throw(TypeError)
-      expect(() => mqnode.deregister(true)).to.throw(TypeError)
-      expect(() => mqnode.deregister(1)).to.throw(TypeError)
-      expect(() => mqnode.deregister({})).to.throw(TypeError)
-      expect(() => mqnode.deregister([])).to.throw(TypeError)
-      expect(() => mqnode.deregister(new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode.deregister('xxx'), TypeError)
+      assert.throws(() => mqnode.deregister(true), TypeError)
+      assert.throws(() => mqnode.deregister(1), TypeError)
+      assert.throws(() => mqnode.deregister({}), TypeError)
+      assert.throws(() => mqnode.deregister([]), TypeError)
+      assert.throws(() => mqnode.deregister(new Date()), TypeError)
 
-      expect(() => mqnode.deregister(() => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.deregister(() => {}), TypeError)
     })
   })
 
   describe('#._update', () => {
     it('should throw TypeError if devAttrs is not an object', () => {
-      expect(() => mqnode._update('xxx')).to.throw(TypeError)
-      expect(() => mqnode._update()).to.throw(TypeError)
-      expect(() => mqnode._update(null)).to.throw(TypeError)
-      expect(() => mqnode._update(NaN)).to.throw(TypeError)
-      expect(() => mqnode._update(true)).to.throw(TypeError)
-      expect(() => mqnode._update(1)).to.throw(TypeError)
-      expect(() => mqnode._update([])).to.throw(TypeError)
-      expect(() => mqnode._update(new Date())).to.throw(TypeError)
-      expect(() => mqnode._update(() => {})).to.throw(TypeError)
-      expect(() => mqnode._update({})).to.throw(TypeError)
+      assert.throws(() => mqnode._update('xxx'), TypeError)
+      assert.throws(() => mqnode._update(), TypeError)
+      assert.throws(() => mqnode._update(null), TypeError)
+      assert.throws(() => mqnode._update(NaN), TypeError)
+      assert.throws(() => mqnode._update(true), TypeError)
+      assert.throws(() => mqnode._update(1), TypeError)
+      assert.throws(() => mqnode._update([]), TypeError)
+      assert.throws(() => mqnode._update(new Date()), TypeError)
+      assert.throws(() => mqnode._update(() => {}), TypeError)
+      assert.throws(() => mqnode._update({}), TypeError)
 
-      expect(() => mqnode._update({}, () => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode._update({}, () => {}), TypeError)
     })
 
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode._update({}, 'xxx')).to.throw(TypeError)
-      expect(() => mqnode._update({}, null)).to.throw(TypeError)
-      expect(() => mqnode._update({}, NaN)).to.throw(TypeError)
-      expect(() => mqnode._update({}, true)).to.throw(TypeError)
-      expect(() => mqnode._update({}, 1)).to.throw(TypeError)
-      expect(() => mqnode._update({}, [])).to.throw(TypeError)
-      expect(() => mqnode._update({}, new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode._update({}, 'xxx'), TypeError)
+      assert.throws(() => mqnode._update({}, null), TypeError)
+      assert.throws(() => mqnode._update({}, NaN), TypeError)
+      assert.throws(() => mqnode._update({}, true), TypeError)
+      assert.throws(() => mqnode._update({}, 1), TypeError)
+      assert.throws(() => mqnode._update({}, []), TypeError)
+      assert.throws(() => mqnode._update({}, new Date()), TypeError)
 
-      expect(() => mqnode._update({}, () => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode._update({}, () => {}), TypeError)
     })
   })
 
   describe('#.notify', () => {
     it('should throw TypeError if data is not an object', () => {
-      expect(() => mqnode.notify('xxx')).to.throw(TypeError)
-      expect(() => mqnode.notify()).to.throw(TypeError)
-      expect(() => mqnode.notify(null)).to.throw(TypeError)
-      expect(() => mqnode.notify(NaN)).to.throw(TypeError)
-      expect(() => mqnode.notify(true)).to.throw(TypeError)
-      expect(() => mqnode.notify(1)).to.throw(TypeError)
-      expect(() => mqnode.notify([])).to.throw(TypeError)
-      expect(() => mqnode.notify(new Date())).to.throw(TypeError)
-      expect(() => mqnode.notify(() => {})).to.throw(TypeError)
-      expect(() => mqnode.notify({})).to.throw(TypeError)
+      assert.throws(() => mqnode.notify('xxx'), TypeError)
+      assert.throws(() => mqnode.notify(), TypeError)
+      assert.throws(() => mqnode.notify(null), TypeError)
+      assert.throws(() => mqnode.notify(NaN), TypeError)
+      assert.throws(() => mqnode.notify(true), TypeError)
+      assert.throws(() => mqnode.notify(1), TypeError)
+      assert.throws(() => mqnode.notify([]), TypeError)
+      assert.throws(() => mqnode.notify(new Date()), TypeError)
+      assert.throws(() => mqnode.notify(() => {}), TypeError)
+      assert.throws(() => mqnode.notify({}), TypeError)
 
-      expect(() => mqnode.notify({}, () => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.notify({}, () => {}), TypeError)
     })
 
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode.notify({}, 'xxx')).to.throw(TypeError)
-      expect(() => mqnode.notify({}, null)).to.throw(TypeError)
-      expect(() => mqnode.notify({}, NaN)).to.throw(TypeError)
-      expect(() => mqnode.notify({}, true)).to.throw(TypeError)
-      expect(() => mqnode.notify({}, 1)).to.throw(TypeError)
-      expect(() => mqnode.notify({}, [])).to.throw(TypeError)
-      expect(() => mqnode.notify({}, new Date())).to.throw(TypeError)
-      expect(() => mqnode.notify({})).to.throw(TypeError)
+      assert.throws(() => mqnode.notify({}, 'xxx'), TypeError)
+      assert.throws(() => mqnode.notify({}, null), TypeError)
+      assert.throws(() => mqnode.notify({}, NaN), TypeError)
+      assert.throws(() => mqnode.notify({}, true), TypeError)
+      assert.throws(() => mqnode.notify({}, 1), TypeError)
+      assert.throws(() => mqnode.notify({}, []), TypeError)
+      assert.throws(() => mqnode.notify({}, new Date()), TypeError)
+      assert.throws(() => mqnode.notify({}), TypeError)
 
-      expect(() => mqnode.notify({}, () => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.notify({}, () => {}), TypeError)
     })
   })
 
   describe('#.respond', () => {
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode.respond({}, 'xxx')).to.throw(TypeError)
-      expect(() => mqnode.respond({}, null)).to.throw(TypeError)
-      expect(() => mqnode.respond({}, NaN)).to.throw(TypeError)
-      expect(() => mqnode.respond({}, true)).to.throw(TypeError)
-      expect(() => mqnode.respond({}, 1)).to.throw(TypeError)
-      expect(() => mqnode.respond({}, [])).to.throw(TypeError)
-      expect(() => mqnode.respond({}, new Date())).to.throw(TypeError)
+      assert.throws(() => mqnode.respond({}, 'xxx'), TypeError)
+      assert.throws(() => mqnode.respond({}, null), TypeError)
+      assert.throws(() => mqnode.respond({}, NaN), TypeError)
+      assert.throws(() => mqnode.respond({}, true), TypeError)
+      assert.throws(() => mqnode.respond({}, 1), TypeError)
+      assert.throws(() => mqnode.respond({}, []), TypeError)
+      assert.throws(() => mqnode.respond({}, new Date()), TypeError)
 
-      expect(() => mqnode.respond({})).not.to.throw(TypeError)
-      expect(() => mqnode.respond({}, () => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.respond({}), TypeError)
+      assert.doesNotThrow(() => mqnode.respond({}, () => {}), TypeError)
     })
   })
 
   describe('#.ping', () => {
     it('should throw TypeError if callback is not a function when given', () => {
-      expect(() => mqnode.ping('xxx')).to.throw(TypeError)
-      expect(() => mqnode.ping(true)).to.throw(TypeError)
-      expect(() => mqnode.ping(1)).to.throw(TypeError)
-      expect(() => mqnode.ping({})).to.throw(TypeError)
-      expect(() => mqnode.ping([])).to.throw(TypeError)
-      expect(() => mqnode.ping(new Date())).to.throw(TypeError)
-      expect(() => mqnode.ping()).to.throw(TypeError)
+      assert.throws(() => mqnode.ping('xxx'), TypeError)
+      assert.throws(() => mqnode.ping(true), TypeError)
+      assert.throws(() => mqnode.ping(1), TypeError)
+      assert.throws(() => mqnode.ping({}), TypeError)
+      assert.throws(() => mqnode.ping([]), TypeError)
+      assert.throws(() => mqnode.ping(new Date()), TypeError)
+      assert.throws(() => mqnode.ping(), TypeError)
 
-      expect(() => mqnode.ping(() => {})).not.to.throw(TypeError)
+      assert.doesNotThrow(() => mqnode.ping(() => {}), TypeError)
     })
   })
 })
@@ -335,16 +325,14 @@ describe('Functional Check', () => {
 
   describe('#ensure members', () => {
     it('should have all correct members when initiated', () => {
-      expect(mqnode.clientId).to.be.equal('foo')
-      expect(mqnode.lifetime).to.be.equal(86400)
-      // expect(mqnode.ip).not.to.be.null; - locally ok. Dont check@CI server, may need root
-      // expect(mqnode.mac).not.to.be.null;- locally ok. dont check@CI server, may need root
-      expect(mqnode.version).to.be.equal('0.0.1')
-      expect(mqnode.mc).not.to.equal(null)
-      expect(mqnode.so).to.be.equal(so)
-      expect(mqnode._connected).to.equal(false)
-      expect(mqnode._lfsecs).to.be.equal(0)
-      expect(mqnode._pubics).to.be.deep.equal({
+      assert.strictEqual(mqnode.clientId, 'foo')
+      assert.strictEqual(mqnode.lifetime, 86400)
+      assert.strictEqual(mqnode.version, '0.0.1')
+      assert.notStrictEqual(mqnode.mc, null)
+      assert.strictEqual(mqnode.so, so)
+      assert.strictEqual(mqnode._connected, false)
+      assert.strictEqual(mqnode._lfsecs, 0)
+      assert.deepStrictEqual(mqnode._pubics, {
         register: `register/${mqnode.clientId}`,
         schedule: `schedule/${mqnode.clientId}`,
         deregister: `deregister/${mqnode.clientId}`,
@@ -353,7 +341,7 @@ describe('Functional Check', () => {
         ping: `ping/${mqnode.clientId}`,
         response: `response/${mqnode.clientId}`
       })
-      expect(mqnode._subics).to.be.deep.equal({
+      assert.deepStrictEqual(mqnode._subics, {
         register: `register/response/${mqnode.clientId}`,
         deregister: `deregister/response/${mqnode.clientId}`,
         schedule: `schedule/response/${mqnode.clientId}`,
@@ -363,20 +351,20 @@ describe('Functional Check', () => {
         request: `request/${mqnode.clientId}`,
         announce: 'announce'
       })
-      expect(mqnode._tobjs).to.be.deep.equal({})
-      expect(mqnode._updater).to.equal(null)
-      expect(mqnode._repAttrs).to.be.deep.equal({})
-      expect(mqnode._reporters).to.be.deep.equal({})
+      assert.deepStrictEqual(mqnode._tobjs, {})
+      assert.strictEqual(mqnode._updater, null)
+      assert.deepStrictEqual(mqnode._repAttrs, {})
+      assert.deepStrictEqual(mqnode._reporters, {})
 
-      expect(mqnode.so.has('lwm2mServer')).to.equal(true)
-      expect(mqnode.so.has('lwm2mServer', 0)).to.equal(true)
-      expect(mqnode.so.has('lwm2mServer', 1)).to.equal(false)
-      expect(mqnode.so.has('device')).to.equal(true)
-      expect(mqnode.so.has('device', 0)).to.equal(true)
-      expect(mqnode.so.has('device', 1)).to.equal(false)
-      expect(mqnode.so.has('connMonitor')).to.equal(true)
-      expect(mqnode.so.has('connMonitor', 0)).to.equal(true)
-      expect(mqnode.so.has('connMonitor', 1)).to.equal(false)
+      assert.strictEqual(mqnode.so.has('lwm2mServer'), true)
+      assert.strictEqual(mqnode.so.has('lwm2mServer', 0), true)
+      assert.strictEqual(mqnode.so.has('lwm2mServer', 1), false)
+      assert.strictEqual(mqnode.so.has('device'), true)
+      assert.strictEqual(mqnode.so.has('device', 0), true)
+      assert.strictEqual(mqnode.so.has('device', 1), false)
+      assert.strictEqual(mqnode.so.has('connMonitor'), true)
+      assert.strictEqual(mqnode.so.has('connMonitor', 0), true)
+      assert.strictEqual(mqnode.so.has('connMonitor', 1), false)
     })
   })
 
@@ -391,21 +379,21 @@ describe('Functional Check', () => {
 
   describe('#.getSmartObject', () => {
     it('should equal to so', () => {
-      expect(mqnode.getSmartObject()).to.be.equal(so)
+      assert.strictEqual(mqnode.getSmartObject(), so)
     })
   })
 
   describe('#.setDevAttrs', () => {
     it('should equal to this', () => {
       mqnode._connected = true
-      expect(mqnode.setDevAttrs({}, () => {})).to.be.equal(mqnode)
+      assert.strictEqual(mqnode.setDevAttrs({}, () => {}), mqnode)
       mqnode._connected = false
     })
 
     it('rsp.status should equal to 200 (ok) when nothing to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({}, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 200) done()
       })
       emitFakeMessage(mqnode, mqnode._subics.update, { transId: mqnode.__transId(), status: 200 })
@@ -415,7 +403,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 405 (notallow) when mac to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ mac: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 405) done()
       })
       mqnode._connected = false
@@ -424,7 +412,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 405 (notallow) when clientId to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ clientId: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 405) done()
       })
       mqnode._connected = false
@@ -433,7 +421,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 400 (badreq) when unkown attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ gg: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 400) done()
       })
       mqnode._connected = false
@@ -442,7 +430,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 400 (badreq) when unkown attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ gg: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 400) done()
       })
       mqnode._connected = false
@@ -451,7 +439,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when lifetime attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ lifetime: 12345 }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 204) done()
       })
 
@@ -462,7 +450,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when ip attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ ip: '192.168.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 204 && mqnode.ip === '192.168.1.1') done()
       })
 
@@ -473,7 +461,7 @@ describe('Functional Check', () => {
     it('rsp.status should equal to 204 (changed) when version attr to update', (done) => {
       mqnode._connected = true
       mqnode.setDevAttrs({ version: '1.2.3' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         if (rsp.status === 204 && mqnode.version === '1.2.3') done()
       })
 
@@ -560,8 +548,7 @@ describe('Functional Check', () => {
     const mqnode = new Mqnode('foo', so, { version: '0.0.1' })
     it('should return with callback - no connection', (done) => {
       mqnode.close((err) => {
-        expect(err).to.be.an('error')
-        expect(err.message).to.equal('No mqtt client attached on qnode, cannot close connection.')
+        assert.strictEqual(err.message, 'No mqtt client attached on qnode, cannot close connection.')
         done()
       })
     })
@@ -608,7 +595,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.publish('x/y/z', { x: 1 }, (err, msg) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = false
         encryStub.restore()
         mcPubStub.restore()
@@ -628,7 +615,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.subscribe('x/y/z', { x: 1 }, (err, msg) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = false
         mcSubStub.restore()
         if (msg === 'subCalled') done()
@@ -647,7 +634,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.unsubscribe('x/y/z', (err, msg) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = false
         mcUnsubStub.restore()
         if (msg === 'unsubCalled') done()
@@ -669,7 +656,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 200) done()
@@ -686,7 +673,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 201) done()
@@ -703,7 +690,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -720,7 +707,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
@@ -737,7 +724,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 409) done()
@@ -754,7 +741,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.register((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -782,7 +769,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -805,7 +792,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -830,7 +817,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -855,7 +842,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.deregister((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         closeStub.restore()
@@ -878,7 +865,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 204) done()
@@ -895,7 +882,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -912,7 +899,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 405) done()
@@ -929,7 +916,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
@@ -946,7 +933,7 @@ describe('Functional Check', () => {
       })
 
       mqnode._update({ version: '1.0.0', ip: '1.1.1.1' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -968,7 +955,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 204) done()
@@ -985,7 +972,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 400) done()
@@ -1002,7 +989,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 404) done()
@@ -1019,7 +1006,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.notify({ x: 'x' }, (err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 500) done()
@@ -1041,7 +1028,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.ping((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 200 && _.isNumber(rsp.data)) done()
@@ -1058,7 +1045,7 @@ describe('Functional Check', () => {
       })
 
       mqnode.ping((err, rsp) => {
-        expect(err).to.be.a('null')
+        assert.ifError(err)
         mqnode._connected = true
         pubStub.restore()
         if (rsp.status === 408) done()
