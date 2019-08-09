@@ -1,6 +1,6 @@
 {
   "name": "mqtt-node",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Client machine node for the lightweight MQTT machine network (LWMQN)",
   "main": "index.js",
   "scripts": {
