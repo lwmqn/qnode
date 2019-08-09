@@ -159,7 +159,7 @@ describe('msg_handlers -> ', function () {
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
     qn._subics = { announce: `announce` }
-    qn._tobjs = { 'announce': 1 }
+    qn._tobjs = { announce: 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `announce`)
     assert.strictEqual(resp, undefined)
@@ -177,7 +177,7 @@ describe('msg_handlers -> ', function () {
     qn._lifeUpdate = (status) => {}
     qn.respond = (status) => {}
     qn._subics = { announce: `announce` }
-    qn._tobjs = { 'announce': 1 }
+    qn._tobjs = { announce: 1 }
 
     const resp = msgHandlers._reqHdlr(qn, `announce`)
     assert.strictEqual(resp, undefined)

@@ -23,17 +23,17 @@
   "dependencies": {
     "busyman": "^0.3.0",
     "debug": "^4.1.1",
-    "lwmqn-util": "^0.5.1",
+    "lwmqn-util": "^0.5.3",
     "mqtt": "^3.0.0",
     "network": "^0.4.1"
   },
   "devDependencies": {
-    "coveralls": "^3.0.4",
-    "mocha": "^6.1.4",
+    "coveralls": "^3.0.6",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "rewire": "^4.0.1",
-    "sinon": "^7.3.2",
-    "smartobject": "^1.5.0",
+    "sinon": "^7.4.1",
+    "smartobject": "^1.5.2",
     "snazzy": "^8.0.0",
     "standard": "^13.0.1"
   }
