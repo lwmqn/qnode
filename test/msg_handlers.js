@@ -39,7 +39,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { register: `register/response/client2` }
+    qn._subics = { register: 'register/response/client2' }
     qn._tobjs = { 'register:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `register/response/${qn.clientId}`)
@@ -56,7 +56,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { deregister: `deregister/response/client2` }
+    qn._subics = { deregister: 'deregister/response/client2' }
     qn._tobjs = { 'deregister:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `deregister/response/${qn.clientId}`)
@@ -73,7 +73,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { schedule: `schedule/response/client2` }
+    qn._subics = { schedule: 'schedule/response/client2' }
     qn._tobjs = { 'schedule:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `schedule/response/${qn.clientId}`)
@@ -90,7 +90,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { notify: `notify/response/client2` }
+    qn._subics = { notify: 'notify/response/client2' }
     qn._tobjs = { 'notify:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `notify/response/${qn.clientId}`)
@@ -107,7 +107,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { update: `update/response/client2` }
+    qn._subics = { update: 'update/response/client2' }
     qn._tobjs = { 'update:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `update/response/${qn.clientId}`)
@@ -124,7 +124,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { ping: `ping/response/client2` }
+    qn._subics = { ping: 'ping/response/client2' }
     qn._tobjs = { 'ping:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `ping/response/${qn.clientId}`)
@@ -141,7 +141,7 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { request: `request/response/client2` }
+    qn._subics = { request: 'request/response/client2' }
     qn._tobjs = { 'request:rsp:1': 1 }
 
     const resp = msgHandlers._rawHdlr(qn, `request/response/${qn.clientId}`)
@@ -158,16 +158,16 @@ describe('msg_handlers -> ', function () {
     const qn = new Mqnode('client2', so)
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
-    qn._subics = { announce: `announce` }
+    qn._subics = { announce: 'announce' }
     qn._tobjs = { announce: 1 }
 
-    const resp = msgHandlers._rawHdlr(qn, `announce`)
+    const resp = msgHandlers._rawHdlr(qn, 'announce')
     assert.strictEqual(resp, undefined)
 
     qn.on('request:rsp:1', (msg, jmsg) => {
       assert.deepStrictEqual(msg, null)
       assert.deepStrictEqual(jmsg, { transId: '1', status: 200 })
-      assert.deepStrictEqual(qn._tobjs['announce'], undefined)
+      assert.deepStrictEqual(qn._tobjs.announce, undefined)
     })
   })
 
@@ -176,16 +176,16 @@ describe('msg_handlers -> ', function () {
     qn.decrypt = (msg, cb) => cb(null, Buffer.from('{"transId": "1", "status": 200}'))
     qn._lifeUpdate = (status) => {}
     qn.respond = (status) => {}
-    qn._subics = { announce: `announce` }
+    qn._subics = { announce: 'announce' }
     qn._tobjs = { announce: 1 }
 
-    const resp = msgHandlers._reqHdlr(qn, `announce`)
+    const resp = msgHandlers._reqHdlr(qn, 'announce')
     assert.strictEqual(resp, undefined)
 
     qn.on('request:rsp:1', (msg, jmsg) => {
       assert.deepStrictEqual(msg, null)
       assert.deepStrictEqual(jmsg, { transId: '1', status: 200 })
-      assert.deepStrictEqual(qn._tobjs['announce'], undefined)
+      assert.deepStrictEqual(qn._tobjs.announce, undefined)
     })
   })
 
