@@ -28,12 +28,12 @@
     "network": "^0.4.1"
   },
   "devDependencies": {
-    "coveralls": "^3.0.6",
-    "mocha": "^6.2.0",
+    "coveralls": "^3.0.9",
+    "mocha": "^6.2.2",
     "nyc": "^14.1.1",
     "rewire": "^4.0.1",
-    "sinon": "^7.4.1",
-    "smartobject": "^1.5.2",
+    "sinon": "^7.5.0",
+    "smartobject": "^1.5.3",
     "snazzy": "^8.0.0",
     "standard": "^14.0.0"
   }
