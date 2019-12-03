@@ -216,16 +216,16 @@ Publish a checkout message to inform the Server that this qnode is going to slee
 
 ```js
 qnode.on('logout', function () {
-    console.log('qnode has logged out from the network.');
-});
+    console.log('qnode has logged out from the network.')
+})
 
 qnode.checkout(function (err, rsp) {
-    console.log(rsp);  // { status: 200 }
+    console.log(rsp)  // { status: 200 }
 
     if (rsp.status === 200) {
-        console.log('qnode has checked out from the network.');
+        console.log('qnode has checked out from the network.')
 
-        qnode.close();  // close the connection.
+        qnode.close()  // close the connection.
                         // The Server will take this qnode as a sleeping Client
                         // but not an offline one.
     }
@@ -256,21 +256,21 @@ Publish a checkin message to inform the Server that this qnode is up from sleep.
 
 ```js
 qnode.on('login', function () {
-    console.log('qnode has logged in the network.');
-});
+    console.log('qnode has logged in the network.')
+})
 
 if (qnode.isConnected()) {
     qnode.checkin(function (err, rsp) {
-        console.log(rsp);  // { status: 200 }
-    });
+        console.log(rsp)  // { status: 200 }
+    })
 } else {
     qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
         if (!err && rsp.status === 200) {
             qnode.checkin(function (err, rsp) {
-                console.log(rsp);  // { status: 200 }
-            });
+                console.log(rsp)  // { status: 200 }
+            })
         }
-    });
+    })
 }
 ```
 
@@ -308,7 +308,7 @@ qnode.notify({
     rid: 'sensorValue',
     data: 32
 }, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
+    console.log(rsp)   // { status: 204 }
 });
 
 // pub an Object Instance
@@ -320,7 +320,7 @@ qnode.notify({
         units: 'percent'
     }
 }, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
+    console.log(rsp)   // { status: 204 }
 });
 
 // pub something that the Server cannot recognize
@@ -330,13 +330,13 @@ qnode.notify({
     rid: 'bar',
     data: 200
 }, function (err, rsp) {
-    console.log(rsp);   // { status: 404 }, 404 NotFound
+    console.log(rsp)   // { status: 404 }, 404 NotFound
 });
 
 // pub something with invalid format
 qnode.notify('Hello World', function (err, rsp) {
-    console.log(rsp);   // { status: 400 }, 400 BadRequest
-});
+    console.log(rsp)   // { status: 400 }, 400 BadRequest
+})
 ```
 
 *************************************************
@@ -360,8 +360,8 @@ Ping the Server.
 
 ```js
 qnode.ping(function (err, rsp) {
-    console.log(rsp);   // { status: 200, data: 16 }, round-trip time is 16 ms
-});
+    console.log(rsp)   // { status: 200, data: 16 }, round-trip time is 16 ms
+})
 ```
 
 *************************************************

@@ -28,10 +28,10 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
 ```js
 qnode.publish('foo/bar/greet', 'Hello World!', function (err, encMsg) {
     if (err)
-        console.log(err);
+        console.log(err)
     else
-        console.log(encMsg);    // 'Hello World!' if you don't implement the encryption
-});
+        console.log(encMsg)   // 'Hello World!' if you don't implement the encryption
+})
 ```
 
 *************************************************
@@ -55,8 +55,8 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registere
 
 ```js
 qnode.subscribe('foo/bar/score', function (err, granted) {
-    console.log(granted);   // [ { topic: 'foo/bar/score', qos: 0 } ]
-});
+    console.log(granted)   // [ { topic: 'foo/bar/score', qos: 0 } ]
+})
 ```
 
 *************************************************
@@ -80,8 +80,8 @@ If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscripti
 ```js
 qnode.unsubscribe('foo/bar/score', function (err) {
     if (err)
-        console.log(err);
-});
+        console.log(err)
+})
 ```
 
 ********************************************

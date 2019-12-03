@@ -3,13 +3,13 @@
 <div align="center">
 
 **mqtt-node** is a client machine node for the lightweight MQTT machine network (LWMQN)
-  
+
 [![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-node.svg?style=flat-square)](https://greenkeeper.io/)
 [![NPM version](https://img.shields.io/npm/v/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
 [![NPM downloads](https://img.shields.io/npm/dm/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
 [![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/mqtt-node)
 [![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-node/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/mqtt-node?branch=master)
-[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby) 
+[![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 ![pr-welcoming-image](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
 
@@ -19,10 +19,10 @@
 
 ## What is LWMQN
 
-Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.  
+Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
 
 ### Server-side and Client-side Libraries:
-   - LWMQN project provides you with this machine-side **mqtt-node** library and a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library to build your machine network with JavaScript and node.js easily. 
+   - LWMQN project provides you with this machine-side **mqtt-node** library and a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library to build your machine network with JavaScript and node.js easily.
 
 * Server-side library: [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd)
 * Client-side library: **mqtt-node** (this module)
@@ -37,12 +37,12 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 ### Acronyms and Abbreviations
 
-* **Server**: LWMQN server  
-* **Client** or **Client Device**: LWMQN client, which is a machine node in the network  
-* **MqttNode**: Class exposed by `require('mqtt-node')`  
-* **SmartObject**: Class exposed by `require('smartobject')`  
-* **qnode**: Instance of MqttNode class  
-* **so**: Instance of SmartObject class  
+* **Server**: LWMQN server
+* **Client** or **Client Device**: LWMQN client, which is a machine node in the network
+* **MqttNode**: Class exposed by `require('mqtt-node')`
+* **SmartObject**: Class exposed by `require('smartobject')`
+* **qnode**: Instance of MqttNode class
+* **so**: Instance of SmartObject class
 
 -------
 

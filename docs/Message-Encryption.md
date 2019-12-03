@@ -36,27 +36,27 @@ Method of decryption. Overridable.
 qnode.encrypt = function (msg, callback) {
     var msgBuf = new Buffer(msg),
         cipher = crypto.createCipher('aes128', 'mysecrete'),
-        encrypted = cipher.update(msgBuf, 'binary', 'base64');
+        encrypted = cipher.update(msgBuf, 'binary', 'base64')
     try {
-        encrypted += cipher.final('base64');
-        callback(null, encrypted);
+        encrypted += cipher.final('base64')
+        callback(null, encrypted)
     } catch (err) {
-        callback(err);
+        callback(err)
     }
-};
+}
 
 qnode.decrypt = function (msg, callback) {
-    msg = msg.toString();
+    msg = msg.toString()
     var decipher = crypto.createDecipher('aes128', 'mypassword'),
-        decrypted = decipher.update(msg, 'base64', 'utf8');
+        decrypted = decipher.update(msg, 'base64', 'utf8')
 
     try {
-        decrypted += decipher.final('utf8');
-        callback(null, decrypted);
+        decrypted += decipher.final('utf8')
+        callback(null, decrypted)
     } catch (e) {
         // log 'decrytion fails'
-        console.log('decrytion fails.');
-        callback(e);
+        console.log('decrytion fails.')
+        callback(e)
     }
 };
 

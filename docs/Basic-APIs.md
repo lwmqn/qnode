@@ -33,15 +33,15 @@ var MqttNode = require('mqtt-node');
 var qnode = new MqttNode('my_foo_client_id', {
     lifetime: 21600,
     version: '0.0.2'
-});
+})
 
 qnode.on('ready', function () {
-    console.log(qnode.clientId);    // 'my_foo_client_id'
-    console.log(qnode.lifetime);    // 21600
-    console.log(qnode.ip);          // '192.168.0.99'
-    console.log(qnode.mac);         // '00:0c:29:3e:1b:d2'
-    console.log(qnode.version);     // '0.0.2'
-});
+    console.log(qnode.clientId)    // 'my_foo_client_id'
+    console.log(qnode.lifetime)    // 21600
+    console.log(qnode.ip)          // '192.168.0.99'
+    console.log(qnode.mac)         // '00:0c:29:3e:1b:d2'
+    console.log(qnode.version)     // '0.0.2'
+})
 
 // Do not change the device attributes with direct assignments, i.e., qnode.lifetime = 2000.
 
@@ -65,16 +65,16 @@ Get the smart object used on this qnode. You can access its Resources with [read
 **Examples:**
 
 ```js
-var so = qnode.getSmartObject();
+var so = qnode.getSmartObject()
 so.read('humidity', 1, 'sensorValue', function (err, data) {
     if (!err)
-        console.log(data);  // 16
-});
+        console.log(data)  // 16
+})
 
 so.write('humidity', 0, 'sensorValue', 15.4, function (err, data) {
     if (!err)
-        console.log(data);  // 15.4
-});
+        console.log(data)  // 15.4
+})
 ```
 
 *************************************************
@@ -93,7 +93,7 @@ Checks if qnode is connected to a Server.
 **Examples:**
 
 ```js
-qnode.isConnected();    // false
+qnode.isConnected()    // false
 ```
 
 *************************************************
