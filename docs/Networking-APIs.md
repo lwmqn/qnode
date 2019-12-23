@@ -178,7 +178,7 @@ Set device attributes of the qnode, and qnode will automatically check what attr
 **Examples:**
 
 ```js
-// this will set the ip on qnode and mqtt-node will publish the update of ip to the Server
+// this will set the ip on qnode and @lwmqn/qnode will publish the update of ip to the Server
 qnode.update({
     ip: '192.168.0.211'
 }, function (err, rsp) {
@@ -278,7 +278,7 @@ if (qnode.isConnected()) {
 ### .notify(note, callback)
 Publish a notification to the Server. The message `note` should be a well-formatted data object.
 
-* Notice that **mqtt-node will automatically report notifications** to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.
+* Notice that **@lwmqn/qnode will automatically report notifications** to the Server if the Client is **observed** by the Server. Therefore, use this API when you do have to notify something to the Server aggressively in your application.
 * If you like to publish a Resource, `note` should be an object with fields of `oid`, `iid`, `rid` and `data`, where `data` is the Resource value.
 * If you like to publish an Object Instance, `note` should be an object with fields of `oid`, `iid` and `data` fields, where `data` is the Object Instance containing all its Resources.
 

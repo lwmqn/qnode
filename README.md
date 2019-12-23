@@ -2,13 +2,12 @@
 
 <div align="center">
 
-**mqtt-node** is a client machine node for the lightweight MQTT machine network (LWMQN)
+**@lwmqn/qnode** is a client machine node for the lightweight MQTT machine network (LWMQN)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/lwmqn/mqtt-node.svg?style=flat-square)](https://greenkeeper.io/)
-[![NPM version](https://img.shields.io/npm/v/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
-[![NPM downloads](https://img.shields.io/npm/dm/mqtt-node.svg?style=flat-square)](https://www.npmjs.com/package/mqtt-node)
-[![Travis branch](https://img.shields.io/travis/lwmqn/mqtt-node/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/mqtt-node)
-[![Coverage Status](https://coveralls.io/repos/github/lwmqn/mqtt-node/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/mqtt-node?branch=master)
+[![NPM version](https://img.shields.io/npm/v/@lwmqn/qnode.svg?style=flat-square)](https://www.npmjs.com/package/@lwmqn/qnode)
+[![NPM downloads](https://img.shields.io/npm/dm/@lwmqn/qnode.svg?style=flat-square)](https://www.npmjs.com/package/@lwmqn/qnode)
+[![Travis branch](https://img.shields.io/travis/lwmqn/@lwmqn/qnode/master.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/lwmqn/@lwmqn/qnode)
+[![Coverage Status](https://coveralls.io/repos/github/lwmqn/@lwmqn/qnode/badge.svg?branch=master&style=flat-square)](https://coveralls.io/github/lwmqn/@lwmqn/qnode?branch=master)
 [![Gitter](https://img.shields.io/gitter/room/lwmqn/Lobby.svg?style=flat-square)](https://gitter.im/lwmqn/Lobby)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](http://standardjs.com/)
 ![pr-welcoming-image](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
@@ -19,14 +18,14 @@
 
 ## What is LWMQN
 
-Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LWM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
+Lightweight Message Queuing Network ([**LwMQN**](http://lwmqn.github.io)) is an open source project that follows part of [**OMA LwM2M v1.0**](http://technical.openmobilealliance.org/Technical/technical-information/release-program/current-releases/oma-lightweightm2m-v1-0) specification to meet the minimum requirements of machine network management.
 
 ### Server-side and Client-side Libraries:
-   - LWMQN project provides you with this machine-side **mqtt-node** library and a server-side [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd) library to build your machine network with JavaScript and node.js easily.
+   - LwMQN project provides you with this machine-side **@lwmqn/qnode** library and a server-side [**@lwmqn/shepherd**](https://github.com/lwmqn/shepherd) library to build your machine network with JavaScript and node.js easily.
 
-* Server-side library: [**mqtt-shepherd**](https://github.com/lwmqn/mqtt-shepherd)
-* Client-side library: **mqtt-node** (this module)
-* [**A simple demo webapp**](https://github.com/lwmqn/lwmqn-demo)
+* Server-side library: [**@lwmqn/shepherd**](https://github.com/lwmqn/shepherd)
+* Client-side library: **@lwmqn/qnode** (this module)
+* [**A simple demo webapp**](https://github.com/lwmqn/demo)
 
 ### Features
 
@@ -39,9 +38,9 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 
 * **Server**: LWMQN server
 * **Client** or **Client Device**: LWMQN client, which is a machine node in the network
-* **MqttNode**: Class exposed by `require('mqtt-node')`
-* **SmartObject**: Class exposed by `require('smartobject')`
-* **qnode**: Instance of MqttNode class
+* **Qnode**: Class exposed by `require('@lwmqn/qnode')`
+* **SmartObject**: Class exposed by `require('@lwmqn/smartobject')`
+* **qnode**: Instance of Qnode class
 * **so**: Instance of SmartObject class
 
 -------
@@ -51,8 +50,8 @@ Lightweight MQTT machine network ([**LWMQN**](http://lwmqn.github.io)) is an ope
 Currently [Node.js 8.x LTS](https://nodejs.org/en/about/releases/) or higher is required.
 
 ```bash
-$ npm install mqtt-node
-$ npm install smartobject
+$ npm install @lwmqn/qnode
+$ npm install @lwmqn/smartobject
 ```
 
 -------
@@ -60,11 +59,11 @@ $ npm install smartobject
 ## Basic Usage
 
 
-Here is a quick example, with two humidity sensors and one custom object, which shows how to use **mqtt-node** and **smartobject** on your client machine.
+Here is a quick example, with two humidity sensors and one custom object, which shows how to use **@lwmqn/qnode** and **smartobject** on your client machine.
 
 ```js
-var MqttNode = require('mqtt-node')
-var SmartObject = require('smartobject')
+var Qnode = require('@lwmqn/qnode')
+var SmartObject = require('@lwmqn/smartobject')
 
 var so = new SmartObject()
 
@@ -87,7 +86,7 @@ so.init('myObject', 0, {    // oid = 'myObject', iid = 0
 })
 
 // Create a qnode with a client id and your smart object. And attach your 'ready' and 'registered' event listeners
-var qnode = new MqttNode('my_foo_client_id', so);
+var qnode = new Qnode('my_foo_client_id', so);
 
 qnode.on('ready', function () {
     // The ready event fires when the device is ready, but not yet remotely register to a Server.
@@ -111,7 +110,7 @@ qnode.on('login', function () {
 qnode.connect('mqtt://192.168.0.2');
 ```
 
-The following example shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/lwmqn/mqtt-shepherd/wiki#Major) document for details):
+The following example shows how to operate upon this qnode **at server-side** (please go to [mqtt-shepherd](https://github.com/lwmqn/shepherd/wiki#Major) document for details):
 
 ```js
 var qnode = qserver.find('my_foo_client_id');   // find the registered device by its client id
@@ -130,17 +129,17 @@ if (qnode) {
 -------
 
 ## Documentation
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Basic-APIs.md"><code><b>Basic APIs</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Networking-APIs.md"><code><b>Networking APIs</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Generic-MQTT-Interfaces.md"><code><b>Generic MQTT Interfaces</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Events.md"><code><b>Events</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Message-Encryption.md"><code><b>Message Encryption</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Identifying-Mode.md"><code><b>Identifying Mode</b></code></a>
-* <a href="https://github.com/lwmqn/mqtt-node/blob/master/docs/Debug-Messages.md"><code><b>Debug messages</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Basic-APIs.md"><code><b>Basic APIs</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Networking-APIs.md"><code><b>Networking APIs</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Generic-MQTT-Interfaces.md"><code><b>Generic MQTT Interfaces</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Events.md"><code><b>Events</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Message-Encryption.md"><code><b>Message Encryption</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Identifying-Mode.md"><code><b>Identifying Mode</b></code></a>
+* <a href="https://github.com/lwmqn/qnode/blob/master/docs/Debug-Messages.md"><code><b>Debug messages</b></code></a>
 
 -------
 
 ## License
 
-Licensed under [MIT](https://github.com/lwmqn/mqtt-node/blob/master/LICENSE).
+Licensed under [MIT](https://github.com/lwmqn/qnode/blob/master/LICENSE).
 

@@ -2,7 +2,7 @@
 const _ = require('busyman')
 const sinon = require('sinon')
 const assert = require('assert')
-const SmartObject = require('smartobject')
+const SmartObject = require('@lwmqn/smartobject')
 const Mqnode = require('../index.js')
 
 const so = new SmartObject()

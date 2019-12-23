@@ -1,6 +1,6 @@
 ## Basic APIs
 
-MqttNode is being exposed by `require('mqtt-node')`
+MqttNode is being exposed by `require('@lwmqn/qnode')`
 
 * This class is for you to create a LWMQN Client on a machine that can run node.js, such as [Linkit Smart 7688](http://home.labs.mediatek.com/hello7688/), [Raspberry Pi](https://www.raspberrypi.org/), [Beaglebone Black](http://beagleboard.org/BLACK), [Edison](http://www.intel.com/content/www/us/en/do-it-yourself/edison.html), and many more.
 * It uses [SmartObject](https://github.com/PeterEB/smartobject) class as its fundamental of resource organization on devices.
@@ -20,7 +20,7 @@ Create an instance of `MqttNode` class.
     |----------|--------|-----------|----------------------------------------------------------------------------------------|
     | lifetime | Number | optional  | Default is 86400 (unit: seconds).                                                      |
     | version  | String | optional  | Minimum supported LWMQN version (this is not really functional at this moment).        |
-    | ip       | String | optional  | Device ip address. By default, mqtt-node itself will query this parameter from system. |
+    | ip       | String | optional  | Device ip address. By default, @lwmqn/qnode itself will query this parameter from system. |
 
 **Returns:**
 
@@ -29,8 +29,8 @@ Create an instance of `MqttNode` class.
 **Examples:**
 
 ```js
-var MqttNode = require('mqtt-node');
-var qnode = new MqttNode('my_foo_client_id', {
+var Qnode = require('@lwmqn/qnode');
+var qnode = new Qnode('my_foo_client_id', {
     lifetime: 21600,
     version: '0.0.2'
 })

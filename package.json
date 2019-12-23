@@ -1,7 +1,7 @@
 {
-  "name": "mqtt-node",
+  "name": "@lwmqn/qnode",
   "version": "0.9.1",
-  "description": "Client machine node for the lightweight MQTT machine network (LWMQN)",
+  "description": "Client node of LwM2M-like Lightweight Message Queuing Network (LwMQN).",
   "main": "index.js",
   "scripts": {
     "lint": "standard --env mocha | snazzy",
@@ -12,28 +12,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lwmqn/mqtt-node.git"
+    "url": "https://github.com/lwmqn/qnode.git"
   },
-  "author": "Simen Li",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lwmqn/mqtt-node/issues"
+    "url": "https://github.com/lwmqn/qnode/issues"
   },
-  "homepage": "https://github.com/lwmqn/mqtt-node",
+  "homepage": "https://github.com/lwmqn/qnode",
   "dependencies": {
+    "@lwmqn/util": "^0.6.0",
     "busyman": "^0.3.0",
     "debug": "^4.1.1",
-    "lwmqn-util": "^0.5.3",
     "mqtt": "^3.0.0",
     "network": "^0.4.1"
   },
   "devDependencies": {
+    "@lwmqn/smartobject": "^1.6.0",
     "coveralls": "^3.0.9",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
     "rewire": "^4.0.1",
     "sinon": "^7.5.0",
-    "smartobject": "^1.5.3",
     "snazzy": "^8.0.0",
     "standard": "^14.0.0"
   }

@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 const assert = require('assert')
-const SmartObject = require('smartobject')
+const SmartObject = require('@lwmqn/smartobject')
 const rewire = require('rewire')
 const init = rewire('../lib/init.js')
 const EventEmitter = require('events')

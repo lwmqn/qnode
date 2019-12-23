@@ -1,2 +1,2 @@
 /* istanbul ignore file */
-module.exports = require('./lib/mqnode')
+module.exports = require('./lib/qnode')
