@@ -1,6 +1,6 @@
 {
   "name": "@lwmqn/qnode",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "Client node of LwM2M-like Lightweight Message Queuing Network (LwMQN).",
   "main": "index.js",
   "scripts": {
