@@ -75,7 +75,7 @@ Here is a quick example, with two humidity sensors and one custom object, which 
 const Qnode = require('@lwmqn/qnode')
 const SmartObject = require('@lwmqn/smartobject')
 
-var so = new SmartObject()
+const so = new SmartObject()
 
 // Humidity sensor - the first instance
 so.init('humidity', 0, { // oid = 'humidity', iid = 0

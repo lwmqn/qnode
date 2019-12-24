@@ -14,7 +14,7 @@ Method of identify. Overridable.
 ```js
 // In this example, assume that ledDrive is a handle to control the LED.
 qnode.identify = function (cb) {
-    ledDriver.blink('led1', 10)  // starts to blink a LED to tell people where it is
-    cb(null)
+  ledDriver.blink('led1', 10) // starts to blink a LED to tell people where it is
+  cb(null)
 }
 ```

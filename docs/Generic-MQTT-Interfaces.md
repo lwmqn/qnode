@@ -3,7 +3,7 @@
 ### .publish(topic, message[, options], callback)
 This is a generic method to publish a message to a topic.
 
-If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered Client to publish any message to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The publishment is not allowed at the Server if the Client was not successfully registered.
+If you are using **@lwmqn/shepherd** as the LwMQN Server, it accepts a registered Client to publish any message to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The publishment is not allowed at the Server if the Client was not successfully registered.
 
 **Arguments:**
 
@@ -27,10 +27,11 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts a registered 
 
 ```js
 qnode.publish('foo/bar/greet', 'Hello World!', function (err, encMsg) {
-    if (err)
-        console.log(err)
-    else
-        console.log(encMsg)   // 'Hello World!' if you don't implement the encryption
+  if (err) {
+    console.log(err)
+  } else {
+    console.log(encMsg) // 'Hello World!' if you don't implement the encryption
+  }
 })
 ```
 
@@ -39,7 +40,7 @@ qnode.publish('foo/bar/greet', 'Hello World!', function (err, encMsg) {
 ### .subscribe(topics[, options], callback)
 This is a generic method to subscribe to a topic or topics listed in an array.
 
-If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registered Client to subscribe to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The generic subscription is not allowed at the Server if the Client was not successfully registered.
+If you are using **mqtt-shepherd** as the LwMQN Server, it accepts the registered Client to subscribe to any topic (if authorized). In this case, the Server simply acts as an MQTT broker. The generic subscription is not allowed at the Server if the Client was not successfully registered.
 
 **Arguments:**
 
@@ -55,7 +56,7 @@ If you are using **mqtt-shepherd** as the LWMQN Server, it accepts the registere
 
 ```js
 qnode.subscribe('foo/bar/score', function (err, granted) {
-    console.log(granted)   // [ { topic: 'foo/bar/score', qos: 0 } ]
+  console.log(granted) // [ { topic: 'foo/bar/score', qos: 0 } ]
 })
 ```
 
@@ -64,7 +65,7 @@ qnode.subscribe('foo/bar/score', function (err, granted) {
 ### .unsubscribe(topics, callback)
 This is a generic method to unsubscribe from a topic or topics.
 
-If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscription is not allowed at the Server if the Client was not successfully registered.
+If you are using **@lwmqn/shepherd** as the LwMQN Server, the generic unsubscription is not allowed at the Server if the Client was not successfully registered.
 
 **Arguments:**
 
@@ -79,8 +80,7 @@ If you are using **mqtt-shepherd** as the LWMQN Server, the generic unsubscripti
 
 ```js
 qnode.unsubscribe('foo/bar/score', function (err) {
-    if (err)
-        console.log(err)
+  if (err) console.log(err)
 })
 ```
 

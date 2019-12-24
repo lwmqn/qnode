@@ -2,11 +2,11 @@
 
 *************************************************
 ### .connect(url[, opts][, callback])
-Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired at each success of connection.
+Connect and register to a LwMQN Server by the given `url`. When succeeds, qnode will fire a `'registered'` event and a `'login'` event at its first-time registration. If qnode has registered before, only the `'login'` event will be fired at each success of connection.
 
 **Arguments:**
 
-1. `url` (_String_): Url of LWMQN Server, e.g. `'mqtt://localhost'`, `'mqtt://192.168.0.100'`, `'mqtt://192.168.0.20:3000'`.
+1. `url` (_String_): Url of LwMQN Server, e.g. `'mqtt://localhost'`, `'mqtt://192.168.0.100'`, `'mqtt://192.168.0.20:3000'`.
 2. `opts` (_Object_): Optional. The connect options with possible properties given in the following table.
 
     | Property        | Type             | Default      | Description                                                     |
@@ -39,26 +39,24 @@ Connect and register to a LWMQN Server by the given `url`. When succeeds, qnode 
 
 ```js
 qnode.on('login', function () {
-    console.log('Connected to the Server.');
-});
+  console.log('Connected to the Server.')
+})
 
 // connect without an account
 qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
-    if (!err)
-        console.log(rsp);   // { status: 201 }
-});
+  if (!err) console.log(rsp) // { status: 201 }
+})
 ```
 
 * If an account is required
 
 ```js
 qnode.connect('mqtt://192.168.0.100', {
-    username: 'someone',
-    password: 'somepassword'
+  username: 'someone',
+  password: 'somepassword'
 }, function (err, rsp) {
-    if (!err)
-        console.log(rsp);   // { status: 201 }
-});
+  if (!err) console.log(rsp) // { status: 201 }
+})
 ```
 
 * Use the MQTT connection options other than defaults
@@ -66,9 +64,9 @@ qnode.connect('mqtt://192.168.0.100', {
 ```js
 // use the MQTT connection options other than defaults
 qnode.connect('mqtt://192.168.0.100', {
-    keepalive: 30,
-    reconnectPeriod: 5000
-});
+  keepalive: 30,
+  reconnectPeriod: 5000
+})
 ```
 
 *************************************************
@@ -87,10 +85,10 @@ Disconnect from the Server. qnode will also fire a `'logout'` event if it is dis
 
 ```js
 qnode.on('logout', function () {
-    console.log('Disconnected from the Server.');
-});
+  console.log('Disconnected from the Server.')
+})
 
-qnode.close();
+qnode.close()
 ```
 
 *************************************************
@@ -119,8 +117,9 @@ Publish a registering request to the Server. **Every time you invoke connect(), 
 
 ```js
 qnode.register(function (err, rsp) {
-    console.log(rsp);  // { status: 201 }
-});
+  console.log(err)
+  console.log(rsp) // { status: 201 }
+})
 ```
 
 *************************************************
@@ -146,12 +145,13 @@ Publish a deregistering request to the Server for the Client to leave the networ
 
 ```js
 qnode.on('deregistered', function () {
-    console.log('qnode has left from the network.');
-});
+  console.log('qnode has left from the network.')
+})
 
 qnode.deregister(function (err, rsp) {
-    console.log(rsp);  // { status: 202 }
-});
+  console.log(err)
+  console.log(rsp) // { status: 202 }
+})
 ```
 
 *************************************************
@@ -180,10 +180,11 @@ Set device attributes of the qnode, and qnode will automatically check what attr
 ```js
 // this will set the ip on qnode and @lwmqn/qnode will publish the update of ip to the Server
 qnode.update({
-    ip: '192.168.0.211'
+  ip: '192.168.0.211'
 }, function (err, rsp) {
-    console.log(rsp);   // { status: 204 }
-});
+  console.log(err)
+  console.log(rsp) // { status: 204 }
+})
 ```
 
 *************************************************
@@ -216,20 +217,20 @@ Publish a checkout message to inform the Server that this qnode is going to slee
 
 ```js
 qnode.on('logout', function () {
-    console.log('qnode has logged out from the network.')
+  console.log('qnode has logged out from the network.')
 })
 
 qnode.checkout(function (err, rsp) {
-    console.log(rsp)  // { status: 200 }
+  console.log(err)
+  console.log(rsp) // { status: 200 }
 
-    if (rsp.status === 200) {
-        console.log('qnode has checked out from the network.')
-
-        qnode.close()  // close the connection.
-                        // The Server will take this qnode as a sleeping Client
-                        // but not an offline one.
-    }
-});
+  if (rsp.status === 200) {
+    console.log('qnode has checked out from the network.')
+    qnode.close() // close the connection.
+                  // The Server will take this qnode as a sleeping Client
+                  // but not an offline one.
+  }
+})
 ```
 
 *************************************************
@@ -256,21 +257,24 @@ Publish a checkin message to inform the Server that this qnode is up from sleep.
 
 ```js
 qnode.on('login', function () {
-    console.log('qnode has logged in the network.')
+  console.log('qnode has logged in the network.')
 })
 
 if (qnode.isConnected()) {
-    qnode.checkin(function (err, rsp) {
-        console.log(rsp)  // { status: 200 }
-    })
+  qnode.checkin(function (err, rsp) {
+    console.log(err)
+    console.log(rsp) // { status: 200 }
+  })
 } else {
-    qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
-        if (!err && rsp.status === 200) {
-            qnode.checkin(function (err, rsp) {
-                console.log(rsp)  // { status: 200 }
-            })
-        }
-    })
+  qnode.connect('mqtt://192.168.0.100', function (err, rsp) {
+    console.log(err)
+    if (!err && rsp.status === 200) {
+      qnode.checkin(function (err, rsp) {
+        console.log(err)
+        console.log(rsp) // { status: 200 }
+      })
+    }
+  })
 }
 ```
 
@@ -303,39 +307,43 @@ Publish a notification to the Server. The message `note` should be a well-format
 ```js
 // pub a Resource
 qnode.notify({
-    oid: 'humidity',
-    iid: 0,
-    rid: 'sensorValue',
-    data: 32
+  oid: 'humidity',
+  iid: 0,
+  rid: 'sensorValue',
+  data: 32
 }, function (err, rsp) {
-    console.log(rsp)   // { status: 204 }
-});
+  console.log(err)
+  console.log(rsp) // { status: 204 }
+})
 
 // pub an Object Instance
 qnode.notify({
-    oid: 'humidity',
-    iid: 0,
-    data: {
-        sensorValue: 32,
-        units: 'percent'
-    }
+  oid: 'humidity',
+  iid: 0,
+  data: {
+    sensorValue: 32,
+    units: 'percent'
+  }
 }, function (err, rsp) {
-    console.log(rsp)   // { status: 204 }
-});
+  console.log(err)
+  console.log(rsp) // { status: 204 }
+})
 
 // pub something that the Server cannot recognize
 qnode.notify({
-    oid: 'foo',
-    iid: 0,
-    rid: 'bar',
-    data: 200
+  oid: 'foo',
+  iid: 0,
+  rid: 'bar',
+  data: 200
 }, function (err, rsp) {
-    console.log(rsp)   // { status: 404 }, 404 NotFound
-});
+  console.log(err)
+  console.log(rsp) // { status: 404 }, 404 NotFound
+})
 
 // pub something with invalid format
 qnode.notify('Hello World', function (err, rsp) {
-    console.log(rsp)   // { status: 400 }, 400 BadRequest
+  console.log(err)
+  console.log(rsp) // { status: 400 }, 400 BadRequest
 })
 ```
 
@@ -360,7 +368,8 @@ Ping the Server.
 
 ```js
 qnode.ping(function (err, rsp) {
-    console.log(rsp)   // { status: 200, data: 16 }, round-trip time is 16 ms
+  console.log(err)
+  console.log(rsp) // { status: 200, data: 16 }, round-trip time is 16 ms
 })
 ```
 

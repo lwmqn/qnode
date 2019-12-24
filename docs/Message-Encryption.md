@@ -34,30 +34,30 @@ Method of decryption. Overridable.
 // In this example, I simply encrypt the message with a constant password 'mysecrete'.
 
 qnode.encrypt = function (msg, callback) {
-    var msgBuf = new Buffer(msg),
-        cipher = crypto.createCipher('aes128', 'mysecrete'),
-        encrypted = cipher.update(msgBuf, 'binary', 'base64')
-    try {
-        encrypted += cipher.final('base64')
-        callback(null, encrypted)
-    } catch (err) {
-        callback(err)
-    }
+  const msgBuf = new Buffer(msg)
+  const cipher = crypto.createCipher('aes128', 'mysecrete')
+  let encrypted = cipher.update(msgBuf, 'binary', 'base64')
+
+  try {
+    encrypted += cipher.final('base64')
+    callback(null, encrypted)
+  } catch (err) {
+    callback(err)
+  }
 }
 
 qnode.decrypt = function (msg, callback) {
-    msg = msg.toString()
-    var decipher = crypto.createDecipher('aes128', 'mypassword'),
-        decrypted = decipher.update(msg, 'base64', 'utf8')
+  msg = msg.toString()
+  const decipher = crypto.createDecipher('aes128', 'mypassword')
+  let decrypted = decipher.update(msg, 'base64', 'utf8')
 
-    try {
-        decrypted += decipher.final('utf8')
-        callback(null, decrypted)
-    } catch (e) {
-        // log 'decrytion fails'
-        console.log('decrytion fails.')
-        callback(e)
-    }
-};
-
+  try {
+    decrypted += decipher.final('utf8')
+    callback(null, decrypted)
+  } catch (e) {
+    // log 'decrytion fails'
+    console.log('decrytion fails.')
+    callback(e)
+  }
+}
 ```

@@ -3,7 +3,7 @@
 
 #### Event: 'registered'
 Listener: `function () {}`
-Fires when qnode is at its first time of registering to the LWMQN Server successfully. If qnode has registered before, only the 'login' event will be fired at each success of registration.
+Fires when qnode is at its first time of registering to the LwMQN Server successfully. If qnode has registered before, only the 'login' event will be fired at each success of registration.
 
 ********************************************
 
