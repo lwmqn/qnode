@@ -24,7 +24,7 @@
     "busyman": "^0.3.0",
     "debug": "^4.1.1",
     "mqtt": "^3.0.0",
-    "network": "^0.4.1"
+    "network": "^0.5.0"
   },
   "devDependencies": {
     "@lwmqn/smartobject": "^1.6.0",
