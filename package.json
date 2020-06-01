@@ -30,7 +30,7 @@
     "@lwmqn/smartobject": "^1.6.0",
     "coveralls": "^3.0.9",
     "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
+    "nyc": "^15.1.0",
     "rewire": "^4.0.1",
     "sinon": "^7.5.0",
     "snazzy": "^8.0.0",
